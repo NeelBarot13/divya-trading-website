@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us | Divya Trading Co. - Ahmedabad, India{% endblock %}
+
+{% block content %}
+
+<!-- Header Banner -->
+<section style="background: var(--primary-navy); color: white; padding: 50px 0; text-align: center;">
+  <div class="container">
+    <span style="font-size: 0.82rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">GET IN TOUCH WITH OUR TEAM</span>
+    <h1 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; margin-top: 6px;">
+      Contact Divya Trading Co.
+    </h1>
+    <p style="font-size: 1rem; color: #CBD5E1; max-width: 650px; margin: 10px auto 0;">
+      Reach our engineers for immediate price quotes, custom repeat drawings, technical support, and worldwide export inquiries.
+    </p>
+  </div>
+</section>
+
+<!-- Contact Form & Info Grid -->
+<section style="padding: 60px 0 80px; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 40px; align-items: start;">
+      
+      <!-- Contact Information Card -->
+      <div>
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm);">
+          <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 20px;">
+            Factory & Sales Office
+          </h2>
+
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Address -->
+            <div style="display: flex; gap: 14px;">
+              <span style="font-size: 1.4rem; color: var(--dtc-blue);">📍</span>
+              <div>
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Address:</strong>
+                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+                  15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India.
+                </p>
+              </div>
+            </div>
+
+            <!-- Phone & WhatsApp -->
+            <div style="display: flex; gap: 14px;">
+              <span style="font-size: 1.4rem; color: #16a34a;">📞</span>
+              <div>
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Phone / WhatsApp:</strong>
+                <p style="font-size: 0.9rem; color: var(--text-main); font-weight: 600;">
+                  <a href="tel:+918320821579">+91 83208 21579</a><br>
+                  <a href="tel:+919426064807">+91 94260 64807</a>
+                </p>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div style="display: flex; gap: 14px;">
+              <span style="font-size: 1.4rem; color: var(--dtc-blue);">✉️</span>
+              <div>
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Email Inquiries:</strong>
+                <p style="font-size: 0.88rem; color: var(--text-main);">
+                  <a href="mailto:divya.trading06@gmail.com">divya.trading06@gmail.com</a><br>
+                  <a href="mailto:neelbarot585@gmail.com">neelbarot585@gmail.com</a>
+                </p>
+              </div>
+            </div>
+
+            <!-- Working Hours -->
+            <div style="display: flex; gap: 14px;">
+              <span style="font-size: 1.4rem; color: #f59e0b;">🕒</span>
+              <div>
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Working Hours:</strong>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">
+                  Monday – Saturday: 9:00 AM – 7:30 PM (IST)<br>
+                  24/7 WhatsApp Assistance for Global Clients
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direct WhatsApp Button -->
+          <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+            <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20I%20have%20an%20urgent%20spare%20parts%20inquiry." 
+               target="_blank" 
+               class="btn-submit-cart-inquiry" 
+               style="background: #25D366; text-decoration: none;">
+              <span>Chat with Us on WhatsApp 💬</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact / Inquiry Form -->
+      <div style="background: var(--bg-white); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-md);">
+        <h2 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
+          Send Technical Requirement / Inquiry
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 24px;">
+          Fill out the form below with your required parts and machine details. Our engineering team will respond promptly.
+        </p>
+
+        <form id="generalContactForm">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" id="contactName" class="form-control" placeholder="Your full name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Company / Mill Name</label>
+              <input type="text" id="contactCompany" class="form-control" placeholder="Textile Mill Name">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input type="email" id="contactEmail" class="form-control" placeholder="your@company.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone / WhatsApp *</label>
+              <input type="tel" id="contactPhone" class="form-control" placeholder="+91 ..." required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Machine Make & Model</label>
+              <input type="text" id="contactMachine" class="form-control" placeholder="e.g. Stork RD-4, Pegasus, Stovec">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Country / City</label>
+              <input type="text" id="contactCountry" class="form-control" value="India">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Spare Parts Required & Quantity *</label>
+            <textarea id="contactMessage" class="form-control" placeholder="List required part names, repeat sizes (64R/81.9R/etc.), quantities, or special specifications..." style="min-height: 110px;" required></textarea>
+          </div>
+
+          <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px;">
+            <span>Submit Requirement Now</span>
+            <span>➔</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('generalContactForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = 'Sending...';
+  submitBtn.disabled = true;
+
+  const payload = {
+    customer_name: document.getElementById('contactName').value,
+    company_name: document.getElementById('contactCompany').value,
+    email: document.getElementById('contactEmail').value,
+    phone: document.getElementById('contactPhone').value,
+    country: document.getElementById('contactCountry').value,
+    machine_model: document.getElementById('contactMachine').value,
+    message: document.getElementById('contactMessage').value,
+    product_name: 'Direct Requirement Inquiry'
+  };
+
+  try {
+    const res = await fetch('/api/inquire', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      e.target.reset();
+    } else {
+      showToast(data.message || 'Error sending message.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error. Please try again or WhatsApp us directly.', 'error');
+  } finally {
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ site_settings.company_name or 'Divya Trading Co.' }} | Manufacturer & Exporter of Rotary Printing Machine Spares{% endblock %}
+
+{% block content %}
+
+<!-- ==========================================================================
+     1. HERO SECTION (Faithful to Reference Mockup & Fully Configurable via Admin)
+     ========================================================================== -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-grid">
+      <!-- Left Hero Text -->
+      <div class="hero-content">
+        <h1 class="hero-title">
+          {{ site_settings.hero_title|safe if site_settings.hero_title else 'PRECISION PARTS.<br>PERFORMANCE ASSURED.' }}
+        </h1>
+        <p class="hero-subtitle">
+          {{ site_settings.hero_subtitle or 'Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines' }}
+        </p>
+
+        <!-- Brand Compatibility Pills (Toggleable & Configurable from Admin) -->
+        {% if site_settings.show_hero_brands != 'false' and brand_pills %}
+        <div class="brand-pills-container">
+          {% for b in brand_pills %}
+          <span class="brand-pill">{{ b }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Trust Badges -->
+        <div class="hero-trust-badges">
+          <div class="trust-badge-item">
+            <div class="trust-badge-icon">⚙️</div>
+            <div class="trust-badge-text">
+              <h4>{{ site_settings.trust_badge_1_title or 'SINCE 1997' }}</h4>
+              <p>{{ site_settings.trust_badge_1_desc or 'Over Two Decades of Excellence' }}</p>
+            </div>
+          </div>
+          <div class="trust-badge-item">
+            <div class="trust-badge-icon">🌐</div>
+            <div class="trust-badge-text">
+              <h4>{{ site_settings.trust_badge_2_title or 'GLOBAL QUALITY' }}</h4>
+              <p>{{ site_settings.trust_badge_2_desc or 'Trusted by Clients Worldwide' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Hero Visual Showcase (Configurable from Admin) -->
+      <div class="hero-visual">
+        <div class="hero-img-card">
+          <img src="{{ site_settings.hero_image or url_for('static', filename='images/hero_parts.jpg') }}" alt="Divya Trading Co Precision Spare Parts Showcase">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     2. OUR PRODUCT RANGE (Category Cards from Reference)
+     ========================================================================== -->
+{% if site_settings.show_product_range != 'false' %}
+<section class="product-range-section">
+  <div class="container">
+    <div class="section-divider-title">
+      <h2>{{ site_settings.product_range_title or 'OUR PRODUCT RANGE' }}</h2>
+    </div>
+
+    <div class="categories-grid">
+      {% for cat in categories[:6] %}
+      <div class="category-card">
+        <div class="cat-card-img-wrapper">
+          <img src="{{ cat.image }}" alt="{{ cat.name }}">
+        </div>
+        <h3 class="cat-card-title">{{ cat.name }}</h3>
+        <p class="cat-card-desc">{{ cat.description }}</p>
+        <a href="{{ url_for('products', category=cat.slug) }}" class="btn-view-products">VIEW PRODUCTS</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ==========================================================================
+     3. QUALITY YOU CAN TRUST (Banner from Reference & Managed from Admin)
+     ========================================================================== -->
+{% if site_settings.show_quality_banner != 'false' %}
+<section class="quality-banner-section">
+  <div class="container">
+    <div class="quality-banner-wrapper">
+      <div class="quality-banner-content">
+        <div class="quality-banner-icon">⚙️</div>
+        <h2 class="quality-banner-title">{{ site_settings.quality_banner_title or 'QUALITY YOU CAN TRUST' }}</h2>
+        <p class="quality-banner-text">
+          {{ site_settings.quality_banner_text or 'With over two decades of experience, we are a leader in quality products. Our reputation is based on performance, reliability and customer satisfaction across textile printing mills worldwide.' }}
+        </p>
+        <div style="margin-top: 24px;">
+          <a href="{{ url_for('products') }}" class="btn-enquire-white" style="font-size: 0.82rem; padding: 9px 20px;">
+            Explore Complete Range ➔
+          </a>
+        </div>
+      </div>
+      <div class="quality-banner-img">
+        <img src="{{ site_settings.quality_banner_image or url_for('static', filename='images/textile_banner.jpg') }}" alt="Textile Rotary Screen Printing Machine">
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ==========================================================================
+     4. WHY CHOOSE DIVYA TRADING CO. (6 Pillars from Reference)
+     ========================================================================== -->
+{% if site_settings.show_why_choose != 'false' %}
+<section class="why-choose-section">
+  <div class="container">
+    <div class="section-divider-title">
+      <h2>{{ site_settings.why_choose_title or 'WHY CHOOSE DIVYA TRADING CO.' }}</h2>
+    </div>
+
+    <div class="pillars-grid">
+      <!-- 1. Experience -->
+      <div class="pillar-card">
+        <div class="pillar-icon-box">⭐</div>
+        <h3 class="pillar-title">{{ site_settings.pillar_1_title or '27+ YEARS OF EXPERIENCE' }}</h3>
+        <p class="pillar-desc">{{ site_settings.pillar_1_desc or 'Serving the textile industry since 1997 with excellence and reliability.' }}</p>
+      </div>
+
+      <!-- 2. Premium Quality -->
+      <div class="pillar-card">
+        <div class="pillar-icon-box">🛡️</div>
+        <h3 class="pillar-title">{{ site_settings.pillar_2_title or 'PREMIUM QUALITY' }}</h3>
+        <p class="pillar-desc">{{ site_settings.pillar_2_desc or 'High precision CNC machined parts for reliable machine performance.' }}</p>
+      </div>
+
+      <!-- 3. Wide Range -->
+      <div class="pillar-card">
+        <div class="pillar-icon-box">🏭</div>
+        <h3 class="pillar-title">{{ site_settings.pillar_3_title or 'WIDE RANGE OF PRODUCTS' }}</h3>
+        <p class="pillar-desc">{{ site_settings.pillar_3_desc or 'Complete range of textile spare parts and consumables under one roof.' }}</p>
+      </div>
+
+      <!-- 4. Global Reach -->
+      <div class="pillar-card">
+        <div class="pillar-icon-box">🌐</div>
+        <h3 class="pillar-title">{{ site_settings.pillar_4_title or 'GLOBAL REACH' }}</h3>
+        <p class="pillar-desc">{{ site_settings.pillar_4_desc or 'Exporting to clients across 30+ countries with global trust.' }}</p>
+      </div>
+
+      <!-- 5. Expert Support -->
+      <div class="pillar-card">
+        <div class="pillar-icon-box">🎧</div>
+        <h3 class="pillar-title">{{ site_settings.pillar_5_title or 'EXPERT SUPPORT' }}</h3>
+        <p class="pillar-desc">{{ site_settings.pillar_5_desc or 'Dedicated engineering support for all your technical requirements.' }}</p>
+      </div>
+
+      <!-- 6. On Time Delivery -->
+      <div class="pillar-card">
+        <div class="pillar-icon-box">🚚</div>
+        <h3 class="pillar-title">{{ site_settings.pillar_6_title or 'ON TIME DELIVERY' }}</h3>
+        <p class="pillar-desc">{{ site_settings.pillar_6_desc or 'Timely worldwide delivery with safe and secure export packaging.' }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ==========================================================================
+     5. FEATURED PRECISION PRODUCTS (Limited to exactly 4 items on Homepage)
+     ========================================================================== -->
+{% if site_settings.show_featured_products != 'false' and featured_products %}
+<section style="padding: 60px 0; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">
+          {{ site_settings.featured_section_subtitle or 'Precision Catalog' }}
+        </span>
+        <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy);">
+          {{ site_settings.featured_section_title or 'Featured Spare Parts' }}
+        </h2>
+      </div>
+      <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.85rem; padding: 9px 18px;">
+        View Complete Catalog ➔
+      </a>
+    </div>
+
+    <!-- 4-Product Grid -->
+    <div class="featured-4-grid">
+      {% for prod in featured_products %}
+      <div class="product-card">
+        {% if prod.is_featured %}
+        <span class="product-badge-featured">Featured</span>
+        {% endif %}
+
+        {% if prod.stock_status == 'out_of_stock' %}
+        <span class="product-badge-stock out_of_stock">Out of Stock</span>
+        {% elif prod.stock_status == 'made_to_order' %}
+        <span class="product-badge-stock made_to_order">Made to Order</span>
+        {% endif %}
+        
+        <a href="{{ url_for('product_detail', slug=prod.slug) }}" class="product-card-img-wrap">
+          <img src="{{ prod.image_url }}" alt="{{ prod.name }}">
+        </a>
+        
+        <div class="product-card-body">
+          <div class="product-meta-row">
+            <span class="product-part-no">{{ prod.part_number }}</span>
+            <span class="product-make-badge">{{ prod.machine_make.name if prod.machine_make else 'Universal' }}</span>
+          </div>
+          
+          <h3 class="product-title">
+            <a href="{{ url_for('product_detail', slug=prod.slug) }}">{{ prod.name }}</a>
+          </h3>
+          
+          <p class="product-specs-summary">
+            {% if prod.repeat_sizes %}<strong>Repeat:</strong> {{ prod.repeat_sizes }}<br>{% endif %}
+            {{ prod.short_description or (prod.description[:85] + '...') }}
+          </p>
+
+          <div class="product-card-actions">
+            <button class="btn-card-inquire btn-quick-inquire" 
+                    data-product-id="{{ prod.id }}" 
+                    data-product-name="{{ prod.name }}" 
+                    data-part-number="{{ prod.part_number }}"
+                    data-repeat-sizes="{{ prod.repeat_sizes }}">
+              Inquire Now
+            </button>
+            <button class="btn-card-add-cart btn-add-quote-cart" 
+                    data-product-id="{{ prod.id }}" 
+                    data-product-name="{{ prod.name }}" 
+                    data-part-number="{{ prod.part_number }}"
+                    data-product-image="{{ prod.image_url }}">
+              + Quote List
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ==========================================================================
+     6. STATS & CTA BAR (From Reference Footer Area & Configurable from Admin)
+     ========================================================================== -->
+{% if site_settings.show_stats_ribbon != 'false' %}
+<section class="stats-cta-section">
+  <div class="container">
+    <div class="stats-cta-grid">
+      <!-- CTA Left -->
+      <div class="cta-box">
+        <h3>{{ site_settings.cta_bar_title or 'LOOKING FOR THE RIGHT PART?' }}</h3>
+        <p>{{ site_settings.cta_bar_desc or 'Send us your requirement and we will get back to you with the best solution.' }}</p>
+        <button class="btn-enquire-white btn-open-quote-cart">
+          <span>ENQUIRE NOW</span>
+          <span style="transform: rotate(-25deg); display: inline-block;">✈</span>
+        </button>
+      </div>
+
+      <!-- Stats Right -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-number">{{ site_settings.stats_products or '1000+' }}</div>
+          <div class="stat-label">PRODUCTS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">👥</div>
+          <div class="stat-number">{{ site_settings.stats_clients or '500+' }}</div>
+          <div class="stat-label">SATISFIED CLIENTS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-number">{{ site_settings.stats_countries or '30+' }}</div>
+          <div class="stat-label">COUNTRIES</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">🛡️</div>
+          <div class="stat-number">{{ site_settings.stats_quality or '100%' }}</div>
+          <div class="stat-label">QUALITY ASSURED</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

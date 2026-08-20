@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Supported Textile Printing Machines | Divya Trading Co.{% endblock %}
+
+{% block content %}
+
+<!-- Header Banner -->
+<section style="background: var(--primary-navy); color: white; padding: 50px 0; text-align: center;">
+  <div class="container">
+    <span style="font-size: 0.82rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">MACHINE COMPATIBILITY</span>
+    <h1 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; margin-top: 6px;">
+      Textile Rotary Printing & Processing Machines
+    </h1>
+    <p style="font-size: 1rem; color: #CBD5E1; max-width: 650px; margin: 10px auto 0;">
+      Precision engineered replacement spares, repeat gear sets, screen heads, and colour pumps compatible with all major global manufacturers.
+    </p>
+  </div>
+</section>
+
+<!-- Machines Grid -->
+<section style="padding: 60px 0 80px; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+      {% for m in machines %}
+      <div style="background: var(--bg-white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; display: flex; flex-direction: column; transition: var(--transition); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-navy);">
+            {{ m.name }}
+          </h3>
+          <span style="background: var(--dtc-blue-light); color: var(--dtc-blue); font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">
+            {{ m.products|length }} Spares
+          </span>
+        </div>
+        
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; flex-grow: 1;">
+          {{ m.description }}
+        </p>
+
+        <a href="{{ url_for('products', machine=m.slug) }}" class="btn-view-products" style="padding: 10px 14px; font-size: 0.82rem;">
+          View {{ m.name }} Spares ➔
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Custom Machine Requirement Box -->
+    <div style="margin-top: 50px; background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius-lg); padding: 32px; text-align: center;">
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
+        Have a Different Machine Make or Custom Drawing?
+      </h3>
+      <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 20px;">
+        We manufacture custom repeat gear sets, screen head rings, squeegee assemblies, and precision shafts as per physical sample or CAD drawing.
+      </p>
+      <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="display: inline-flex;">Send Machine Specifications</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

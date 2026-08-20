@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}My Quotes & Inquiries | {{ site_settings.company_name or 'Divya Trading Co.' }}{% endblock %}
+
+{% block content %}
+<div style="background: var(--bg-light); min-height: 85vh; padding: 40px 0 80px;">
+  <div class="container">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.88rem; font-weight: 500;
+                      {% if category == 'success' %}background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+                      {% elif category == 'danger' %}background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
+                      {% else %}background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Customer Profile Header Banner -->
+    <div style="background: var(--primary-navy); border-radius: var(--radius-lg); padding: 28px 32px; color: white; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; box-shadow: var(--shadow-md);">
+      <div style="display: flex; align-items: center; gap: 18px;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+          👤
+        </div>
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">Customer Account</span>
+          <h1 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; line-height: 1.2;">
+            {{ customer.name }}
+          </h1>
+          <p style="font-size: 0.85rem; color: #CBD5E1; margin: 2px 0 0;">
+            {{ customer.company_name or 'Independent Mill/Buyer' }} • {{ customer.email }} • {{ customer.phone }}
+          </p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="{{ url_for('products') }}" class="btn-enquire-white" style="font-size: 0.85rem; padding: 9px 18px;">
+          + New Quote Request
+        </a>
+        <a href="{{ url_for('customer_logout') }}" style="background: rgba(255,255,255,0.12); color: #E2E8F0; padding: 9px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: var(--transition);">
+          Sign Out 🚪
+        </a>
+      </div>
+    </div>
+
+    <!-- 4 Overview Metric Stats -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 30px;">
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-sm);">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;">Total Quotes</span>
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy); margin-top: 4px;">
+          {{ total_quotes }}
+        </div>
+      </div>
+
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-sm); border-left: 4px solid #F59E0B;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: #D97706; text-transform: uppercase;">Under Review</span>
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: #B45309; margin-top: 4px;">
+          {{ pending_quotes }}
+        </div>
+      </div>
+
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-sm); border-left: 4px solid #0052CC;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase;">Quotation Ready</span>
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--dtc-blue); margin-top: 4px;">
+          {{ ready_quotes }}
+        </div>
+      </div>
+
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-sm); border-left: 4px solid #10B981;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: #059669; text-transform: uppercase;">Completed / Ready</span>
+        <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: #047857; margin-top: 4px;">
+          {{ completed_quotes }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quotes List -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+      <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+          Your Quote Requests & Status History
+        </h2>
+        <span style="font-size: 0.85rem; color: var(--text-light);">{{ inquiries|length }} quote records</span>
+      </div>
+
+      {% if inquiries %}
+      <div style="display: flex; flex-direction: column;">
+        {% for inq in inquiries %}
+        <div style="padding: 24px; border-bottom: 1px solid var(--border-color); transition: background 0.2s ease; {% if loop.last %}border-bottom: none;{% endif %}"
+             onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+          
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 14px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--primary-navy);">
+                  #{{ inq.inquiry_number }}
+                </span>
+
+                <!-- Status Badge -->
+                {% if inq.status == 'new' %}
+                  <span style="background: #FEF3C7; color: #92400E; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+                    🟡 Under Engineering Review
+                  </span>
+                {% elif inq.status == 'contacted' %}
+                  <span style="background: #EFF6FF; color: #1E40AF; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+                    🔵 In Review by Sales Team
+                  </span>
+                {% elif inq.status == 'quoted' %}
+                  <span style="background: #ECFDF5; color: #065F46; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid #A7F3D0;">
+                    🎉 Quotation Prepared & Ready
+                  </span>
+                {% elif inq.status == 'completed' %}
+                  <span style="background: #E0E7FF; color: #3730A3; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+                    🟢 Order Confirmed / Fulfilled
+                  </span>
+                {% else %}
+                  <span style="background: #F1F5F9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+                    Closed
+                  </span>
+                {% endif %}
+              </div>
+
+              <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;">
+                Submitted on {{ inq.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                {% if inq.machine_model %} • Machine: <strong>{{ inq.machine_model }}</strong>{% endif %}
+              </div>
+            </div>
+
+            <!-- View Quote Detail Button -->
+            <a href="{{ url_for('customer_quote_detail', inquiry_number=inq.inquiry_number) }}" class="btn-enquire-primary" style="font-size: 0.84rem; padding: 8px 16px;">
+              <span>View Quote & Chat</span>
+              <span>➔</span>
+            </a>
+          </div>
+
+          <!-- Quotation Highlight (If prepared by admin) -->
+          {% if inq.quote_amount %}
+          <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">Quotation Amount</span>
+              <div style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: #15803D;">
+                {{ inq.quote_amount }}
+              </div>
+            </div>
+            {% if inq.delivery_timeline %}
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Lead Time</span>
+              <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary-navy);">{{ inq.delivery_timeline }}</div>
+            </div>
+            {% endif %}
+            {% if inq.payment_terms %}
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Payment Terms</span>
+              <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);">{{ inq.payment_terms }}</div>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Requested Items Preview -->
+          <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px;">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; display: block; margin-bottom: 8px;">
+              Requested Parts ({{ inq.items|length }} items):
+            </span>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              {% for item in inq.items %}
+              <div style="background: white; border: 1px solid #CBD5E1; border-radius: 4px; padding: 4px 10px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+                <strong style="color: var(--primary-navy);">{{ item.product_name }}</strong>
+                {% if item.part_number %}<span style="color: var(--dtc-blue); font-size: 0.74rem;">({{ item.part_number }})</span>{% endif %}
+                <span style="background: #E2E8F0; padding: 1px 6px; border-radius: 3px; font-weight: 700; font-size: 0.72rem;">Qty: {{ item.quantity }}</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Discussion count pill if messages exist -->
+          {% if inq.messages %}
+          <div style="margin-top: 10px; font-size: 0.8rem; color: var(--dtc-blue); font-weight: 600; display: flex; align-items: center; gap: 4px;">
+            <span>💬</span>
+            <span>{{ inq.messages|length }} message(s) in discussion thread</span>
+          </div>
+          {% endif %}
+
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <!-- Empty State -->
+      <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+        <span style="font-size: 3.5rem; display: block; margin-bottom: 12px;">📦</span>
+        <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 6px;">
+          No Quote Requests Found Yet
+        </h3>
+        <p style="font-size: 0.9rem; max-width: 480px; margin: 0 auto 24px;">
+          Explore our extensive catalog of rotary printing spare parts, screen heads, gears, and shafts to request an official quotation.
+        </p>
+        <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.9rem; padding: 11px 24px;">
+          Explore Products Catalog ➔
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Roles & Team Passwords | Divya Trading Co. Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
+      <div class="sidebar-title">
+        <h2>DIVYA TRADING</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Inquiries & Quotes</span>
+      </a>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Manage Products</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Customer Accounts</span>
+      </a>
+      <a href="{{ url_for('admin_users') }}" class="sidebar-nav-item active">
+        <span class="nav-icon">🔐</span>
+        <span>Team Roles & Passwords</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-nav-item">
+        <span class="nav-icon">🏷️</span>
+        <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>Website CMS & Settings</span>
+      </a>
+      <a href="{{ url_for('home') }}" target="_blank" class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <span class="nav-icon">🌐</span>
+        <span>View Live Website ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Logged in: <strong>{{ session.admin_username }}</strong></span>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div class="admin-page-title">
+        <h1>Admin Team Access Roles & Passwords</h1>
+        <p>Super Admin control: Assign roles, view and update team passwords, and manage administrative permissions.</p>
+      </div>
+
+      <div class="admin-top-actions">
+        <button class="btn-admin-primary" onclick="document.getElementById('addAdminUserModal').classList.add('active')">
+          <span>+ Add New Admin User</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Role Explanation Banner -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+      <div style="background: white; border: 1px solid var(--admin-border); border-left: 4px solid #7C3AED; border-radius: 8px; padding: 16px;">
+        <strong style="color: #6D28D9; font-size: 0.92rem; display: block; margin-bottom: 4px;">👑 Super Administrator</strong>
+        <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Full unrestricted access to team user passwords, CMS settings, categories, products, and quotations.</p>
+      </div>
+      <div style="background: white; border: 1px solid var(--admin-border); border-left: 4px solid #0052CC; border-radius: 8px; padding: 16px;">
+        <strong style="color: #0052CC; font-size: 0.92rem; display: block; margin-bottom: 4px;">💼 Sales & Quotes Manager</strong>
+        <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Manage customer RFQs, prepare price quotations, send emails, and chat with customers.</p>
+      </div>
+      <div style="background: white; border: 1px solid var(--admin-border); border-left: 4px solid #10B981; border-radius: 8px; padding: 16px;">
+        <strong style="color: #059669; font-size: 0.92rem; display: block; margin-bottom: 4px;">📦 Catalog & Product Editor</strong>
+        <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Add, update, activate/deactivate spare parts, stock statuses, photos, and categories.</p>
+      </div>
+    </div>
+
+    <!-- Admin Users Table -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Admin Team Accounts ({{ admin_users|length }})</h3>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email Address</th>
+              <th>Access Role</th>
+              <th>Current Password</th>
+              <th>Status</th>
+              <th>Created Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in admin_users %}
+            <tr>
+              <td style="color: #64748b; font-weight: 700;">#{{ user.id }}</td>
+              <td>
+                <strong style="color: #0A2540; font-size: 0.92rem;">{{ user.username }}</strong>
+                {% if user.username == session.admin_username %}
+                <span style="font-size: 0.7rem; background: #E0E7FF; color: #3730A3; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 4px;">You</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="mailto:{{ user.email }}" style="color: #0052cc;">{{ user.email }}</a>
+              </td>
+              <td>
+                {% if user.role == 'superadmin' %}
+                  <span style="background: #F3E8FF; color: #6D28D9; font-weight: 700; font-size: 0.76rem; padding: 4px 10px; border-radius: 9999px; border: 1px solid #DDD6FE;">
+                    👑 Super Administrator
+                  </span>
+                {% elif user.role == 'sales_manager' %}
+                  <span style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; font-size: 0.76rem; padding: 4px 10px; border-radius: 9999px; border: 1px solid #BFDBFE;">
+                    💼 Sales Manager
+                  </span>
+                {% else %}
+                  <span style="background: #ECFDF5; color: #059669; font-weight: 700; font-size: 0.76rem; padding: 4px 10px; border-radius: 9999px; border: 1px solid #A7F3D0;">
+                    📦 Product Editor
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <code style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 3px 8px; border-radius: 4px; font-size: 0.84rem; font-weight: 700; color: #0A2540;" id="pwd-display-{{ user.id }}">
+                    {{ user.view_password or '••••••••' }}
+                  </code>
+                </div>
+              </td>
+              <td>
+                <span style="background: #D1FAE5; color: #065F46; font-size: 0.74rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Active</span>
+              </td>
+              <td style="font-size: 0.8rem; color: #64748b;">
+                {{ user.created_at.strftime('%d %b %Y') if user.created_at else '-' }}
+              </td>
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn-action-sm btn-edit-user" 
+                          data-id="{{ user.id }}"
+                          data-username="{{ user.username }}"
+                          data-email="{{ user.email }}"
+                          data-role="{{ user.role }}"
+                          data-password="{{ user.view_password or '' }}">
+                    Update Password / Role ➔
+                  </button>
+
+                  {% if user.username != 'admin' and user.id != session.admin_user_id %}
+                  <form action="{{ url_for('admin_delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Delete admin user {{ user.username }}?');" style="display: inline;">
+                    <button type="submit" class="btn-action-sm btn-action-delete">✕</button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Admin User Modal -->
+  <div class="modal-overlay" id="addAdminUserModal">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>Create Admin Team Member</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('addAdminUserModal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('admin_add_user') }}" method="POST">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Username *</label>
+            <input type="text" name="username" class="form-control" placeholder="e.g. sales_neel / rahul" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" class="form-control" placeholder="user@company.com" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Initial Password *</label>
+            <input type="text" name="password" class="form-control" placeholder="Enter password (e.g. Dtc@2026)" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label">Access Role *</label>
+            <select name="role" class="form-control" required>
+              <option value="superadmin">👑 Super Administrator (Full Access)</option>
+              <option value="sales_manager" selected>💼 Sales & Quotes Manager</option>
+              <option value="product_editor">📦 Catalog & Product Editor</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center;">
+            Create Admin Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Admin User / Update Password Modal -->
+  <div class="modal-overlay" id="editAdminUserModal">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>Update Team Password & Role</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('editAdminUserModal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="editAdminUserForm" action="" method="POST">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Username</label>
+            <input type="text" id="editUsername" class="form-control" disabled style="background: #F1F5F9;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" id="editEmail" class="form-control" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Update Password (Leave blank to keep current)</label>
+            <input type="text" name="new_password" id="editNewPassword" class="form-control" placeholder="Enter new password to reset">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label">Assigned Role</label>
+            <select name="role" id="editRole" class="form-control">
+              <option value="superadmin">👑 Super Administrator (Full Access)</option>
+              <option value="sales_manager">💼 Sales & Quotes Manager</option>
+              <option value="product_editor">📦 Catalog & Product Editor</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center;">
+            Save Password & Role Updates
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.btn-edit-user').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const userId = btn.dataset.id;
+        const form = document.getElementById('editAdminUserForm');
+        form.action = `/admin/users/${userId}/edit`;
+        
+        document.getElementById('editUsername').value = btn.dataset.username;
+        document.getElementById('editEmail').value = btn.dataset.email;
+        document.getElementById('editRole').value = btn.dataset.role;
+        document.getElementById('editNewPassword').value = btn.dataset.password || '';
+        
+        document.getElementById('editAdminUserModal').classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

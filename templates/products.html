@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Products Catalog | Divya Trading Co. - Machine Spares{% endblock %}
+
+{% block content %}
+
+<!-- Catalog Header Bar -->
+<section class="catalog-header-bar">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+      <div>
+        <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: var(--primary-navy);">
+          {% if selected_category %}
+            {{ selected_category.name }}
+          {% elif selected_machine %}
+            Spares for {{ selected_machine.name }}
+          {% elif search_query %}
+            Search Results for "{{ search_query }}"
+          {% else %}
+            Rotary Machine Spares Catalog
+          {% endif %}
+        </h1>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 4px;">
+          Explore our precision engineered textile machinery components. No prices shown — request an instant quote.
+        </p>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <form action="{{ url_for('products') }}" method="GET" style="display: flex; gap: 8px; min-width: 320px;">
+        {% if selected_category %}
+        <input type="hidden" name="category" value="{{ selected_category.slug }}">
+        {% endif %}
+        {% if selected_machine %}
+        <input type="hidden" name="machine" value="{{ selected_machine.slug }}">
+        {% endif %}
+        <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search part #, repeat size, name..." style="background: white;">
+        <button type="submit" class="btn-enquire-primary" style="padding: 0 18px;">Search</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Catalog Main Content Layout -->
+<section style="background: var(--bg-white);">
+  <div class="container">
+    <div class="catalog-layout">
+      <!-- Left Sidebar: Filters -->
+      <aside class="sidebar-filters">
+        <!-- Active Filter Reset -->
+        {% if selected_category or selected_machine or search_query %}
+        <div style="margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color);">
+          <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">Active Filter:</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+            <span style="font-size: 0.88rem; font-weight: 700; color: var(--dtc-blue);">
+              {{ selected_category.name if selected_category else (selected_machine.name if selected_machine else search_query) }}
+            </span>
+            <a href="{{ url_for('products') }}" style="font-size: 0.78rem; color: var(--dtc-accent-red); font-weight: 600;">Clear All ✕</a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Filter By Category -->
+        <div class="filter-section">
+          <h3 class="filter-heading">
+            <span>Categories</span>
+            <span style="font-size: 0.75rem; color: #94a3b8;">({{ categories|length }})</span>
+          </h3>
+          <div class="filter-list">
+            <a href="{{ url_for('products', machine=selected_machine.slug if selected_machine else None) }}" 
+               class="filter-item-btn {% if not selected_category %}active{% endif %}">
+              <span>All Categories</span>
+              <span class="filter-count">{{ products|length if not selected_category else 'All' }}</span>
+            </a>
+            {% for cat in categories %}
+            <a href="{{ url_for('products', category=cat.slug, machine=selected_machine.slug if selected_machine else None) }}" 
+               class="filter-item-btn {% if selected_category and selected_category.id == cat.id %}active{% endif %}">
+              <span>{{ cat.name }}</span>
+              <span class="filter-count">{{ cat.products|length }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Filter By Machine Make -->
+        <div class="filter-section">
+          <h3 class="filter-heading">
+            <span>Machine Compatibility</span>
+          </h3>
+          <div class="filter-list">
+            <a href="{{ url_for('products', category=selected_category.slug if selected_category else None) }}" 
+               class="filter-item-btn {% if not selected_machine %}active{% endif %}">
+              <span>All Machine Makes</span>
+            </a>
+            {% for m in machines %}
+            <a href="{{ url_for('products', machine=m.slug, category=selected_category.slug if selected_category else None) }}" 
+               class="filter-item-btn {% if selected_machine and selected_machine.id == m.id %}active{% endif %}">
+              <span>{{ m.name }}</span>
+              <span class="filter-count">{{ m.products|length }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Help / Support Widget -->
+        <div style="background: var(--dtc-blue-light); border-radius: var(--radius-sm); padding: 16px; margin-top: 24px; text-align: center;">
+          <h4 style="font-size: 0.92rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">Need Custom Repeats?</h4>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">We manufacture customized repeat sizes and OEM spare replacements to exact drawings.</p>
+          <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="width: 100%; justify-content: center; font-size: 0.8rem; padding: 8px 12px;">Contact Engineers</a>
+        </div>
+      </aside>
+
+      <!-- Right Main: Product Grid -->
+      <main class="catalog-main">
+        <!-- Results count bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color);">
+          <span style="font-size: 0.88rem; color: var(--text-muted);">
+            Showing <strong>{{ products|length }}</strong> precision parts
+          </span>
+          <button class="btn-quote-cart btn-open-quote-cart" style="font-size: 0.82rem; padding: 6px 14px;">
+            <span>Review Quote List</span>
+            <span class="cart-badge">0</span>
+          </button>
+        </div>
+
+        <!-- Product Cards Grid -->
+        {% if products %}
+        <div class="product-grid">
+          {% for prod in products %}
+          <div class="product-card">
+            {% if prod.is_featured %}
+            <span class="product-badge-featured">Featured</span>
+            {% endif %}
+
+            {% if prod.stock_status == 'out_of_stock' %}
+            <span class="product-badge-stock out_of_stock">Out of Stock</span>
+            {% elif prod.stock_status == 'made_to_order' %}
+            <span class="product-badge-stock made_to_order">Made to Order</span>
+            {% endif %}
+            
+            <a href="{{ url_for('product_detail', slug=prod.slug) }}" class="product-card-img-wrap">
+              <img src="{{ prod.image_url }}" alt="{{ prod.name }}" loading="lazy">
+            </a>
+            
+            <div class="product-card-body">
+              <div class="product-meta-row">
+                <span class="product-part-no">{{ prod.part_number }}</span>
+                <span class="product-make-badge">{{ prod.machine_make.name if prod.machine_make else 'Universal' }}</span>
+              </div>
+              
+              <h3 class="product-title">
+                <a href="{{ url_for('product_detail', slug=prod.slug) }}">{{ prod.name }}</a>
+              </h3>
+              
+              <p class="product-specs-summary">
+                {% if prod.repeat_sizes %}<strong>Repeats:</strong> {{ prod.repeat_sizes }}<br>{% endif %}
+                {% if prod.material %}<strong>Material:</strong> {{ prod.material }}<br>{% endif %}
+                {{ prod.short_description or (prod.description[:85] + '...') }}
+              </p>
+
+              <div class="product-card-actions">
+                <button class="btn-card-inquire btn-quick-inquire" 
+                        data-product-id="{{ prod.id }}" 
+                        data-product-name="{{ prod.name }}" 
+                        data-part-number="{{ prod.part_number }}"
+                        data-repeat-sizes="{{ prod.repeat_sizes }}">
+                  Inquire Now
+                </button>
+                <button class="btn-card-add-cart btn-add-quote-cart" 
+                        data-product-id="{{ prod.id }}" 
+                        data-product-name="{{ prod.name }}" 
+                        data-part-number="{{ prod.part_number }}"
+                        data-product-image="{{ prod.image_url }}">
+                  + Quote List
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty Results View -->
+        <div style="text-align: center; padding: 60px 20px; background: var(--bg-light); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+          <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🔍</span>
+          <h3 style="font-family: var(--font-heading); color: var(--primary-navy); margin-bottom: 8px;">No Spare Parts Found</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 450px; margin: 0 auto 20px;">
+            We manufacture over 1000+ custom and standard machine spares. If you cannot find what you are looking for, please share your requirement with our engineering team.
+          </p>
+          <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="margin-right: 8px;">Clear Filters</a>
+          <a href="{{ url_for('contact') }}" class="btn-card-add-cart" style="display: inline-flex; padding: 10px 20px;">Custom Inquiry</a>
+        </div>
+        {% endif %}
+      </main>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

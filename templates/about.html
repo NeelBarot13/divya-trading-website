@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us | Divya Trading Co. - Textile Spares Manufacturer{% endblock %}
+
+{% block content %}
+
+<!-- Header Banner -->
+<section style="background: var(--primary-navy); color: white; padding: 60px 0; text-align: center;">
+  <div class="container">
+    <span style="font-size: 0.82rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">ABOUT DIVYA TRADING CO.</span>
+    <h1 style="font-family: var(--font-heading); font-size: 2.6rem; font-weight: 800; margin-top: 6px;">
+      Precision Parts. Performance Assured.
+    </h1>
+    <p style="font-size: 1.05rem; color: #CBD5E1; max-width: 680px; margin: 12px auto 0;">
+      Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines since 1997.
+    </p>
+  </div>
+</section>
+
+<!-- Company Overview Section -->
+<section style="padding: 70px 0; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 50px; align-items: center;">
+      <div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">Our Heritage</span>
+        <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-navy); margin: 6px 0 18px;">
+          Over Two Decades of Manufacturing Excellence
+        </h2>
+        <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin-bottom: 16px;">
+          <strong>DIVYA TRADING CO. SINCE 1997</strong> has grown in strength to emerge as one of the reputed manufacturers and exporters of various spare parts for textile printing and processing machines.
+        </p>
+        <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">
+          We offer a complete range of high-precision replacement parts for <strong>STORMAC, STORK (RD-3 & RD-4), ICHINOSE, REGGIANI, HARISH, ZIMMER PRINTING, STOVEC PRINTING MACHINE</strong>, and Stenter Processing Machines.
+        </p>
+        <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin-bottom: 24px;">
+          With over two decades of experience, we have today emerged as a leader in quality products in our specialty of operation. Our reputation is based on the performance and reliability of our world-class precision products.
+        </p>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <a href="{{ url_for('products') }}" class="btn-enquire-primary">Explore Products ➔</a>
+          <a href="{{ url_for('contact') }}" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700;">Get in Touch</a>
+        </div>
+      </div>
+
+      <div>
+        <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);">
+          <img src="{{ url_for('static', filename='images/textile_banner.jpg') }}" alt="Divya Trading Co Manufacturing Plant" style="width: 100%; height: auto;">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Manufacturing Plant & RD-DD Development -->
+<section style="padding: 60px 0; background: var(--bg-light); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+  <div class="container">
+    <div style="max-width: 800px; margin: 0 auto; text-align: center; margin-bottom: 40px;">
+      <h2 style="font-family: var(--font-heading); font-size: 1.9rem; font-weight: 800; color: var(--primary-navy);">
+        State of the Art Manufacturing Plant
+      </h2>
+      <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 8px;">
+        All our products are manufactured at our state-of-the-art facility in Ahmedabad, equipped with CNC machinery and precision quality inspection instruments.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px;">
+        <div style="font-size: 2rem; margin-bottom: 12px;">⚙️</div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          RD-DD & Pegasus Development
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+          We have an active number of developments for the new RD - DD Pegasus parts. This includes complete Screen heads in R640, R819, R914 up to normal wear and tear parts.
+        </p>
+      </div>
+
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px;">
+        <div style="font-size: 2rem; margin-bottom: 12px;">🔬</div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          Zero-Tolerance Quality Inspection
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+          Every gear set, screen head, roller, and colour pump undergoes stringent dimensional verification to ensure seamless zero-vibration fitment on customer machines.
+        </p>
+      </div>
+
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px;">
+        <div style="font-size: 2rem; margin-bottom: 12px;">✈️</div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          Global Exporter Network
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+          Exporting precision textile machine components across 30+ countries including Bangladesh, Turkey, Egypt, Indonesia, Vietnam, and Latin America.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

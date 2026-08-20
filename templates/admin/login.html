@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Divya Trading Co.</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-login-body">
+
+  <div class="admin-login-card">
+    <div class="login-brand">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Divya Trading Co.">
+      <h2>DIVYA TRADING CO.</h2>
+      <p>Administrative Control Center</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('admin_login') }}" method="POST">
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label">Username or Email</label>
+        <input type="text" name="username" class="form-control" placeholder="admin" value="admin" required autofocus>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" value="admin123" required>
+      </div>
+
+      <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+        Secure Log In ➔
+      </button>
+    </form>
+
+    <div style="margin-top: 24px; text-align: center; font-size: 0.8rem; color: #64748b;">
+      <p>Default credentials: <strong>admin</strong> / <strong>admin123</strong></p>
+      <a href="{{ url_for('home') }}" style="color: #0052cc; margin-top: 8px; display: inline-block;">← Return to Main Website</a>
+    </div>
+  </div>
+
+</body>
+</html>

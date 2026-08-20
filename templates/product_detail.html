@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | Divya Trading Co.{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb bar -->
+<div style="background: var(--bg-light); padding: 14px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+  <div class="container">
+    <a href="{{ url_for('home') }}" style="color: var(--text-light);">Home</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <a href="{{ url_for('products') }}" style="color: var(--text-light);">Products</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <a href="{{ url_for('products', category=product.category.slug) }}" style="color: var(--text-light);">{{ product.category.name }}</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <span style="color: var(--primary-navy); font-weight: 600;">{{ product.part_number }}</span>
+  </div>
+</div>
+
+<!-- Product Detail Main View -->
+<section style="padding: 50px 0 80px; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 50px; align-items: start;">
+      <!-- Product Image Gallery / Showcase -->
+      <div>
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md);">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-height: 420px; margin: 0 auto; object-fit: contain; border-radius: var(--radius-sm);">
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
+            <span style="font-size: 1.3rem;">⚙️</span>
+            <div>
+              <strong style="font-size: 0.8rem; color: var(--primary-navy); display: block;">100% In-House Made</strong>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">Precision CNC Machined</span>
+            </div>
+          </div>
+          <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
+            <span style="font-size: 1.3rem;">🌍</span>
+            <div>
+              <strong style="font-size: 0.8rem; color: var(--primary-navy); display: block;">Export Quality</strong>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">Trusted Worldwide</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Information & Inquiry Box -->
+      <div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+          <span class="product-part-no" style="font-size: 0.88rem; padding: 4px 10px;">Part Number: {{ product.part_number }}</span>
+          <span style="background: #e2e8f0; color: #334155; font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;">
+            Category: {{ product.category.name }}
+          </span>
+          <span style="background: #fef3c7; color: #92400e; font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;">
+            Make: {{ product.machine_make.name if product.machine_make else 'All Makes' }}
+          </span>
+        </div>
+
+        <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-navy); line-height: 1.2; margin-bottom: 12px;">
+          {{ product.name }}
+        </h1>
+
+        {% if product.short_description %}
+        <p style="font-size: 1.05rem; font-weight: 600; color: var(--dtc-blue); line-height: 1.5; margin-bottom: 16px;">
+          {{ product.short_description }}
+        </p>
+        {% endif %}
+
+        <div style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;">
+          <h4 style="font-family: var(--font-heading); font-size: 0.9rem; font-weight: 700; color: var(--primary-navy); text-transform: uppercase; margin-bottom: 6px;">Product Overview & Function</h4>
+          <p style="margin: 0;">{{ product.description }}</p>
+        </div>
+
+        <!-- Technical Specs Table -->
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 30px;">
+          <div style="background: #f1f5f9; padding: 10px 18px; font-weight: 700; font-size: 0.85rem; color: var(--primary-navy); text-transform: uppercase;">
+            Technical Specifications
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+            {% if product.repeat_sizes %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 10px 18px; color: var(--text-light); width: 35%; font-weight: 500;">Repeat Sizes:</td>
+              <td style="padding: 10px 18px; font-weight: 600; color: var(--primary-navy);">{{ product.repeat_sizes }}</td>
+            </tr>
+            {% endif %}
+            {% if product.material %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 10px 18px; color: var(--text-light); font-weight: 500;">Material Grade:</td>
+              <td style="padding: 10px 18px; font-weight: 600; color: var(--primary-navy);">{{ product.material }}</td>
+            </tr>
+            {% endif %}
+            {% if product.specifications %}
+            <tr>
+              <td style="padding: 10px 18px; color: var(--text-light); font-weight: 500; vertical-align: top;">Key Features:</td>
+              <td style="padding: 10px 18px; color: var(--text-main); white-space: pre-line;">{{ product.specifications }}</td>
+            </tr>
+            {% endif %}
+          </table>
+        </div>
+
+        <!-- Action CTAs -->
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 30px;">
+          <button class="btn-enquire-primary btn-quick-inquire" 
+                  data-product-id="{{ product.id }}" 
+                  data-product-name="{{ product.name }}" 
+                  data-part-number="{{ product.part_number }}"
+                  data-repeat-sizes="{{ product.repeat_sizes }}"
+                  style="flex: 1; justify-content: center; padding: 14px 20px;">
+            <span>Inquire About This Part</span>
+            <span>✉</span>
+          </button>
+          
+          <button class="btn-card-add-cart btn-add-quote-cart" 
+                  data-product-id="{{ product.id }}" 
+                  data-product-name="{{ product.name }}" 
+                  data-part-number="{{ product.part_number }}"
+                  data-product-image="{{ product.image_url }}"
+                  style="flex: 1; justify-content: center; padding: 14px 20px; font-size: 0.9rem; font-weight: 700;">
+            <span>+ Add to Quote List</span>
+          </button>
+        </div>
+
+        <!-- WhatsApp Quick Chat Link -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <strong style="color: #166534; font-size: 0.9rem; display: block;">Need Urgent Delivery or Custom Fitment?</strong>
+            <span style="font-size: 0.8rem; color: #15803d;">Chat directly with our textile parts engineer on WhatsApp</span>
+          </div>
+          <a href="https://wa.me/918320821579?text=Hello,%20I%20am%20interested%20in%20product%20{{ product.name }}%20(Part%20No:%20{{ product.part_number }})." 
+             target="_blank" 
+             style="background: #16a34a; color: white; padding: 8px 16px; border-radius: 4px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">
+            WhatsApp Now ➔
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div style="margin-top: 70px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 24px;">
+        Related Spares in {{ product.category.name }}
+      </h3>
+      <div class="product-grid">
+        {% for rel in related_products %}
+        <div class="product-card">
+          <a href="{{ url_for('product_detail', slug=rel.slug) }}" class="product-card-img-wrap">
+            <img src="{{ rel.image_url }}" alt="{{ rel.name }}">
+          </a>
+          <div class="product-card-body">
+            <div class="product-meta-row">
+              <span class="product-part-no">{{ rel.part_number }}</span>
+              <span class="product-make-badge">{{ rel.machine_make.name if rel.machine_make else 'Universal' }}</span>
+            </div>
+            <h4 class="product-title" style="font-size: 0.95rem;">
+              <a href="{{ url_for('product_detail', slug=rel.slug) }}">{{ rel.name }}</a>
+            </h4>
+            <div class="product-card-actions" style="margin-top: auto;">
+              <button class="btn-card-inquire btn-quick-inquire" 
+                      data-product-id="{{ rel.id }}" 
+                      data-product-name="{{ rel.name }}" 
+                      data-part-number="{{ rel.part_number }}">
+                Inquire
+              </button>
+              <button class="btn-card-add-cart btn-add-quote-cart" 
+                      data-product-id="{{ rel.id }}" 
+                      data-product-name="{{ rel.name }}" 
+                      data-part-number="{{ rel.part_number }}"
+                      data-product-image="{{ rel.image_url }}">
+                + List
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

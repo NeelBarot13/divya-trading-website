@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Products | Divya Trading Co. Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Interactive toggle switches */
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider-toggle {
+      background-color: #10b981;
+    }
+    input:checked + .slider-toggle:before {
+      transform: translateX(20px);
+    }
+    .stock-select-badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      outline: none;
+    }
+    .stock-select-badge.in_stock {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+    .stock-select-badge.out_of_stock {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+    .stock-select-badge.made_to_order {
+      background: #fffbeb;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
+      <div class="sidebar-title">
+        <h2>DIVYA TRADING</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Inquiries & Quotes</span>
+      </a>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-nav-item active">
+        <span class="nav-icon">📦</span>
+        <span>Manage Products</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Customer Accounts</span>
+      </a>
+      <a href="{{ url_for('admin_users') }}" class="sidebar-nav-item">
+        <span class="nav-icon">🔐</span>
+        <span>Team Roles & Passwords</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-nav-item">
+        <span class="nav-icon">🏷️</span>
+        <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>Website CMS & Settings</span>
+      </a>
+      <a href="{{ url_for('home') }}" target="_blank" class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <span class="nav-icon">🌐</span>
+        <span>View Live Website ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Logged in: <strong>{{ session.admin_username }}</strong></span>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div class="admin-page-title">
+        <h1>Product Catalog & Stock Management</h1>
+        <p>1-Click activate/deactivate products, manage 2-tier descriptions, stock availability, and specifications.</p>
+      </div>
+
+      <div class="admin-top-actions">
+        <a href="{{ url_for('admin_export_products') }}" class="btn-admin-export">
+          <span>📥 Export Catalog CSV</span>
+        </a>
+        <button class="btn-admin-primary" onclick="document.getElementById('addProductModal').classList.add('active')">
+          <span>+ Add New Product</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Filter & Search Bar -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <h3 style="margin-right: 10px;">Products ({{ products|length }})</h3>
+          
+          <form action="{{ url_for('admin_products') }}" method="GET" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <!-- Category filter -->
+            <select name="category" class="form-control" style="width: 170px; font-size: 0.82rem; padding: 6px 10px;" onchange="this.form.submit()">
+              <option value="">All Categories</option>
+              {% for c in categories %}
+              <option value="{{ c.id }}" {% if selected_category == c.id %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+
+            <!-- Status filter -->
+            <select name="status" class="form-control" style="width: 150px; font-size: 0.82rem; padding: 6px 10px;" onchange="this.form.submit()">
+              <option value="">All Statuses</option>
+              <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active Only</option>
+              <option value="deactive" {% if status_filter == 'deactive' %}selected{% endif %}>Deactivated Only</option>
+              <option value="out_of_stock" {% if status_filter == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+            </select>
+            
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search by name, part #..." style="width: 200px; font-size: 0.82rem; padding: 6px 10px;">
+            <button type="submit" class="btn-admin-primary" style="padding: 6px 12px; font-size: 0.82rem;">Search</button>
+            {% if selected_category or status_filter or search_q %}
+            <a href="{{ url_for('admin_products') }}" class="btn-action-sm" style="align-self: center;">Clear</a>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Thumb</th>
+              <th>Part No.</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Machine Make</th>
+              <th>Stock Status</th>
+              <th>Live Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prod in products %}
+            <tr id="prod-row-{{ prod.id }}">
+              <td>
+                <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
+              </td>
+              <td style="font-weight: 700; color: #0052cc;">{{ prod.part_number }}</td>
+              <td style="font-weight: 600;">
+                <a href="{{ url_for('product_detail', slug=prod.slug) }}" target="_blank" style="color: #0F172A; text-decoration: none;">
+                  {{ prod.name }} ↗
+                </a>
+                {% if prod.is_featured %}
+                <span style="background: #fef3c7; color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; margin-left: 4px;">Featured</span>
+                {% endif %}
+                {% if prod.short_description %}
+                <div style="font-size: 0.76rem; color: #64748b; font-weight: normal; margin-top: 2px;">
+                  {{ prod.short_description[:80] }}...
+                </div>
+                {% endif %}
+              </td>
+              <td>{{ prod.category.name if prod.category else '-' }}</td>
+              <td>{{ prod.machine_make.name if prod.machine_make else 'Universal' }}</td>
+              
+              <!-- 1-Click Stock Status Dropdown -->
+              <td>
+                <select class="stock-select-badge {{ prod.stock_status or 'in_stock' }}" onchange="updateProductStock({{ prod.id }}, this)">
+                  <option value="in_stock" {% if prod.stock_status == 'in_stock' or not prod.stock_status %}selected{% endif %}>🟢 In Stock</option>
+                  <option value="out_of_stock" {% if prod.stock_status == 'out_of_stock' %}selected{% endif %}>🔴 Out of Stock</option>
+                  <option value="made_to_order" {% if prod.stock_status == 'made_to_order' %}selected{% endif %}>🟡 Made to Order</option>
+                </select>
+              </td>
+
+              <!-- 1-Click Active / Deactive Switch Toggle -->
+              <td>
+                <label class="switch-toggle" title="Toggle active status on live catalog">
+                  <input type="checkbox" {% if prod.is_active %}checked{% endif %} onchange="toggleProductActive({{ prod.id }}, this)">
+                  <span class="slider-toggle"></span>
+                </label>
+                <span id="active-label-{{ prod.id }}" style="font-size: 0.75rem; font-weight: 700; margin-left: 6px; color: {% if prod.is_active %}#059669{% else %}#dc2626{% endif %};">
+                  {{ 'Active' if prod.is_active else 'Disabled' }}
+                </span>
+              </td>
+
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn-action-sm btn-edit-product" 
+                          data-id="{{ prod.id }}"
+                          data-name="{{ prod.name }}"
+                          data-part-number="{{ prod.part_number }}"
+                          data-category-id="{{ prod.category_id }}"
+                          data-machine-id="{{ prod.machine_make_id or '' }}"
+                          data-repeat-sizes="{{ prod.repeat_sizes or '' }}"
+                          data-material="{{ prod.material or '' }}"
+                          data-stock-status="{{ prod.stock_status or 'in_stock' }}"
+                          data-short-description="{{ prod.short_description or '' }}"
+                          data-description="{{ prod.description or '' }}"
+                          data-specifications="{{ prod.specifications or '' }}"
+                          data-is-featured="{{ prod.is_featured }}"
+                          data-is-active="{{ prod.is_active }}"
+                          data-image-url="{{ prod.image_url }}">
+                    Edit
+                  </button>
+                  <form action="{{ url_for('admin_delete_product', product_id=prod.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');" style="display: inline;">
+                    <button type="submit" class="btn-action-sm btn-action-delete">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Product Modal -->
+  <div class="modal-overlay" id="addProductModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3>Add New Machine Spare Part</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('addProductModal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('admin_add_product') }}" method="POST" enctype="multipart/form-data">
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Product Name *</label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Stork RD-4 Screen Head Ring" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Part Number / Code *</label>
+              <input type="text" name="part_number" class="form-control" placeholder="e.g. DTC-SH-RD4-64R" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select name="category_id" class="form-control" required>
+                {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Machine Make</label>
+              <select name="machine_make_id" class="form-control">
+                <option value="">Universal / All Makes</option>
+                {% for m in machines %}
+                <option value="{{ m.id }}">{{ m.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock Availability</label>
+              <select name="stock_status" class="form-control">
+                <option value="in_stock">In Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+                <option value="made_to_order">Made to Order</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Repeat Sizes (if applicable)</label>
+              <input type="text" name="repeat_sizes" class="form-control" placeholder="e.g. 64R, 81.9R, 91.4R">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Material Grade</label>
+              <input type="text" name="material" class="form-control" placeholder="e.g. Alloy Steel / CNC Aluminium">
+            </div>
+          </div>
+
+          <!-- 1. Short Description (1-2 lines for card summaries) -->
+          <div class="form-group">
+            <label class="form-label">Short Description (1-2 lines for Homepage & Catalog cards) *</label>
+            <input type="text" name="short_description" class="form-control" placeholder="e.g. High precision 64R screen head ring for RD-4 rotary machines." required>
+          </div>
+
+          <!-- 2. Detailed Technical Description (for single product page) -->
+          <div class="form-group">
+            <label class="form-label">Long Detailed Technical Description (Shown on Product Detail page)</label>
+            <textarea name="description" class="form-control" placeholder="Comprehensive description of engineering tolerances, alloy composition, and compatibility..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Technical Specifications</label>
+            <textarea name="specifications" class="form-control" placeholder="Key specs, bearing dimensions, tolerances..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Product Image Preset or Upload</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center;">
+              <select name="image_preset" class="form-control">
+                <option value="/static/images/cat_screen_heads.jpg">Screen Heads Standard</option>
+                <option value="/static/images/cat_gears.jpg">Gears & Drive Box</option>
+                <option value="/static/images/cat_pumps.jpg">Colour Pumps</option>
+                <option value="/static/images/cat_rollers.jpg">Rollers & Shafts</option>
+                <option value="/static/images/cat_squeegee.jpg">Squeegee Blade Coils</option>
+                <option value="/static/images/cat_components.jpg">Machine Components</option>
+                <option value="/static/images/hero_parts.jpg">Assorted Spares</option>
+              </select>
+              <input type="file" name="image_file" class="form-control" accept="image/*">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 24px; margin: 16px 0;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 600;">
+              <input type="checkbox" name="is_featured" value="1"> Featured on Homepage
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 600;">
+              <input type="checkbox" name="is_active" value="1" checked> Active in Catalog
+            </label>
+          </div>
+
+          <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center;">
+            Save Product to Catalog
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Product Modal -->
+  <div class="modal-overlay" id="editProductModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3>Edit Spare Part</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('editProductModal').classList.remove('active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="editProductForm" action="" method="POST" enctype="multipart/form-data">
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Product Name *</label>
+              <input type="text" id="editName" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Part Number / Code *</label>
+              <input type="text" id="editPartNumber" name="part_number" class="form-control" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select id="editCategoryId" name="category_id" class="form-control" required>
+                {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Machine Compatibility</label>
+              <select id="editMachineId" name="machine_make_id" class="form-control">
+                <option value="">Universal / All Makes</option>
+                {% for m in machines %}
+                <option value="{{ m.id }}">{{ m.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock Status</label>
+              <select id="editStockStatus" name="stock_status" class="form-control">
+                <option value="in_stock">In Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+                <option value="made_to_order">Made to Order</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Repeat Sizes</label>
+              <input type="text" id="editRepeatSizes" name="repeat_sizes" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Material Grade</label>
+              <input type="text" id="editMaterial" name="material" class="form-control">
+            </div>
+          </div>
+
+          <!-- 1. Short Description -->
+          <div class="form-group">
+            <label class="form-label">Short Description (1-2 lines for Cards) *</label>
+            <input type="text" id="editShortDescription" name="short_description" class="form-control" required>
+          </div>
+
+          <!-- 2. Detailed Technical Description -->
+          <div class="form-group">
+            <label class="form-label">Long Detailed Technical Description (Detail Page)</label>
+            <textarea id="editDescription" name="description" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Technical Specifications</label>
+            <textarea id="editSpecifications" name="specifications" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Update Image</label>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <img id="editImagePreview" src="" alt="Preview" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1;">
+              <input type="file" name="image_file" class="form-control" accept="image/*" style="flex: 1;">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 24px; margin: 16px 0;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 600;">
+              <input type="checkbox" id="editIsFeatured" name="is_featured" value="1"> Featured on Homepage
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 600;">
+              <input type="checkbox" id="editIsActive" name="is_active" value="1"> Active in Catalog
+            </label>
+          </div>
+
+          <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center;">
+            Update Product
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1-Click Toggle for Active/Deactive Product
+    async function toggleProductActive(productId, checkbox) {
+      try {
+        const res = await fetch(`/admin/products/${productId}/toggle-active`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          const label = document.getElementById(`active-label-${productId}`);
+          if (label) {
+            label.textContent = data.is_active ? 'Active' : 'Disabled';
+            label.style.color = data.is_active ? '#059669' : '#dc2626';
+          }
+        }
+      } catch (err) {
+        alert('Error updating status');
+      }
+    }
+
+    // 1-Click Stock Status Update
+    async function updateProductStock(productId, selectEl) {
+      const newStatus = selectEl.value;
+      selectEl.className = `stock-select-badge ${newStatus}`;
+      try {
+        const formData = new FormData();
+        formData.append('stock_status', newStatus);
+        await fetch(`/admin/products/${productId}/stock-status`, {
+          method: 'POST',
+          body: formData
+        });
+      } catch (err) {
+        alert('Error updating stock status');
+      }
+    }
+
+    // Edit Product Modal Populate
+    document.querySelectorAll('.btn-edit-product').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const form = document.getElementById('editProductForm');
+        form.action = `/admin/products/${btn.dataset.id}/edit`;
+        
+        document.getElementById('editName').value = btn.dataset.name;
+        document.getElementById('editPartNumber').value = btn.dataset.partNumber;
+        document.getElementById('editCategoryId').value = btn.dataset.categoryId;
+        document.getElementById('editMachineId').value = btn.dataset.machineId;
+        document.getElementById('editStockStatus').value = btn.dataset.stockStatus || 'in_stock';
+        document.getElementById('editRepeatSizes').value = btn.dataset.repeatSizes;
+        document.getElementById('editMaterial').value = btn.dataset.material;
+        document.getElementById('editShortDescription').value = btn.dataset.shortDescription || '';
+        document.getElementById('editDescription').value = btn.dataset.description;
+        document.getElementById('editSpecifications').value = btn.dataset.specifications;
+        document.getElementById('editIsFeatured').checked = btn.dataset.isFeatured === 'True';
+        document.getElementById('editIsActive').checked = btn.dataset.isActive === 'True';
+        document.getElementById('editImagePreview').src = btn.dataset.imageUrl;
+        
+        document.getElementById('editProductModal').classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

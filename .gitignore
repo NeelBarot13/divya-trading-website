@@ -1,0 +1,19 @@
+# Python virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite Database (optional - keep instance clean)
+instance/
+*.sqlite3
+
+# Logs & temp files
+*.log
+.DS_Store
+Thumbs.db

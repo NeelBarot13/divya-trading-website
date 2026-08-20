@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Categories & Makes | Divya Trading Co. Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
+      <div class="sidebar-title">
+        <h2>DIVYA TRADING</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Inquiries & Quotes</span>
+      </a>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Manage Products</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Customer Accounts</span>
+      </a>
+      <a href="{{ url_for('admin_users') }}" class="sidebar-nav-item">
+        <span class="nav-icon">🔐</span>
+        <span>Team Roles & Passwords</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-nav-item active">
+        <span class="nav-icon">🏷️</span>
+        <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item">
+        <span class="nav-icon">⚙️</span>
+        <span>SMTP & Settings</span>
+      </a>
+      <a href="{{ url_for('home') }}" target="_blank" class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <span class="nav-icon">🌐</span>
+        <span>View Live Website ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Logged in: <strong>{{ session.admin_username }}</strong></span>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div class="admin-page-title">
+        <h1>Categories & Machine Makes</h1>
+        <p>Organize products category-wise and by compatible rotary machine models.</p>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start;">
+      
+      <!-- 1. Product Categories Table & Add Form -->
+      <div>
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Product Categories ({{ categories|length }})</h3>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Products</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in categories %}
+                <tr>
+                  <td>
+                    <strong>{{ c.name }}</strong>
+                    <br><span style="font-size: 0.75rem; color: #64748b;">slug: /{{ c.slug }}</span>
+                  </td>
+                  <td>
+                    <span style="background: #eff6ff; color: #1d4ed8; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">
+                      {{ c.products|length }}
+                    </span>
+                  </td>
+                  <td>
+                    <form action="{{ url_for('admin_delete_category', cat_id=c.id) }}" method="POST" onsubmit="return confirm('Delete this category and its products?');">
+                      <button type="submit" class="btn-action-sm btn-action-delete">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add Category Form -->
+        <div class="admin-card" style="padding: 20px;">
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 14px;">+ Add New Category</h4>
+          <form action="{{ url_for('admin_categories') }}" method="POST">
+            <input type="hidden" name="action" value="add_category">
+            <div class="form-group">
+              <label class="form-label">Category Name *</label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Laser Engraved Screen Rings" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control" placeholder="Short description for homepage card..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category Image Preset</label>
+              <select name="image" class="form-control">
+                <option value="/static/images/cat_screen_heads.jpg">Screen Heads</option>
+                <option value="/static/images/cat_gears.jpg">Gears & Gear Sets</option>
+                <option value="/static/images/cat_pumps.jpg">Colour Pumps</option>
+                <option value="/static/images/cat_rollers.jpg">Rollers & Shafts</option>
+                <option value="/static/images/cat_squeegee.jpg">Squeegee Blades</option>
+                <option value="/static/images/cat_components.jpg">Machine Components</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center;">Save Category</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 2. Machine Makes Table & Add Form -->
+      <div>
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Machine Makes & Models ({{ machines|length }})</h3>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Machine Make</th>
+                  <th>Spares Count</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in machines %}
+                <tr>
+                  <td>
+                    <strong>{{ m.name }}</strong>
+                    <br><span style="font-size: 0.75rem; color: #64748b;">slug: /{{ m.slug }}</span>
+                  </td>
+                  <td>
+                    <span style="background: #eff6ff; color: #1d4ed8; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">
+                      {{ m.products|length }}
+                    </span>
+                  </td>
+                  <td>
+                    <form action="{{ url_for('admin_delete_machine', make_id=m.id) }}" method="POST" onsubmit="return confirm('Delete this machine make?');">
+                      <button type="submit" class="btn-action-sm btn-action-delete">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add Machine Make Form -->
+        <div class="admin-card" style="padding: 20px;">
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 14px;">+ Add Machine Make</h4>
+          <form action="{{ url_for('admin_categories') }}" method="POST">
+            <input type="hidden" name="action" value="add_machine">
+            <div class="form-group">
+              <label class="form-label">Machine Brand / Model Name *</label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. BUSER / Toshin" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description / Compatibility Notes</label>
+              <textarea name="description" class="form-control" placeholder="Notes on rotary screen heads, repeats..."></textarea>
+            </div>
+            <button type="submit" class="btn-admin-primary" style="width: 100%; justify-content: center;">Save Machine Make</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

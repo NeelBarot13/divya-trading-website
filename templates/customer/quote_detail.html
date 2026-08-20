@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Quote #{{ inquiry.inquiry_number }} | {{ site_settings.company_name or 'Divya Trading Co.' }}{% endblock %}
+
+{% block content %}
+<div style="background: var(--bg-light); min-height: 85vh; padding: 40px 0 80px;">
+  <div class="container" style="max-width: 1060px;">
+
+    <!-- Back to Quotes Link -->
+    <div style="margin-bottom: 20px;">
+      <a href="{{ url_for('customer_dashboard') }}" style="font-weight: 700; color: var(--dtc-blue); font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
+        <span>←</span> Back to All Quotes
+      </a>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.88rem; font-weight: 500;
+                      {% if category == 'success' %}background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+                      {% elif category == 'danger' %}background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
+                      {% else %}background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Quote Header Card -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 0.5px;">Quotation Reference</span>
+          <h1 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy); margin: 2px 0 6px;">
+            #{{ inquiry.inquiry_number }}
+          </h1>
+          <p style="font-size: 0.85rem; color: var(--text-light); margin: 0;">
+            Created on {{ inquiry.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+          </p>
+        </div>
+
+        <!-- Status Badge -->
+        <div>
+          {% if inquiry.status == 'new' %}
+            <span style="background: #FEF3C7; color: #92400E; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
+              🟡 Under Engineering Review
+            </span>
+          {% elif inquiry.status == 'contacted' %}
+            <span style="background: #EFF6FF; color: #1E40AF; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
+              🔵 In Review by Sales Team
+            </span>
+          {% elif inquiry.status == 'quoted' %}
+            <span style="background: #ECFDF5; color: #065F46; font-size: 0.85rem; font-weight: 800; padding: 6px 16px; border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid #A7F3D0;">
+              🎉 Quotation Prepared & Ready
+            </span>
+          {% elif inquiry.status == 'completed' %}
+            <span style="background: #E0E7FF; color: #3730A3; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
+              🟢 Order Confirmed / Ready
+            </span>
+          {% else %}
+            <span style="background: #F1F5F9; color: #475569; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
+              Closed
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Customer & Machine Info Grid -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; font-size: 0.85rem;">
+        <div>
+          <span style="color: var(--text-light); display: block;">Customer Name</span>
+          <strong style="color: var(--primary-navy);">{{ inquiry.customer_name }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-light); display: block;">Company / Mill</span>
+          <strong style="color: var(--primary-navy);">{{ inquiry.company_name or 'Independent Mill' }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-light); display: block;">Machine Model</span>
+          <strong style="color: var(--primary-navy);">{{ inquiry.machine_model or 'Universal / Various' }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--text-light); display: block;">Location</span>
+          <strong style="color: var(--primary-navy);">{{ inquiry.country }}</strong>
+        </div>
+      </div>
+
+      {% if inquiry.message %}
+      <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px; margin-top: 18px; font-size: 0.85rem;">
+        <span style="font-weight: 700; color: var(--primary-navy);">Initial Requirement Note:</span>
+        <p style="color: var(--text-muted); margin: 4px 0 0;">{{ inquiry.message }}</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Official Quotation Response (If admin entered quotation details) -->
+    {% if inquiry.quote_amount or inquiry.admin_notes %}
+    <div style="background: #F0FDF4; border: 2px solid #86EFAC; border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span style="font-size: 1.5rem;">📋</span>
+        <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #14532D; margin: 0;">
+          Divya Trading Co. Formal Quotation Details
+        </h3>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 20px; align-items: center; margin-bottom: 16px;">
+        <div style="background: white; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px 16px;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Quotation Price</span>
+          <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: #15803D; line-height: 1.1;">
+            {{ inquiry.quote_amount }}
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Dispatch Lead Time</span>
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-navy); margin-top: 2px;">
+            {{ inquiry.delivery_timeline or 'Ready for immediate dispatch' }}
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Payment Terms</span>
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-top: 2px;">
+            {{ inquiry.payment_terms or 'Standard B2B Terms' }}
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Validity</span>
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-top: 2px;">
+            {{ inquiry.quote_valid_until or '30 Days' }}
+          </div>
+        </div>
+      </div>
+
+      {% if inquiry.admin_notes %}
+      <div style="background: white; border: 1px solid #BBF7D0; border-radius: 6px; padding: 12px 16px; font-size: 0.85rem; color: #166534;">
+        <strong>Engineering Remarks:</strong> {{ inquiry.admin_notes }}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Requested Items Table -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 30px;">
+      <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color);">
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+          Requested Spare Parts ({{ inquiry.items|length }} items)
+        </h3>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+        <thead>
+          <tr style="background: var(--bg-light); text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">
+            <th style="padding: 12px 20px;">Item / Photo</th>
+            <th style="padding: 12px 20px;">Part Number</th>
+            <th style="padding: 12px 20px;">Repeat / Specifications</th>
+            <th style="padding: 12px 20px; text-align: center;">Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in inquiry.items %}
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 14px 20px;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <img src="{{ item.image_url }}" alt="{{ item.product_name }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
+                <div>
+                  <strong style="color: var(--primary-navy); display: block;">{{ item.product_name }}</strong>
+                  {% if item.product %}
+                  <a href="{{ url_for('product_detail', slug=item.product.slug) }}" target="_blank" style="font-size: 0.75rem; color: var(--dtc-blue);">View in catalog ↗</a>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td style="padding: 14px 20px;">
+              <span style="background: var(--dtc-blue-light); color: var(--dtc-blue); font-weight: 700; font-size: 0.8rem; padding: 3px 8px; border-radius: 4px;">
+                {{ item.part_number or 'Custom Spec' }}
+              </span>
+            </td>
+            <td style="padding: 14px 20px; color: var(--text-muted);">
+              {{ item.notes or 'Standard Spec' }}
+            </td>
+            <td style="padding: 14px 20px; text-align: center;">
+              <span style="font-weight: 700; font-size: 1rem; color: var(--primary-navy);">{{ item.quantity }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Two-Way Discussion Thread / Direct Customer-Admin Chat -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;">
+      <div style="background: var(--primary-navy); padding: 18px 24px; color: white; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">💬</span>
+          <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin: 0;">
+            Discussion & Messages Thread with Divya Trading Co.
+          </h3>
+        </div>
+        <span style="font-size: 0.8rem; color: #93C5FD;">Live Engineering Support</span>
+      </div>
+
+      <div style="padding: 24px;">
+        
+        <!-- Messages History -->
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; max-height: 400px; overflow-y: auto; padding-right: 8px;">
+          
+          <!-- Initial Auto Message -->
+          <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <strong style="color: var(--primary-navy);">⚙️ Divya Trading Co. System</strong>
+              <span style="font-size: 0.75rem; color: var(--text-light);">{{ inquiry.created_at.strftime('%b %d, %Y %I:%M %p') }}</span>
+            </div>
+            <p style="margin: 0; color: var(--text-muted);">
+              Inquiry <strong>#{{ inquiry.inquiry_number }}</strong> received and queued for technical quotation.
+            </p>
+          </div>
+
+          {% for msg in inquiry.messages %}
+          <div style="border-radius: 8px; padding: 14px 16px; font-size: 0.86rem;
+                      {% if msg.sender_type == 'admin' %}
+                        background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0052CC;
+                      {% else %}
+                        background: #F8FAFC; border: 1px solid #CBD5E1; border-left: 4px solid #0A2540;
+                      {% endif %}">
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <strong style="{% if msg.sender_type == 'admin' %}color: #0052CC;{% else %}color: var(--primary-navy);{% endif %}">
+                {% if msg.sender_type == 'admin' %}👔 {{ msg.sender_name }}{% else %}👤 {{ msg.sender_name }} (You){% endif %}
+              </strong>
+              <span style="font-size: 0.75rem; color: var(--text-light);">{{ msg.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            </div>
+
+            <p style="margin: 0; color: var(--text-main); line-height: 1.5; white-space: pre-wrap;">{{ msg.message }}</p>
+          </div>
+          {% endfor %}
+
+        </div>
+
+        <!-- Add Reply Form -->
+        <form action="{{ url_for('customer_add_comment', inquiry_number=inquiry.inquiry_number) }}" method="POST" style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+          <h4 style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 10px;">
+            Reply or Add Comments / Requirements
+          </h4>
+          
+          <div class="form-group" style="margin-bottom: 12px;">
+            <textarea name="message" class="form-control" placeholder="Ask questions, confirm quantity adjustments, specify delivery location, or accept this quotation..." required style="min-height: 80px;"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.78rem; color: var(--text-light);">
+              Our sales team in Ahmedabad will be notified immediately upon submission.
+            </span>
+            <button type="submit" class="btn-enquire-primary" style="font-size: 0.86rem; padding: 9px 20px;">
+              <span>Send Message</span>
+              <span>➔</span>
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

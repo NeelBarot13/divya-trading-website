@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Customer Account | {{ site_settings.company_name or 'Divya Trading Co.' }}{% endblock %}
+
+{% block content %}
+<div style="background: var(--bg-light); min-height: 85vh; padding: 50px 0 80px; display: flex; align-items: center;">
+  <div class="container" style="max-width: 560px;">
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.88rem; font-weight: 500;
+                      {% if category == 'success' %}background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+                      {% elif category == 'danger' %}background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
+                      {% else %}background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div style="background: var(--bg-white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); overflow: hidden;">
+      
+      <!-- Top Header -->
+      <div style="background: var(--primary-navy); padding: 30px; text-align: center; color: white;">
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.12); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+          ✨
+        </div>
+        <h2 style="font-family: var(--font-heading); font-size: 1.45rem; font-weight: 800; text-transform: uppercase;">
+          Register Customer Account
+        </h2>
+        <p style="font-size: 0.85rem; color: #93C5FD; margin-top: 4px;">
+          Access your quote history, quotation response amounts, delivery timelines, and direct messaging.
+        </p>
+      </div>
+
+      <!-- Form Body -->
+      <div style="padding: 30px;">
+        <form action="{{ url_for('customer_register') }}" method="POST">
+          <input type="hidden" name="next" value="{{ next_url }}">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Your Full Name *</label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. John Doe / Rajesh Patel" required autofocus style="padding: 10px 12px;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Company / Mill Name</label>
+              <input type="text" name="company_name" class="form-control" placeholder="Textile Mills Pvt Ltd" style="padding: 10px 12px;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Email Address *</label>
+              <input type="email" name="email" class="form-control" placeholder="name@company.com" required style="padding: 10px 12px;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Phone / WhatsApp *</label>
+              <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210" required style="padding: 10px 12px;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Country *</label>
+              <input type="text" name="country" class="form-control" value="India" required style="padding: 10px 12px;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">City / State</label>
+              <input type="text" name="city" class="form-control" placeholder="Surat / Ahmedabad / Dhaka" style="padding: 10px 12px;">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Choose Password *</label>
+            <input type="password" name="password" class="form-control" placeholder="Create a secure password" required minlength="4" style="padding: 10px 12px;">
+          </div>
+
+          <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm);">
+            <span>Create Account & Continue</span>
+            <span>➔</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color);">
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Already have an account?
+            <a href="{{ url_for('customer_login', next=next_url) }}" style="font-weight: 700; color: var(--dtc-blue);">Sign In Here ➔</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

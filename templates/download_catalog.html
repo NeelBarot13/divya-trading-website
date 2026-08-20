@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Download Product Catalog | Divya Trading Co.{% endblock %}
+
+{% block content %}
+
+<!-- Header Banner -->
+<section style="background: var(--primary-navy); color: white; padding: 50px 0; text-align: center;">
+  <div class="container">
+    <span style="font-size: 0.82rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">OFFICIAL BROCHURE & CATALOG</span>
+    <h1 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; margin-top: 6px;">
+      Divya Trading Co. Product Catalog
+    </h1>
+    <p style="font-size: 1rem; color: #CBD5E1; max-width: 650px; margin: 10px auto 0;">
+      Browse our complete range of rotary screen printing machine spare parts, screen heads, gear sets, colour pumps, and squeegee coils.
+    </p>
+  </div>
+</section>
+
+<!-- Catalog Showcase & Quick Download -->
+<section style="padding: 60px 0 80px; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; align-items: center; margin-bottom: 60px;">
+      <div>
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-lg);">
+          <img src="{{ url_for('static', filename='images/hero_parts.jpg') }}" alt="DTC Catalog Preview" style="border-radius: var(--radius-md); width: 100%; height: auto;">
+        </div>
+      </div>
+
+      <div>
+        <span class="product-part-no" style="font-size: 0.85rem; padding: 4px 10px;">Full PDF Catalog (8 Pages)</span>
+        <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy); margin: 10px 0 16px;">
+          Rotary Printing Machine Spares Technical Brochure
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+          Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.
+        </p>
+
+        <div style="background: var(--bg-light); border-left: 4px solid var(--dtc-blue); padding: 14px 18px; border-radius: 4px; margin-bottom: 24px;">
+          <strong style="color: var(--primary-navy); font-size: 0.9rem; display: block;">Instant Download or Direct WhatsApp Delivery:</strong>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Get a high-resolution PDF sent directly to your email or WhatsApp number.</span>
+        </div>
+
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+          <a href="{{ url_for('static', filename='images/hero_parts.jpg') }}" download="Divya_Trading_Co_Catalog.jpg" class="btn-enquire-primary" style="padding: 12px 24px;">
+            <span>Download Catalog PDF / Image</span>
+            <span>⬇</span>
+          </a>
+          <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20please%20send%20me%20your%20complete%20PDF%20catalog." target="_blank" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #25D366; color: white; border-color: #25D366;">
+            <span>Request on WhatsApp 💬</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Catalog Sections Preview Grid -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 50px;">
+      <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); text-align: center; margin-bottom: 30px;">
+        Catalog Sections Overview
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+          <h4 style="color: var(--primary-navy); font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">Page 1-3: Screen Heads & Repeats</h4>
+          <p style="font-size: 0.84rem; color: var(--text-muted);">RD-4, RD-3, Pegasus, MBK, Zimmer in 64, 81.9, 91.4, 101.8 repeats.</p>
+          <a href="{{ url_for('products', category='screen-head-parts') }}" style="font-size: 0.8rem; font-weight: 700; margin-top: 10px; display: inline-block;">Browse Section ➔</a>
+        </div>
+
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+          <h4 style="color: var(--primary-navy); font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">Page 4-5: Pumps & Squeegee Blades</h4>
+          <p style="font-size: 0.84rem; color: var(--text-muted);">SB-4/SB-5/SB-7 Colour Pumps, Drive boxes, Swedish steel squeegee coils.</p>
+          <a href="{{ url_for('products', category='pumps-and-accessories') }}" style="font-size: 0.8rem; font-weight: 700; margin-top: 10px; display: inline-block;">Browse Section ➔</a>
+        </div>
+
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+          <h4 style="color: var(--primary-navy); font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">Page 6-8: Components & Spares</h4>
+          <p style="font-size: 0.84rem; color: var(--text-muted);">Brackets, bushings, couplings, pin plates, stenter spares, washing boxes.</p>
+          <a href="{{ url_for('products', category='machine-components') }}" style="font-size: 0.8rem; font-weight: 700; margin-top: 10px; display: inline-block;">Browse Section ➔</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

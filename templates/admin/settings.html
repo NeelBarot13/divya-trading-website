@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website CMS & Appearance Settings | Divya Trading Co. Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Tabbed interface styling for PrintShop-grade CMS */
+    .cms-tabs-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid var(--admin-border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .cms-tab-btn {
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--admin-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cms-tab-btn:hover {
+      color: var(--admin-blue);
+      background: rgba(0, 82, 204, 0.04);
+    }
+    .cms-tab-btn.active {
+      color: var(--admin-blue);
+      border-bottom-color: var(--admin-blue);
+      background: white;
+    }
+    .cms-tab-content {
+      display: none;
+    }
+    .cms-tab-content.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toggle-card {
+      background: #F8FAFC;
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .toggle-card strong {
+      font-size: 0.88rem;
+      color: var(--admin-navy);
+      display: block;
+    }
+    .toggle-card span {
+      font-size: 0.76rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
+      <div class="sidebar-title">
+        <h2>DIVYA TRADING</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Inquiries & Quotes</span>
+      </a>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-nav-item">
+        <span class="nav-icon">📦</span>
+        <span>Manage Products</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Customer Accounts</span>
+      </a>
+      <a href="{{ url_for('admin_users') }}" class="sidebar-nav-item">
+        <span class="nav-icon">🔐</span>
+        <span>Team Roles & Passwords</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-nav-item">
+        <span class="nav-icon">🏷️</span>
+        <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item active">
+        <span class="nav-icon">⚙️</span>
+        <span>Website CMS & Settings</span>
+      </a>
+      <a href="{{ url_for('home') }}" target="_blank" class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <span class="nav-icon">🌐</span>
+        <span>View Live Website ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Logged in: <strong>{{ session.admin_username }}</strong></span>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div class="admin-page-title">
+        <h1>Website CMS & Appearance Manager</h1>
+        <p>Control homepage banners, product showcase limits, section visibility, brand theme, and SMTP notifications.</p>
+      </div>
+
+      <div class="admin-top-actions">
+        <button type="submit" form="mainCmsForm" class="btn-admin-primary" style="padding: 10px 24px; font-size: 0.95rem;">
+          <span>💾 Save All Website Settings</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Main CMS Tabs Navigation -->
+    <div class="cms-tabs-nav">
+      <button type="button" class="cms-tab-btn active" onclick="switchCmsTab('tab-hero', this)">
+        <span>🖼️</span> Hero Banner & Badges
+      </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-showcase', this)">
+        <span>✨</span> Product Showcase & Toggles
+      </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-quality', this)">
+        <span>🛡️</span> Quality Banner & 6 Pillars
+      </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-stats', this)">
+        <span>📈</span> Stats Counters & CTA
+      </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-contact', this)">
+        <span>📞</span> Brand & Contact Info
+      </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-email', this)">
+        <span>✉️</span> SMTP Notifications
+      </button>
+    </div>
+
+    <!-- Main Settings Form -->
+    <form id="mainCmsForm" action="{{ url_for('admin_settings') }}" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="save_settings">
+
+      <!-- ===================================================================
+           TAB 1: HERO BANNER & BADGES
+           =================================================================== -->
+      <div id="tab-hero" class="cms-tab-content active">
+        <div class="admin-card" style="padding: 28px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
+            Homepage Hero Banner Configuration
+          </h3>
+
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label">Hero Main Title (HTML supported, e.g. &lt;br&gt; for line break)</label>
+            <input type="text" name="hero_title" class="form-control" value="{{ settings.hero_title or 'PRECISION PARTS.<br>PERFORMANCE ASSURED.' }}" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label">Hero Subtitle / Description</label>
+            <textarea name="hero_subtitle" class="form-control" style="min-height: 70px;">{{ settings.hero_subtitle or 'Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines' }}</textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label">Brand Compatibility Pills (Comma-separated list)</label>
+            <input type="text" name="hero_brands" class="form-control" value="{{ settings.hero_brands or 'STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC' }}">
+            <span style="font-size: 0.75rem; color: #64748b;">These brand tags appear as pills below the hero title on the homepage.</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <!-- Trust Badge 1 -->
+            <div style="background: #F8FAFC; border: 1px solid var(--admin-border); border-radius: 8px; padding: 16px;">
+              <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Trust Badge 1 (Experience)</h4>
+              <div class="form-group">
+                <label class="form-label">Badge 1 Heading</label>
+                <input type="text" name="trust_badge_1_title" class="form-control" value="{{ settings.trust_badge_1_title or 'SINCE 1997' }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Badge 1 Subtext</label>
+                <input type="text" name="trust_badge_1_desc" class="form-control" value="{{ settings.trust_badge_1_desc or 'Over Two Decades of Excellence' }}">
+              </div>
+            </div>
+
+            <!-- Trust Badge 2 -->
+            <div style="background: #F8FAFC; border: 1px solid var(--admin-border); border-radius: 8px; padding: 16px;">
+              <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Trust Badge 2 (Global Quality)</h4>
+              <div class="form-group">
+                <label class="form-label">Badge 2 Heading</label>
+                <input type="text" name="trust_badge_2_title" class="form-control" value="{{ settings.trust_badge_2_title or 'GLOBAL QUALITY' }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Badge 2 Subtext</label>
+                <input type="text" name="trust_badge_2_desc" class="form-control" value="{{ settings.trust_badge_2_desc or 'Trusted by Clients Worldwide' }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Image Upload / Preset -->
+          <div class="form-group">
+            <label class="form-label">Hero Showcase Image</label>
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <img src="{{ settings.hero_image or url_for('static', filename='images/hero_parts.jpg') }}" alt="Hero Preview" style="width: 100px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1;">
+              <div style="flex: 1;">
+                <input type="file" name="hero_image_file" class="form-control" accept="image/*">
+                <span style="font-size: 0.75rem; color: #64748b;">Upload a new image or leave empty to keep current.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 2: PRODUCT SHOWCASE & SECTION VISIBILITY TOGGLES
+           =================================================================== -->
+      <div id="tab-showcase" class="cms-tab-content">
+        <div class="admin-card" style="padding: 28px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
+            Homepage Product Showcase & Layout Controls
+          </h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div class="form-group">
+              <label class="form-label">Homepage Featured Products Limit</label>
+              <select name="home_featured_limit" class="form-control" style="font-weight: 700;">
+                <option value="4" {% if settings.home_featured_limit == '4' or not settings.home_featured_limit %}selected{% endif %}>4 Products (Recommended)</option>
+                <option value="8" {% if settings.home_featured_limit == '8' %}selected{% endif %}>8 Products</option>
+                <option value="12" {% if settings.home_featured_limit == '12' %}selected{% endif %}>12 Products</option>
+              </select>
+              <span style="font-size: 0.75rem; color: #64748b;">Controls how many featured items are shown on the homepage grid.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Featured Section Title</label>
+              <input type="text" name="featured_section_title" class="form-control" value="{{ settings.featured_section_title or 'Featured Spare Parts' }}">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Featured Section Subtitle</label>
+              <input type="text" name="featured_section_subtitle" class="form-control" value="{{ settings.featured_section_subtitle or 'Precision Catalog' }}">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label">Product Range Section Title</label>
+            <input type="text" name="product_range_title" class="form-control" value="{{ settings.product_range_title or 'OUR PRODUCT RANGE' }}">
+          </div>
+
+          <!-- Section Visibility Toggles -->
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--admin-navy); margin: 24px 0 14px;">
+            Homepage Sections Visibility Toggles
+          </h4>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Brand Compatibility Pills</strong>
+              <span>Show/hide machine brands (STORMAC, STORK, ICHINOSE...) in the hero header.</span>
+            </div>
+            <input type="checkbox" name="show_hero_brands" value="true" {% if settings.show_hero_brands != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Product Range Category Cards</strong>
+              <span>Show/hide the 6 category cards section on the homepage.</span>
+            </div>
+            <input type="checkbox" name="show_product_range" value="true" {% if settings.show_product_range != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Quality You Can Trust Banner</strong>
+              <span>Show/hide the industrial printing machine banner section.</span>
+            </div>
+            <input type="checkbox" name="show_quality_banner" value="true" {% if settings.show_quality_banner != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Why Choose Divya Trading Co. Section</strong>
+              <span>Show/hide the 6 value pillars cards.</span>
+            </div>
+            <input type="checkbox" name="show_why_choose" value="true" {% if settings.show_why_choose != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Featured Products Grid</strong>
+              <span>Show/hide the 4 featured parts showcase on the homepage.</span>
+            </div>
+            <input type="checkbox" name="show_featured_products" value="true" {% if settings.show_featured_products != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Stats & Quick Inquiry Ribbon</strong>
+              <span>Show/hide the bottom navy stats ribbon.</span>
+            </div>
+            <input type="checkbox" name="show_stats_ribbon" value="true" {% if settings.show_stats_ribbon != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+
+          <div class="toggle-card">
+            <div>
+              <strong>Floating WhatsApp Quick Connect Button</strong>
+              <span>Show/hide the floating green WhatsApp chat bubble in the bottom left corner.</span>
+            </div>
+            <input type="checkbox" name="show_whatsapp_button" value="true" {% if settings.show_whatsapp_button != 'false' %}checked{% endif %} style="transform: scale(1.3);">
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 3: QUALITY BANNER & 6 VALUE PILLARS
+           =================================================================== -->
+      <div id="tab-quality" class="cms-tab-content">
+        <div class="admin-card" style="padding: 28px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
+            Quality Banner & 6 Value Pillars
+          </h3>
+
+          <!-- Quality Banner -->
+          <div style="background: #F8FAFC; border: 1px solid var(--admin-border); border-radius: 8px; padding: 20px; margin-bottom: 28px;">
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 14px;">Quality Banner Content</h4>
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">Banner Heading</label>
+              <input type="text" name="quality_banner_title" class="form-control" value="{{ settings.quality_banner_title or 'QUALITY YOU CAN TRUST' }}">
+            </div>
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">Banner Description</label>
+              <textarea name="quality_banner_text" class="form-control">{{ settings.quality_banner_text or 'With over two decades of experience, we are a leader in quality products. Our reputation is based on performance, reliability and customer satisfaction across textile printing mills worldwide.' }}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Banner Image</label>
+              <div style="display: flex; gap: 14px; align-items: center;">
+                <img src="{{ settings.quality_banner_image or url_for('static', filename='images/textile_banner.jpg') }}" alt="Quality Banner Preview" style="width: 100px; height: 60px; object-fit: cover; border-radius: 6px;">
+                <input type="file" name="quality_banner_image_file" class="form-control" accept="image/*" style="flex: 1;">
+              </div>
+            </div>
+          </div>
+
+          <!-- 6 Pillars -->
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label">Why Choose Section Heading</label>
+            <input type="text" name="why_choose_title" class="form-control" value="{{ settings.why_choose_title or 'WHY CHOOSE DIVYA TRADING CO.' }}">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <!-- Pillar 1 -->
+            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
+              <strong style="color: #0052cc;">Pillar 1: Experience</strong>
+              <input type="text" name="pillar_1_title" class="form-control" value="{{ settings.pillar_1_title or '27+ YEARS OF EXPERIENCE' }}" style="margin: 8px 0 6px;">
+              <textarea name="pillar_1_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_1_desc or 'Serving the textile industry since 1997 with excellence and reliability.' }}</textarea>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
+              <strong style="color: #0052cc;">Pillar 2: Quality</strong>
+              <input type="text" name="pillar_2_title" class="form-control" value="{{ settings.pillar_2_title or 'PREMIUM QUALITY' }}" style="margin: 8px 0 6px;">
+              <textarea name="pillar_2_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_2_desc or 'High precision CNC machined parts for reliable machine performance.' }}</textarea>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
+              <strong style="color: #0052cc;">Pillar 3: Wide Range</strong>
+              <input type="text" name="pillar_3_title" class="form-control" value="{{ settings.pillar_3_title or 'WIDE RANGE OF PRODUCTS' }}" style="margin: 8px 0 6px;">
+              <textarea name="pillar_3_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_3_desc or 'Complete range of textile spare parts and consumables under one roof.' }}</textarea>
+            </div>
+
+            <!-- Pillar 4 -->
+            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
+              <strong style="color: #0052cc;">Pillar 4: Global Reach</strong>
+              <input type="text" name="pillar_4_title" class="form-control" value="{{ settings.pillar_4_title or 'GLOBAL REACH' }}" style="margin: 8px 0 6px;">
+              <textarea name="pillar_4_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_4_desc or 'Exporting to clients across 30+ countries with global trust.' }}</textarea>
+            </div>
+
+            <!-- Pillar 5 -->
+            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
+              <strong style="color: #0052cc;">Pillar 5: Expert Support</strong>
+              <input type="text" name="pillar_5_title" class="form-control" value="{{ settings.pillar_5_title or 'EXPERT SUPPORT' }}" style="margin: 8px 0 6px;">
+              <textarea name="pillar_5_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_5_desc or 'Dedicated engineering support for all your technical requirements.' }}</textarea>
+            </div>
+
+            <!-- Pillar 6 -->
+            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
+              <strong style="color: #0052cc;">Pillar 6: Delivery</strong>
+              <input type="text" name="pillar_6_title" class="form-control" value="{{ settings.pillar_6_title or 'ON TIME DELIVERY' }}" style="margin: 8px 0 6px;">
+              <textarea name="pillar_6_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_6_desc or 'Timely worldwide delivery with safe and secure export packaging.' }}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 4: STATS COUNTERS & CTA RIBBON
+           =================================================================== -->
+      <div id="tab-stats" class="cms-tab-content">
+        <div class="admin-card" style="padding: 28px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
+            Statistics Counters & Quick Inquiry Ribbon
+          </h3>
+
+          <div style="background: #F8FAFC; border: 1px solid var(--admin-border); border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+            <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 14px;">CTA Ribbon Text</h4>
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">CTA Heading</label>
+              <input type="text" name="cta_bar_title" class="form-control" value="{{ settings.cta_bar_title or 'LOOKING FOR THE RIGHT PART?' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CTA Subtitle</label>
+              <input type="text" name="cta_bar_desc" class="form-control" value="{{ settings.cta_bar_desc or 'Send us your requirement and we will get back to you with the best solution.' }}">
+            </div>
+          </div>
+
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 14px;">4 Metric Stats</h4>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Stat 1 (Products)</label>
+              <input type="text" name="stats_products" class="form-control" value="{{ settings.stats_products or '1000+' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stat 2 (Satisfied Clients)</label>
+              <input type="text" name="stats_clients" class="form-control" value="{{ settings.stats_clients or '500+' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stat 3 (Countries)</label>
+              <input type="text" name="stats_countries" class="form-control" value="{{ settings.stats_countries or '30+' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stat 4 (Quality Assurance)</label>
+              <input type="text" name="stats_quality" class="form-control" value="{{ settings.stats_quality or '100%' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 5: BRAND & CONTACT INFORMATION
+           =================================================================== -->
+      <div id="tab-contact" class="cms-tab-content">
+        <div class="admin-card" style="padding: 28px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
+            Company Brand & Contact Details
+          </h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+            <div class="form-group">
+              <label class="form-label">Company Brand Name</label>
+              <input type="text" name="company_name" class="form-control" value="{{ settings.company_name or 'DIVYA TRADING CO.' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Company Tagline</label>
+              <input type="text" name="company_tagline" class="form-control" value="{{ settings.company_tagline or 'all type rotary printing machine spares' }}">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label">Header Logo</label>
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <img src="{{ settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px;">
+              <input type="file" name="site_logo_file" class="form-control" accept="image/*" style="flex: 1;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+            <div class="form-group">
+              <label class="form-label">Primary Phone / WhatsApp</label>
+              <input type="text" name="phone_primary" class="form-control" value="{{ settings.phone_primary or '+91 83208 21579' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secondary Phone</label>
+              <input type="text" name="phone_secondary" class="form-control" value="{{ settings.phone_secondary or '+91 94260 64807' }}">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+            <div class="form-group">
+              <label class="form-label">Primary Email</label>
+              <input type="email" name="email_primary" class="form-control" value="{{ settings.email_primary or 'divya.trading06@gmail.com' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secondary Email</label>
+              <input type="email" name="email_secondary" class="form-control" value="{{ settings.email_secondary or 'neelbarot585@gmail.com' }}">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label">Factory & Office Address</label>
+            <textarea name="address" class="form-control">{{ settings.address or '15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India' }}</textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">WhatsApp Number (with country code)</label>
+              <input type="text" name="whatsapp_number" class="form-control" value="{{ settings.whatsapp_number or '+918320821579' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp Default Pre-filled Message</label>
+              <input type="text" name="whatsapp_default_message" class="form-control" value="{{ settings.whatsapp_default_message or 'Hello Divya Trading Co., I would like to inquire about rotary printing machine spare parts.' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 6: SMTP EMAIL NOTIFICATIONS
+           =================================================================== -->
+      <div id="tab-email" class="cms-tab-content">
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start;">
+          <div class="admin-card" style="padding: 28px;">
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 16px;">
+              SMTP Email Notification Configuration
+            </h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">
+              Every single-part inquiry and multi-part quote request automatically generates email notifications.
+            </p>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">Admin Alert Recipient Emails (comma separated)</label>
+              <input type="text" name="ADMIN_NOTIFICATION_EMAIL" class="form-control" value="{{ config.ADMIN_NOTIFICATION_EMAIL or 'divya.trading06@gmail.com,neelbarot585@gmail.com' }}">
+              <span style="font-size: 0.75rem; color: #64748b;">Inquiries will be immediately dispatched to these email addresses.</span>
+            </div>
+
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 14px; margin-top: 18px; font-size: 0.82rem; color: #1e3a8a;">
+              <strong>Live Delivery Mode:</strong> To configure production SMTP (Gmail / SendGrid / Office365), add your credentials in <code>.env</code>. When offline or unconfigured, emails are logged in simulated mode in the audit log below with zero downtime!
+            </div>
+          </div>
+
+          <!-- Test Email Box -->
+          <div>
+            <div class="admin-card" style="padding: 24px; margin-bottom: 20px;">
+              <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Send Test Email</h4>
+              <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 14px;">Verify email delivery directly from here.</p>
+              
+              <div class="form-group" style="margin-bottom: 12px;">
+                <input type="email" id="testEmailTarget" class="form-control" placeholder="your@email.com" value="divya.trading06@gmail.com">
+              </div>
+              <button type="button" onclick="sendTestEmailAjax()" class="btn-admin-primary" style="width: 100%; justify-content: center; background: #059669;">
+                Send Test Email ✉
+              </button>
+            </div>
+
+            <!-- Email Activity Audit Log -->
+            <div class="admin-card" style="padding: 20px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Recent Email Activity ({{ email_logs|length }})</h4>
+              {% if email_logs %}
+              <div style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+                {% for log in email_logs %}
+                <div style="background: #F8FAFC; padding: 8px 12px; border-radius: 6px; font-size: 0.76rem;">
+                  <div style="display: flex; justify-content: space-between;">
+                    <strong style="color: #0A2540;">{{ log.subject }}</strong>
+                    <span style="font-weight: 700; color: {% if log.status == 'sent' %}#16a34a{% else %}#d97706{% endif %};">{{ log.status|upper }}</span>
+                  </div>
+                  <div style="color: #64748b; margin-top: 2px;">{{ log.timestamp }} | To: {{ log.recipients|join(', ') }}</div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p style="font-size: 0.8rem; color: #94a3b8; text-align: center; padding: 12px;">No email activity yet.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <script>
+    function switchCmsTab(tabId, btn) {
+      document.querySelectorAll('.cms-tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.cms-tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId)?.classList.add('active');
+      btn.classList.add('active');
+    }
+
+    async function sendTestEmailAjax() {
+      const email = document.getElementById('testEmailTarget').value;
+      if (!email) return alert('Please enter an email address.');
+      
+      const formData = new FormData();
+      formData.append('action', 'test_email');
+      formData.append('test_email_recipient', email);
+      
+      try {
+        const res = await fetch('{{ url_for("admin_settings") }}', {
+          method: 'POST',
+          body: formData
+        });
+        alert('Test email trigger sent! Check the notification log.');
+        window.location.reload();
+      } catch (e) {
+        alert('Error sending test email.');
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+================================================================================
+DIVYA TRADING CO. - MASTER SYSTEM ARCHITECTURE & REPRODUCTION PROMPT
+================================================================================
+
+PROJECT: Divya Trading Co. (DTC) - Precision Rotary Printing Machine Spares B2B Platform
+BUSINESS MODEL: Request-For-Quote (RFQ) & Industrial Quotation Management Platform
+TECH STACK: Python (Flask, SQLAlchemy), Semantic HTML5, Vanilla CSS3, Vanilla JS, SQLite / MySQL, SMTP
+
+--------------------------------------------------------------------------------
+MASTER PROMPT FOR REPRODUCING THIS ENTIRE SYSTEM:
+--------------------------------------------------------------------------------
+
+"Act as a Principal Full-Stack Software Engineer and Industrial B2B UI/UX Architect.
+Design, build, and deploy a complete, production-ready B2B E-Commerce Catalog & Quotation Management Web Platform for 'Divya Trading Co.' (Ahmedabad, India) - a precision manufacturer and global exporter of textile rotary printing and processing machine spare parts since 1997.
+
+CORE ARCHITECTURAL SPECIFICATIONS:
+
+1. B2B NO-PRICE CATALOG & 2-TIER PRODUCT DESCRIPTIONS:
+   - Precision parts for Stork RD-3/RD-4, Stormac, Pegasus, Ichinose, Reggiani, Harish, Zimmer, Stovec.
+   - Prices are HIDDEN publicly. Customers request formal price quotations per repeat size and volume.
+   - 2-Tier Description System:
+     * Short Description: 1-2 concise lines shown on homepage featured cards and catalog grid cards.
+     * Long Description: In-depth technical description shown on the single product detail page.
+   - Stock Status: Badges and 1-Click updates for 'In Stock', 'Out of Stock', and 'Made to Order'.
+   - 1-Click Active/Deactivate: Disable any product from live public visibility with instant async toggle.
+
+2. CUSTOMER PORTAL & MY QUOTES DASHBOARD:
+   - Registration & Login (/register, /login) with automatic past guest inquiry linking by email.
+   - Header Navigation:
+     * Guest View: Clean, uppercase 'LOGIN / SIGNUP' menu text matching other navbar links.
+     * Logged-in View: Sleek circular profile button with user initials and dropdown (My Quotes & Status, Request New Quote, Sign Out).
+     * Complete Removal of Admin Links: Zero mention or link to admin panel on the public frontend.
+   - Guest Inquiry Modal: Pop-up prompt suggesting account creation to track quotes with real-time status and live chat, with 'Continue as Guest' fallback.
+   - 'My Quotes' Dashboard (/my-quotes):
+     * Metric counters: Total Inquiries, Under Review, Quotation Ready, Completed.
+     * Live status badges (Under Review, Quoted, Confirmed).
+   - Quotation Details & Two-Way Discussion Thread (/my-quotes/<inquiry_number>):
+     * Official quotation summary card (price amount, dispatch timeline, payment terms, validity).
+     * Live interactive discussion thread between customer and DTC sales engineering team with email alerts.
+
+3. DUAL QUOTE REQUEST FLOWS:
+   - Single-Product Quick Inquiry: Modal pre-filled with product name, part number, repeat size, and quantity.
+   - Multi-Product Quote List Drawer: Side drawer that collects multiple parts into a combined inquiry submission.
+
+4. FULL-FEATURED ADMIN PANEL (/admin):
+   - Inquiries & Quotation Preparation (/admin/dashboard):
+     * Review submitted RFQs, input formal quote price (e.g. Rs. 1,45,000 / $1,750 USD), lead time, payment terms, and validity.
+     * Direct reply in the two-way customer discussion thread with instant email alerts.
+     * CSV Export of inquiries with one click.
+   - Product & Stock Manager (/admin/products):
+     * Add/Edit products with 2-tier descriptions, part numbers, machine make, category, photos, and specs.
+     * 1-Click toggles for live activation and stock status directly on the data table.
+   - Customer Accounts Manager (/admin/customers):
+     * Directory of all registered textile mills, contact phone/WhatsApp, and total quotes submitted.
+   - Team Roles & Password Management (/admin/users - Super Admin Exclusive):
+     * Super Admin can assign access roles: 'Super Administrator', 'Sales & Quotes Manager', 'Catalog & Product Editor'.
+     * Super Admin can view team password hints/values and update any team member's password directly.
+   - Website CMS & Settings (/admin/settings):
+     * Tabbed controls for Hero Title/Subtitle, Brand Compatibility Pills, 4-Product Showcase limit, 6 Value Pillars, Stats ribbon, and SMTP email settings."
+
+--------------------------------------------------------------------------------
+DATABASE MODELS:
+--------------------------------------------------------------------------------
+- Category: id, name, slug, description, image, order_index
+- MachineMake: id, name, slug, description
+- Product: id, name, part_number, slug, category_id, machine_make_id, short_description, description, specifications, repeat_sizes, material, image_url, is_featured, is_active, stock_status
+- CustomerUser: id, name, company_name, email, phone, country, city, password_hash
+- Inquiry: id, inquiry_number, customer_id, customer_name, company_name, email, phone, country, machine_model, message, status, quote_amount, delivery_timeline, payment_terms, quote_valid_until, admin_notes
+- InquiryItem: id, inquiry_id, product_id, product_name, part_number, quantity, notes
+- InquiryMessage: id, inquiry_id, sender_type, sender_name, message, created_at
+- AdminUser: id, username, email, password_hash, view_password, role ('superadmin', 'sales_manager', 'product_editor'), is_active
+- SiteSetting: id, key, value, description
+
+--------------------------------------------------------------------------------
+DEFAULT CREDENTIALS:
+--------------------------------------------------------------------------------
+- Admin Portal: http://127.0.0.1:5000/admin/login
+  * Super Admin Username: admin
+  * Super Admin Password: admin123
+- Customer Portal: http://127.0.0.1:5000/login
+  * Test Customer: buyer@suratfabrics.com / password123 (or register a new account)
+================================================================================
