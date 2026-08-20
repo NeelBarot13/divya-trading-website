@@ -83,15 +83,15 @@
     <!-- Role Explanation Banner -->
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
       <div style="background: white; border: 1px solid var(--admin-border); border-left: 4px solid #7C3AED; border-radius: 8px; padding: 16px;">
-        <strong style="color: #6D28D9; font-size: 0.92rem; display: block; margin-bottom: 4px;">👑 Super Administrator</strong>
+        <strong style="color: #6D28D9; font-size: 0.92rem; display: block; margin-bottom: 4px;">Super Administrator</strong>
         <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Full unrestricted access to team user passwords, CMS settings, categories, products, and quotations.</p>
       </div>
       <div style="background: white; border: 1px solid var(--admin-border); border-left: 4px solid #0052CC; border-radius: 8px; padding: 16px;">
-        <strong style="color: #0052CC; font-size: 0.92rem; display: block; margin-bottom: 4px;">💼 Sales & Quotes Manager</strong>
+        <strong style="color: #0052CC; font-size: 0.92rem; display: block; margin-bottom: 4px;">Sales & Quotes Manager</strong>
         <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Manage customer RFQs, prepare price quotations, send emails, and chat with customers.</p>
       </div>
       <div style="background: white; border: 1px solid var(--admin-border); border-left: 4px solid #10B981; border-radius: 8px; padding: 16px;">
-        <strong style="color: #059669; font-size: 0.92rem; display: block; margin-bottom: 4px;">📦 Catalog & Product Editor</strong>
+        <strong style="color: #059669; font-size: 0.92rem; display: block; margin-bottom: 4px;">Catalog & Product Editor</strong>
         <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Add, update, activate/deactivate spare parts, stock statuses, photos, and categories.</p>
       </div>
     </div>
@@ -132,15 +132,15 @@
               <td>
                 {% if user.role == 'superadmin' %}
                   <span style="background: #F3E8FF; color: #6D28D9; font-weight: 700; font-size: 0.76rem; padding: 4px 10px; border-radius: 9999px; border: 1px solid #DDD6FE;">
-                    👑 Super Administrator
+                    Super Administrator
                   </span>
                 {% elif user.role == 'sales_manager' %}
                   <span style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; font-size: 0.76rem; padding: 4px 10px; border-radius: 9999px; border: 1px solid #BFDBFE;">
-                    💼 Sales Manager
+                    Sales Manager
                   </span>
                 {% else %}
                   <span style="background: #ECFDF5; color: #059669; font-weight: 700; font-size: 0.76rem; padding: 4px 10px; border-radius: 9999px; border: 1px solid #A7F3D0;">
-                    📦 Product Editor
+                    Product Editor
                   </span>
                 {% endif %}
               </td>

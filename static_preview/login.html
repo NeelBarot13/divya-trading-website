@@ -3,102 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}{{ site_settings.company_name or 'Divya Trading Co.' }} | Precision Spare Parts for Textile Printing Machines{% endblock %}</title>
+  <title>Sign In to Customer Portal | DIVYA TRADING CO.</title>
   <meta name="description" content="Divya Trading Co. - Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines (Stork, Stormac, Ichinose, Reggiani, Harish, Zimmer, Stovec). Since 1997.">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}">
+  <link rel="icon" type="image/png" href="/static/images/logo.png">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="/static/css/style.css">
   
-  {% block extra_head %}{% endblock %}
+  
 </head>
-<body data-logged-in="{% if current_customer %}true{% else %}false{% endif %}">
+<body data-logged-in="false">
 
   <!-- Main Navigation Header -->
   <header class="site-header">
     <div class="container header-inner">
       <!-- Brand Logo -->
-      <a href="{{ url_for('home') }}" class="brand-logo-link" id="headerLogoLink" title="Divya Trading Co.">
-        <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="{{ site_settings.company_name or 'Divya Trading Co.' }}" class="brand-logo-img">
+      <a href="index.html" class="brand-logo-link" id="headerLogoLink" title="Divya Trading Co.">
+        <img src="/static/images/logo.png" alt="DIVYA TRADING CO." class="brand-logo-img">
       </a>
 
       <!-- Desktop Navigation Links -->
       <nav class="main-nav" id="mainNav">
-        <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">HOME</a>
-        <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">ABOUT US</a>
+        <a href="index.html" class="nav-link ">HOME</a>
+        <a href="about.html" class="nav-link ">ABOUT US</a>
         
         <!-- Products Dropdown -->
         <div class="nav-item-dropdown">
-          <a href="{{ url_for('products') }}" class="nav-link dropdown-toggle {% if request.endpoint == 'products' %}active{% endif %}">
+          <a href="products.html" class="nav-link dropdown-toggle ">
             PRODUCTS <span class="dropdown-caret">▾</span>
           </a>
           <div class="dropdown-menu">
-            <a href="{{ url_for('products') }}" class="dropdown-item"><strong>All Products Catalog</strong> ➔</a>
+            <a href="products.html" class="dropdown-item"><strong>All Products Catalog</strong> ➔</a>
             <div class="dropdown-divider"></div>
-            {% for cat in nav_categories %}
-            <a href="{{ url_for('products', category=cat.slug) }}" class="dropdown-item">
-              <span>{{ cat.name }}</span>
+            
+            <a href="/products?category=screen-head-parts" class="dropdown-item">
+              <span>Screen Head Parts</span>
             </a>
-            {% endfor %}
+            
+            <a href="/products?category=machine-components" class="dropdown-item">
+              <span>Machine Components</span>
+            </a>
+            
+            <a href="/products?category=gears-and-gear-sets" class="dropdown-item">
+              <span>Gears &amp; Gear Sets</span>
+            </a>
+            
+            <a href="/products?category=rollers-and-shafts" class="dropdown-item">
+              <span>Rollers &amp; Shafts</span>
+            </a>
+            
+            <a href="/products?category=pumps-and-accessories" class="dropdown-item">
+              <span>Pumps &amp; Accessories</span>
+            </a>
+            
+            <a href="/products?category=squeegee-blades-and-suspensions" class="dropdown-item">
+              <span>Squeegee Blades &amp; Suspensions</span>
+            </a>
+            
+            <a href="/products?category=spares-for-stovec-and-stenter" class="dropdown-item">
+              <span>Spares for Stovec &amp; Stenter</span>
+            </a>
+            
+            <a href="/products?category=magnetic-and-blade-printing" class="dropdown-item">
+              <span>Magnetic &amp; Blade Printing</span>
+            </a>
+            
+            <a href="/products?category=washing-and-cleaning-units" class="dropdown-item">
+              <span>Washing and Cleaning Units</span>
+            </a>
+            
           </div>
         </div>
 
         <!-- Machines Dropdown -->
         <div class="nav-item-dropdown">
-          <a href="{{ url_for('machines') }}" class="nav-link dropdown-toggle {% if request.endpoint == 'machines' %}active{% endif %}">
+          <a href="machines.html" class="nav-link dropdown-toggle ">
             MACHINES <span class="dropdown-caret">▾</span>
           </a>
           <div class="dropdown-menu">
-            <a href="{{ url_for('machines') }}" class="dropdown-item"><strong>Supported Machine Makes</strong> ➔</a>
+            <a href="machines.html" class="dropdown-item"><strong>Supported Machine Makes</strong> ➔</a>
             <div class="dropdown-divider"></div>
-            {% for m in nav_machines %}
-            <a href="{{ url_for('products', machine=m.slug) }}" class="dropdown-item">
-              <span>{{ m.name }}</span>
+            
+            <a href="/products?machine=harish" class="dropdown-item">
+              <span>Harish</span>
             </a>
-            {% endfor %}
+            
+            <a href="/products?machine=ichinose" class="dropdown-item">
+              <span>Ichinose</span>
+            </a>
+            
+            <a href="/products?machine=mbk" class="dropdown-item">
+              <span>MBK</span>
+            </a>
+            
+            <a href="/products?machine=mhn-ragging-machine" class="dropdown-item">
+              <span>MHN / Ragging Machine</span>
+            </a>
+            
+            <a href="/products?machine=pegasus-rd-dd" class="dropdown-item">
+              <span>Pegasus / RD-DD</span>
+            </a>
+            
+            <a href="/products?machine=reggiani" class="dropdown-item">
+              <span>Reggiani</span>
+            </a>
+            
+            <a href="/products?machine=stork-rd-3-rd-4" class="dropdown-item">
+              <span>Stork (RD-3 &amp; RD-4)</span>
+            </a>
+            
+            <a href="/products?machine=stormac" class="dropdown-item">
+              <span>Stormac</span>
+            </a>
+            
+            <a href="/products?machine=stovec" class="dropdown-item">
+              <span>Stovec</span>
+            </a>
+            
+            <a href="/products?machine=zimmer" class="dropdown-item">
+              <span>Zimmer</span>
+            </a>
+            
           </div>
         </div>
 
-        <a href="{{ url_for('download_catalog') }}" class="nav-link {% if request.endpoint == 'download_catalog' %}active{% endif %}">DOWNLOAD CATALOG</a>
-        <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">CONTACT US</a>
+        <a href="download_catalog.html" class="nav-link ">DOWNLOAD CATALOG</a>
+        <a href="contact.html" class="nav-link ">CONTACT US</a>
 
         <!-- Normal Text Menu Item for Login / Signup when Guest -->
-        {% if not current_customer %}
-        <a href="{{ url_for('customer_login') }}" class="nav-link nav-link-auth {% if request.endpoint in ('customer_login', 'customer_register') %}active{% endif %}">
+        
+        <a href="/customer/login" class="nav-link nav-link-auth active">
           LOGIN / SIGNUP
         </a>
-        {% endif %}
+        
       </nav>
 
       <!-- Header Actions: Circular Profile Icon when Logged In -->
       <div class="header-actions">
-        {% if current_customer %}
-          <!-- Circular Profile Icon & Dropdown -->
-          <div class="nav-item-dropdown profile-dropdown-wrapper">
-            <button class="profile-circle-btn" id="profileCircleBtn" title="{{ current_customer.name }}">
-              <span class="profile-circle-initials">{{ current_customer.name[:2]|upper }}</span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-              <div class="profile-menu-header">
-                <span class="profile-header-role">Customer Account</span>
-                <strong class="profile-header-name">{{ current_customer.name }}</strong>
-                <span class="profile-header-email">{{ current_customer.email }}</span>
-              </div>
-              <a href="{{ url_for('customer_dashboard') }}" class="dropdown-item">
-                <span>My Quotes & Status</span>
-              </a>
-              <a href="{{ url_for('products') }}" class="dropdown-item">
-                <span>Request New Quote</span>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="{{ url_for('customer_logout') }}" class="dropdown-item text-danger">
-                <span>Sign Out</span>
-              </a>
-            </div>
-          </div>
-        {% endif %}
+        
 
         <!-- Mobile Toggle -->
         <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation">
@@ -110,7 +154,78 @@
 
   <!-- Main Body Content Block -->
   <main>
-    {% block content %}{% endblock %}
+    
+<div style="background: var(--bg-light); min-height: 80vh; padding: 60px 0 80px; display: flex; align-items: center;">
+  <div class="container" style="max-width: 480px;">
+    
+    <!-- Flash Messages -->
+    
+      
+    
+
+    <div style="background: var(--bg-white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); overflow: hidden;">
+      
+      <!-- Top Accent Banner -->
+      <div style="background: var(--primary-navy); padding: 32px 30px; text-align: center; color: white;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.12); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+          👤
+        </div>
+        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+          Customer Portal Login
+        </h2>
+        <p style="font-size: 0.85rem; color: #93C5FD; margin-top: 4px;">
+          Track previous quotes, view pricing responses, and chat directly with our engineering team.
+        </p>
+      </div>
+
+      <!-- Form Body -->
+      <div style="padding: 32px 30px;">
+        <form action="/customer/login" method="POST">
+          <input type="hidden" name="next" value="/customer/dashboard">
+          
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Email Address *</label>
+            <input type="email" name="email" class="form-control" placeholder="name@company.com" required autofocus style="padding: 12px 14px; font-size: 0.95rem;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="font-weight: 600; color: var(--primary-navy); margin-bottom: 0;">Password *</label>
+            </div>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required style="padding: 12px 14px; font-size: 0.95rem;">
+          </div>
+
+          <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm);">
+            <span>Sign In to My Quotes</span>
+            <span>➔</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Don't have an account yet?
+            <a href="/customer/register?next=/customer/dashboard" style="font-weight: 700; color: var(--dtc-blue);">Create Account ➔</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Quick Info Feature Cards below login -->
+    <div style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+        <span style="font-size: 1.2rem; display: block; margin-bottom: 4px;">⚡</span>
+        <strong>Instant Quote Status</strong><br>Real-time updates on price & lead times
+      </div>
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+        <span style="font-size: 1.2rem; display: block; margin-bottom: 4px;">💬</span>
+        <strong>Direct Admin Chat</strong><br>Ask questions & request repeat variations
+      </div>
+    </div>
+
+  </div>
+</div>
+
   </main>
 
   <!-- Quote Cart Sliding Drawer (Multi-Product Inquiry Drawer) -->
@@ -129,7 +244,7 @@
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" style="margin: 0 auto 12px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
         <h4>Your Quote List is Empty</h4>
         <p>Browse our precision spare parts catalog and click <strong>"Add to Quote Cart"</strong> to inquire about multiple components together.</p>
-        <a href="{{ url_for('products') }}" class="btn-enquire-primary" onclick="QuoteCart.closeDrawer()" style="font-size: 0.82rem; padding: 8px 16px;">Browse Products</a>
+        <a href="products.html" class="btn-enquire-primary" onclick="QuoteCart.closeDrawer()" style="font-size: 0.82rem; padding: 8px 16px;">Browse Products</a>
       </div>
 
       <!-- Items List -->
@@ -141,20 +256,20 @@
         <form id="cartInquirySubmitForm">
           <div class="form-group">
             <label class="form-label">Full Name *</label>
-            <input type="text" id="cartCustomerName" class="form-control" placeholder="Your name" value="{{ current_customer.name if current_customer else '' }}" required>
+            <input type="text" id="cartCustomerName" class="form-control" placeholder="Your name" value="" required>
           </div>
           <div class="form-group">
             <label class="form-label">Company / Mill Name</label>
-            <input type="text" id="cartCompanyName" class="form-control" placeholder="Textile Mill / Company" value="{{ current_customer.company_name if current_customer else '' }}">
+            <input type="text" id="cartCompanyName" class="form-control" placeholder="Textile Mill / Company" value="">
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-group">
               <label class="form-label">Email Address *</label>
-              <input type="email" id="cartEmail" class="form-control" placeholder="name@domain.com" value="{{ current_customer.email if current_customer else '' }}" required>
+              <input type="email" id="cartEmail" class="form-control" placeholder="name@domain.com" value="" required>
             </div>
             <div class="form-group">
               <label class="form-label">Phone / WhatsApp *</label>
-              <input type="tel" id="cartPhone" class="form-control" placeholder="+91 98765 43210" value="{{ current_customer.phone if current_customer else '' }}" required>
+              <input type="tel" id="cartPhone" class="form-control" placeholder="+91 98765 43210" value="" required>
             </div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -164,7 +279,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Country</label>
-              <input type="text" id="cartCountry" class="form-control" value="{{ current_customer.country if current_customer else 'India' }}">
+              <input type="text" id="cartCountry" class="form-control" value="India">
             </div>
           </div>
           <div class="form-group">
@@ -198,20 +313,20 @@
           
           <div class="form-group">
             <label class="form-label">Your Name *</label>
-            <input type="text" id="inqCustomerName" class="form-control" placeholder="Full name" value="{{ current_customer.name if current_customer else '' }}" required>
+            <input type="text" id="inqCustomerName" class="form-control" placeholder="Full name" value="" required>
           </div>
           <div class="form-group">
             <label class="form-label">Company / Mill Name</label>
-            <input type="text" id="inqCompanyName" class="form-control" placeholder="Company name" value="{{ current_customer.company_name if current_customer else '' }}">
+            <input type="text" id="inqCompanyName" class="form-control" placeholder="Company name" value="">
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group">
               <label class="form-label">Email Address *</label>
-              <input type="email" id="inqEmail" class="form-control" placeholder="your@email.com" value="{{ current_customer.email if current_customer else '' }}" required>
+              <input type="email" id="inqEmail" class="form-control" placeholder="your@email.com" value="" required>
             </div>
             <div class="form-group">
               <label class="form-label">Phone / WhatsApp *</label>
-              <input type="tel" id="inqPhone" class="form-control" placeholder="+91 ..." value="{{ current_customer.phone if current_customer else '' }}" required>
+              <input type="tel" id="inqPhone" class="form-control" placeholder="+91 ..." value="" required>
             </div>
           </div>
           <div style="display: grid; grid-template-columns: 100px 1fr; gap: 12px;">
@@ -252,10 +367,10 @@
         </p>
 
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;">
-          <a href="{{ url_for('customer_login') }}" class="btn-enquire-primary" style="justify-content: center; width: 100%; font-size: 0.9rem; padding: 11px;">
+          <a href="/customer/login" class="btn-enquire-primary" style="justify-content: center; width: 100%; font-size: 0.9rem; padding: 11px;">
             Sign In to Customer Account
           </a>
-          <a href="{{ url_for('customer_register') }}" style="display: block; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-weight: 700; font-size: 0.88rem; color: var(--primary-navy); text-decoration: none; background: #F8FAFC;">
+          <a href="/customer/register" style="display: block; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-weight: 700; font-size: 0.88rem; color: var(--primary-navy); text-decoration: none; background: #F8FAFC;">
             Create New Account ➔
           </a>
         </div>
@@ -273,8 +388,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Floating WhatsApp Quick Connect Button -->
-  {% if site_settings.show_whatsapp_button != 'false' %}
-  <a href="https://wa.me/{{ (site_settings.whatsapp_number or '918320821579')|replace('+', '')|replace(' ', '') }}?text={{ (site_settings.whatsapp_default_message or 'Hello Divya Trading Co., I would like to inquire about rotary printing machine spare parts.')|urlencode }}" 
+  
+  <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.%2C%20I%20would%20like%20to%20inquire%20about%20rotary%20printing%20machine%20spare%20parts." 
      target="_blank" 
      rel="noopener noreferrer" 
      class="floating-whatsapp-btn"
@@ -282,7 +397,7 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
     <span>WhatsApp Us</span>
   </a>
-  {% endif %}
+  
 
   <!-- Footer -->
   <footer class="site-footer">
@@ -290,49 +405,49 @@
       <div class="footer-top-row">
         <!-- Footer Brand -->
         <div class="footer-brand">
-          <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="{{ site_settings.company_name or 'Divya Trading Co.' }}" class="footer-logo">
+          <img src="/static/images/logo.png" alt="DIVYA TRADING CO." class="footer-logo">
         </div>
 
         <!-- Footer Contact Info -->
         <div class="footer-contact-items">
           <div class="footer-contact-item">
             <span class="contact-icon">📞</span>
-            <a href="tel:{{ site_settings.phone_primary }}">{{ site_settings.phone_primary }}</a>
-            {% if site_settings.phone_secondary %}
+            <a href="tel:+91 83208 21579">+91 83208 21579</a>
+            
             <span style="color:#64748b;">/</span>
-            <a href="tel:{{ site_settings.phone_secondary }}">{{ site_settings.phone_secondary }}</a>
-            {% endif %}
+            <a href="tel:+91 94260 64807">+91 94260 64807</a>
+            
           </div>
           <div class="footer-contact-item">
             <span class="contact-icon">✉</span>
-            <a href="mailto:{{ site_settings.email_secondary or site_settings.email_primary }}">{{ site_settings.email_secondary or site_settings.email_primary }}</a>
+            <a href="mailto:neelbarot585@gmail.com">neelbarot585@gmail.com</a>
           </div>
           <div class="footer-contact-item">
             <span class="contact-icon">📍</span>
-            <span>{{ site_settings.address or 'Ahmedabad, Gujarat, India' }}</span>
+            <span>15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India</span>
           </div>
         </div>
       </div>
 
       <div class="footer-bottom-row">
-        <p>© {{ current_year }} {{ site_settings.company_name or 'DIVYA TRADING CO.' }} All Rights Reserved.</p>
+        <p>© 2026 DIVYA TRADING CO. All Rights Reserved.</p>
         <div class="footer-bottom-links">
-          <a href="{{ url_for('home') }}">Home</a>
-          <a href="{{ url_for('products') }}">Products Catalog</a>
-          <a href="{{ url_for('machines') }}">Machines</a>
-          <a href="{{ url_for('download_catalog') }}">Download Catalog</a>
-          <a href="{{ url_for('about') }}">About Us</a>
-          <a href="{{ url_for('contact') }}">Contact Us</a>
-          <a href="{{ url_for('customer_dashboard') }}">My Quotes</a>
+          <a href="index.html">Home</a>
+          <a href="products.html">Products Catalog</a>
+          <a href="machines.html">Machines</a>
+          <a href="download_catalog.html">Download Catalog</a>
+          <a href="about.html">About Us</a>
+          <a href="contact.html">Contact Us</a>
+          <a href="/customer/dashboard">My Quotes</a>
         </div>
       </div>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
-  {% block extra_js %}{% endblock %}
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/cart.js"></script>
+  
 
 </body>
 </html>

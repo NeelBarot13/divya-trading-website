@@ -1,124 +1,143 @@
 {% extends 'base.html' %}
 
-{% block title %}Contact Us | Divya Trading Co. - Ahmedabad, India{% endblock %}
+{% block title %}Contact Us | Divya Trading Co. - Precision Machine Spares{% endblock %}
 
 {% block content %}
 
 <!-- Header Banner -->
-<section style="background: var(--primary-navy); color: white; padding: 50px 0; text-align: center;">
+<section style="background: var(--primary-navy); color: white; padding: 45px 0; text-align: center;">
   <div class="container">
-    <span style="font-size: 0.82rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">GET IN TOUCH WITH OUR TEAM</span>
-    <h1 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; margin-top: 6px;">
+    <span style="font-size: 0.8rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">GET IN TOUCH WITH OUR TEAM</span>
+    <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; margin-top: 6px;">
       Contact Divya Trading Co.
     </h1>
-    <p style="font-size: 1rem; color: #CBD5E1; max-width: 650px; margin: 10px auto 0;">
-      Reach our engineers for immediate price quotes, custom repeat drawings, technical support, and worldwide export inquiries.
+    <p style="font-size: 0.95rem; color: #CBD5E1; max-width: 650px; margin: 10px auto 0;">
+      Reach our engineers for immediate price quotations, custom repeat drawings, technical support, and worldwide export inquiries.
     </p>
   </div>
 </section>
 
 <!-- Contact Form & Info Grid -->
-<section style="padding: 60px 0 80px; background: var(--bg-white);">
+<section style="padding: 50px 0 80px; background: var(--bg-white);">
   <div class="container">
     <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 40px; align-items: start;">
       
       <!-- Contact Information Card -->
       <div>
         <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm);">
-          <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 20px;">
+          <h2 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 20px;">
             Factory & Sales Office
           </h2>
 
           <div style="display: flex; flex-direction: column; gap: 20px;">
             <!-- Address -->
             <div style="display: flex; gap: 14px;">
-              <span style="font-size: 1.4rem; color: var(--dtc-blue);">📍</span>
+              <span style="font-size: 1.2rem; color: var(--dtc-blue);">📍</span>
               <div>
-                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Address:</strong>
-                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
-                  15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India.
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.9rem; margin-bottom: 4px;">Address:</strong>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                  {{ site_settings.address or '15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India.' }}
                 </p>
               </div>
             </div>
 
             <!-- Phone & WhatsApp -->
             <div style="display: flex; gap: 14px;">
-              <span style="font-size: 1.4rem; color: #16a34a;">📞</span>
+              <span style="font-size: 1.2rem; color: #16a34a;">📞</span>
               <div>
-                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Phone / WhatsApp:</strong>
-                <p style="font-size: 0.9rem; color: var(--text-main); font-weight: 600;">
-                  <a href="tel:+918320821579">+91 83208 21579</a><br>
-                  <a href="tel:+919426064807">+91 94260 64807</a>
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.9rem; margin-bottom: 4px;">Phone & WhatsApp:</strong>
+                <p style="font-size: 0.88rem; color: var(--text-main); font-weight: 600; margin: 0;">
+                  <a href="tel:{{ site_settings.phone_primary }}">{{ site_settings.phone_primary }}</a>
+                  {% if site_settings.phone_secondary %}
+                  <br><a href="tel:{{ site_settings.phone_secondary }}">{{ site_settings.phone_secondary }}</a>
+                  {% endif %}
                 </p>
               </div>
             </div>
 
             <!-- Email -->
             <div style="display: flex; gap: 14px;">
-              <span style="font-size: 1.4rem; color: var(--dtc-blue);">✉️</span>
+              <span style="font-size: 1.2rem; color: var(--dtc-blue);">✉</span>
               <div>
-                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Email Inquiries:</strong>
-                <p style="font-size: 0.88rem; color: var(--text-main);">
-                  <a href="mailto:divya.trading06@gmail.com">divya.trading06@gmail.com</a><br>
-                  <a href="mailto:neelbarot585@gmail.com">neelbarot585@gmail.com</a>
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.9rem; margin-bottom: 4px;">Email Inquiries:</strong>
+                <p style="font-size: 0.88rem; color: var(--text-main); margin: 0;">
+                  <a href="mailto:{{ site_settings.email_primary }}">{{ site_settings.email_primary }}</a><br>
+                  <a href="mailto:{{ site_settings.email_secondary or 'neelbarot585@gmail.com' }}">{{ site_settings.email_secondary or 'neelbarot585@gmail.com' }}</a>
                 </p>
               </div>
             </div>
 
             <!-- Working Hours -->
             <div style="display: flex; gap: 14px;">
-              <span style="font-size: 1.4rem; color: #f59e0b;">🕒</span>
+              <span style="font-size: 1.2rem; color: #f59e0b;">🕒</span>
               <div>
-                <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Working Hours:</strong>
-                <p style="font-size: 0.88rem; color: var(--text-muted);">
+                <strong style="color: var(--primary-navy); display: block; font-size: 0.9rem; margin-bottom: 4px;">Working Hours:</strong>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
                   Monday – Saturday: 9:00 AM – 7:30 PM (IST)<br>
-                  24/7 WhatsApp Assistance for Global Clients
+                  Global Export Assistance on WhatsApp
                 </p>
               </div>
             </div>
           </div>
 
           <!-- Direct WhatsApp Button -->
-          <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--border-color);">
-            <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20I%20have%20an%20urgent%20spare%20parts%20inquiry." 
+          <div style="margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+            <a href="https://wa.me/{{ (site_settings.whatsapp_number or '918320821579')|replace('+', '')|replace(' ', '') }}?text=Hello%20Divya%20Trading%20Co.,%20I%20would%20like%20to%20inquire%20about%20rotary%20printing%20machine%20spare%20parts." 
                target="_blank" 
                class="btn-submit-cart-inquiry" 
-               style="background: #25D366; text-decoration: none;">
-              <span>Chat with Us on WhatsApp 💬</span>
+               style="background: #25D366; text-decoration: none; justify-content: center;">
+              <span>WhatsApp Direct Message</span>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- Contact / Inquiry Form -->
-      <div style="background: var(--bg-white); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-md);">
-        <h2 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
+      <!-- Contact / Inquiry Form with Autofill -->
+      <div style="background: var(--bg-white); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-sm);">
+        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 6px;">
           Send Technical Requirement / Inquiry
         </h2>
-        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 24px;">
+        <p style="color: var(--text-muted); font-size: 0.86rem; margin-bottom: 22px;">
+          {% if current_customer %}
+          Logged in as <strong>{{ current_customer.name }}</strong> ({{ current_customer.email }}). Your details are automatically pre-filled.
+          {% else %}
           Fill out the form below with your required parts and machine details. Our engineering team will respond promptly.
+          {% endif %}
         </p>
 
         <form id="generalContactForm">
+          <!-- Select Product Dropdown (Optional) -->
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" style="font-weight: 700;">Select Specific Product / Component (Optional)</label>
+            <select id="contactProductSelect" class="form-control" style="font-size: 0.88rem; padding: 10px;">
+              <option value="">-- General Technical Inquiry / Multiple Spare Parts --</option>
+              {% for p in products %}
+              <option value="{{ p.id }}" data-part="{{ p.part_number }}" data-name="{{ p.name }}">
+                {{ p.part_number }} - {{ p.name }} ({{ p.machine_make.name if p.machine_make else 'Universal' }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
               <label class="form-label">Full Name *</label>
-              <input type="text" id="contactName" class="form-control" placeholder="Your full name" required>
+              <input type="text" id="contactName" class="form-control" placeholder="Your full name" value="{{ current_customer.name if current_customer else '' }}" required>
             </div>
             <div class="form-group">
               <label class="form-label">Company / Mill Name</label>
-              <input type="text" id="contactCompany" class="form-control" placeholder="Textile Mill Name">
+              <input type="text" id="contactCompany" class="form-control" placeholder="Textile Mill Name" value="{{ current_customer.company_name if current_customer else '' }}">
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
               <label class="form-label">Email Address *</label>
-              <input type="email" id="contactEmail" class="form-control" placeholder="your@company.com" required>
+              <input type="email" id="contactEmail" class="form-control" placeholder="your@company.com" value="{{ current_customer.email if current_customer else '' }}" required>
             </div>
             <div class="form-group">
               <label class="form-label">Phone / WhatsApp *</label>
-              <input type="tel" id="contactPhone" class="form-control" placeholder="+91 ..." required>
+              <input type="tel" id="contactPhone" class="form-control" placeholder="+91 ..." value="{{ current_customer.phone if current_customer else '' }}" required>
             </div>
           </div>
 
@@ -129,13 +148,13 @@
             </div>
             <div class="form-group">
               <label class="form-label">Country / City</label>
-              <input type="text" id="contactCountry" class="form-control" value="India">
+              <input type="text" id="contactCountry" class="form-control" value="{{ (current_customer.city + ', ' if current_customer and current_customer.city else '') + (current_customer.country if current_customer else 'India') }}">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Spare Parts Required & Quantity *</label>
-            <textarea id="contactMessage" class="form-control" placeholder="List required part names, repeat sizes (64R/81.9R/etc.), quantities, or special specifications..." style="min-height: 110px;" required></textarea>
+            <label class="form-label">Spare Parts Required, Repeat Sizes & Quantity *</label>
+            <textarea id="contactMessage" class="form-control" placeholder="List required part names, repeat sizes (64R / 81.9R / etc.), quantities, or special specifications..." style="min-height: 110px;" required></textarea>
           </div>
 
           <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px;">
@@ -157,8 +176,11 @@ document.getElementById('generalContactForm')?.addEventListener('submit', async 
   e.preventDefault();
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.innerHTML;
-  submitBtn.innerHTML = 'Sending...';
+  submitBtn.innerHTML = 'Submitting...';
   submitBtn.disabled = true;
+
+  const productSelect = document.getElementById('contactProductSelect');
+  const selectedProdId = productSelect ? productSelect.value : null;
 
   const payload = {
     customer_name: document.getElementById('contactName').value,
@@ -168,7 +190,8 @@ document.getElementById('generalContactForm')?.addEventListener('submit', async 
     country: document.getElementById('contactCountry').value,
     machine_model: document.getElementById('contactMachine').value,
     message: document.getElementById('contactMessage').value,
-    product_name: 'Direct Requirement Inquiry'
+    product_id: selectedProdId ? parseInt(selectedProdId) : null,
+    product_name: selectedProdId ? productSelect.options[productSelect.selectedIndex].text : 'Direct Requirement Inquiry'
   };
 
   try {
@@ -180,7 +203,11 @@ document.getElementById('generalContactForm')?.addEventListener('submit', async 
     const data = await res.json();
     if (data.success) {
       showToast(data.message, 'success');
+      {% if not current_customer %}
       e.target.reset();
+      {% else %}
+      document.getElementById('contactMessage').value = '';
+      {% endif %}
     } else {
       showToast(data.message || 'Error sending message.', 'error');
     }

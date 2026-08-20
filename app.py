@@ -188,7 +188,8 @@ def download_catalog():
 
 @app.route('/contact')
 def contact():
-    return render_template('contact.html')
+    products = Product.query.filter_by(is_active=True).order_by(Product.name).all()
+    return render_template('contact.html', products=products)
 
 
 # ==========================================

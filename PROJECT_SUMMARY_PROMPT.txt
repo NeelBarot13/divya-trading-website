@@ -15,7 +15,7 @@ Design, build, and deploy a complete, production-ready B2B E-Commerce Catalog & 
 
 CORE ARCHITECTURAL SPECIFICATIONS:
 
-1. B2B NO-PRICE CATALOG & 2-TIER PRODUCT DESCRIPTIONS:
+1. B2B NO-PRICE CATALOG & MOBILE RESPONSIVE UI:
    - Precision parts for Stork RD-3/RD-4, Stormac, Pegasus, Ichinose, Reggiani, Harish, Zimmer, Stovec.
    - Prices are HIDDEN publicly. Customers request formal price quotations per repeat size and volume.
    - 2-Tier Description System:
@@ -23,9 +23,12 @@ CORE ARCHITECTURAL SPECIFICATIONS:
      * Long Description: In-depth technical description shown on the single product detail page.
    - Stock Status: Badges and 1-Click updates for 'In Stock', 'Out of Stock', and 'Made to Order'.
    - 1-Click Active/Deactivate: Disable any product from live public visibility with instant async toggle.
+   - Mobile & Tablet Optimization: Responsive collapsible navigation, fluid product cards (1-2 cols on mobile), and touch-friendly targets.
 
-2. CUSTOMER PORTAL & MY QUOTES DASHBOARD:
+2. CUSTOMER PORTAL, AUTOFILL & MY QUOTES DASHBOARD:
    - Registration & Login (/register, /login) with automatic past guest inquiry linking by email.
+   - Global Customer Detail Autofill: Pre-fills customer name, company, email, phone, and country across all inquiry forms and Contact Us page.
+   - Contact Us Product Selector: Dropdown on Contact Us page allowing selection of specific spare parts.
    - Header Navigation:
      * Guest View: Clean, uppercase 'LOGIN / SIGNUP' menu text matching other navbar links.
      * Logged-in View: Sleek circular profile button with user initials and dropdown (My Quotes & Status, Request New Quote, Sign Out).

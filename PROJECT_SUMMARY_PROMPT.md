@@ -14,7 +14,7 @@ Design, build, and deploy a complete, production-ready B2B E-Commerce Catalog & 
 
 ### CORE ARCHITECTURAL REQUIREMENTS:
 
-1. B2B NO-PRICE CATALOG MODEL:
+1. B2B NO-PRICE CATALOG & MOBILE RESPONSIVE UI:
    - High precision industrial products across 6+ machine makes (Stork RD-3/RD-4, Stormac, Pegasus, Ichinose, Reggiani, Harish, Zimmer, Stovec).
    - Prices are NOT displayed publicly. Instead, customers request formal price quotations per repeat size/quantity.
    - 2-Tier Product Descriptions: 
@@ -22,13 +22,16 @@ Design, build, and deploy a complete, production-ready B2B E-Commerce Catalog & 
      * Long Description: In-depth technical engineering overview, tolerances, and compatibility displayed on the single product detail page.
    - Stock Status Badges: 1-Click interactive toggling between "In Stock", "Out of Stock", and "Made to Order".
    - 1-Click Active/Deactive Toggle: Admin can disable any product from live public visibility with zero page refresh.
+   - Mobile & Tablet Optimization: Responsive collapsible navigation, fluid product grids (1-2 cols on mobile), full-width modal fits, and touch-optimized action targets.
 
-2. CUSTOMER AUTHENTICATION & "MY QUOTES" PORTAL:
+2. CUSTOMER AUTHENTICATION, AUTOFILL & "MY QUOTES" PORTAL:
    - Customer Registration & Sign-In (/register, /login) with automatic past inquiry linking by email.
+   - Logged-in Global Autofill: All customer fields (Name, Email, Phone, Company, Country) automatically pre-fill across Quick Inquiries, Quote Cart, and Contact Us forms.
+   - Contact Us Page Product Selector: Includes an optional dropdown to select any specific spare part directly from the contact form.
    - Header Navigation:
      * Guest View: Clean, uppercase "LOGIN / SIGNUP" menu item matching standard navigation links.
      * Logged-in View: Sleek circular profile icon with customer initials and dropdown menu (My Quotes & Status, Request New Quote, Sign Out).
-     * Zero Admin Links: The public frontend must contain zero links or mentions of the admin portal (admin is accessed directly via /admin/login).
+     * Zero Admin Links: The public frontend contains zero links or mentions of the admin portal (admin is accessed directly via /admin/login).
    - Guest Inquiry Prompt: Sleek modal popup prompting guests to create an account or sign in to track quotes with real-time status, with one-click "Continue as Guest" fallback.
    - "My Quotes" Dashboard (/my-quotes):
      * Metric counters: Total Inquiries, Under Review, Quotation Ready, Completed.
