@@ -20,7 +20,7 @@
 <!-- Contact Form & Info Grid -->
 <section style="padding: 50px 0 80px; background: var(--bg-white);">
   <div class="container">
-    <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 40px; align-items: start;">
+    <div class="contact-layout-grid">
       
       <!-- Contact Information Card -->
       <div>
@@ -119,34 +119,34 @@
             </select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div class="form-group">
+          <div class="form-row-2col">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Full Name *</label>
               <input type="text" id="contactName" class="form-control" placeholder="Your full name" value="{{ current_customer.name if current_customer else '' }}" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Company / Mill Name</label>
               <input type="text" id="contactCompany" class="form-control" placeholder="Textile Mill Name" value="{{ current_customer.company_name if current_customer else '' }}">
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div class="form-group">
+          <div class="form-row-2col" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Email Address *</label>
               <input type="email" id="contactEmail" class="form-control" placeholder="your@company.com" value="{{ current_customer.email if current_customer else '' }}" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Phone / WhatsApp *</label>
               <input type="tel" id="contactPhone" class="form-control" placeholder="+91 ..." value="{{ current_customer.phone if current_customer else '' }}" required>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div class="form-group">
+          <div class="form-row-2col" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Machine Make & Model</label>
               <input type="text" id="contactMachine" class="form-control" placeholder="e.g. Stork RD-4, Pegasus, Stovec">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Country / City</label>
               <input type="text" id="contactCountry" class="form-control" value="{{ (current_customer.city + ', ' if current_customer and current_customer.city else '') + (current_customer.country if current_customer else 'India') }}">
             </div>

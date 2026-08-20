@@ -16,13 +16,17 @@
 </head>
 <body data-logged-in="false">
 
-  <!-- Main Navigation Header -->
+  <!-- Site Header -->
   <header class="site-header">
     <div class="container header-inner">
-      <!-- Brand Logo -->
+      <!-- Brand Logo Combo: Sharp Emblem on Left + Crisp Large Typography on Right -->
       <a href="index.html" class="brand-logo-link" id="headerLogoLink" title="Divya Trading Co.">
         <div class="brand-logo-combo">
-          <img src="static/images/logo.png" alt="DIVYA TRADING CO." class="brand-logo-img">
+          <img src="static/images/dtc_emblem.png" alt="DTC Emblem" class="brand-emblem-icon">
+          <div class="brand-text-block">
+            <span class="brand-main-title">DIVYA TRADING CO.</span>
+            <span class="brand-sub-tagline">TEXTILE MACHINERY PRECISION SPARES</span>
+          </div>
         </div>
       </a>
 
@@ -162,8 +166,14 @@
   <!-- Modern Mobile Slide-Out Navigation Drawer -->
   <aside class="mobile-drawer" id="mobileDrawer">
     <div class="mobile-drawer-header">
-      <a href="index.html" class="mobile-drawer-brand">
-        <img src="static/images/logo.png" alt="DIVYA TRADING CO." class="mobile-drawer-logo">
+      <a href="index.html" class="brand-logo-link" style="text-decoration: none;">
+        <div class="brand-logo-combo">
+          <img src="static/images/dtc_emblem.png" alt="DTC Emblem" class="brand-emblem-icon" style="height: 38px; width: 38px;">
+          <div class="brand-text-block">
+            <span class="brand-main-title" style="font-size: 1.1rem;">DIVYA TRADING CO.</span>
+            <span class="brand-sub-tagline" style="font-size: 0.52rem;">TEXTILE MACHINERY SPARES</span>
+          </div>
+        </div>
       </a>
       <button class="mobile-drawer-close-btn" id="mobileDrawerCloseBtn" aria-label="Close Navigation">✕</button>
     </div>
@@ -295,25 +305,28 @@
         </div>
 
         <a href="download_catalog.html" class="mobile-nav-row ">
-          <span class="mobile-nav-icon">📥</span>
+          <span class="mobile-nav-icon">📄</span>
           <span class="mobile-nav-text">Download Catalog</span>
         </a>
         <a href="contact.html" class="mobile-nav-row ">
-          <span class="mobile-nav-icon">📞</span>
+          <span class="mobile-nav-icon">✉</span>
           <span class="mobile-nav-text">Contact Us</span>
         </a>
 
         
       </div>
 
-      <!-- Quick Contact Direct Call & WhatsApp in Mobile Drawer -->
-      <div class="mobile-drawer-contacts">
-        <a href="tel:+91 83208 21579" class="btn-drawer-quick btn-drawer-call">
-          <span>📞 Call Sales Engineering</span>
-        </a>
-        <a href="https://wa.me/918320821579" target="_blank" rel="noopener" class="btn-drawer-quick btn-drawer-wa">
-          <span>💬 WhatsApp Instant Quote</span>
-        </a>
+      <!-- Quick Contact in Drawer -->
+      <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);">
+        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Direct Sales Inquiry</span>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+          <a href="tel:+91 83208 21579" style="font-size: 0.85rem; font-weight: 600; color: var(--primary-navy); text-decoration: none;">
+            📞 +91 83208 21579
+          </a>
+          <a href="mailto:divya.trading06@gmail.com" style="font-size: 0.82rem; color: var(--dtc-blue); text-decoration: none;">
+            ✉ divya.trading06@gmail.com
+          </a>
+        </div>
       </div>
     </div>
   </aside>
@@ -338,7 +351,7 @@
 <!-- Product Detail Main View -->
 <section style="padding: 50px 0 80px; background: var(--bg-white);">
   <div class="container">
-    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 50px; align-items: start;">
+    <div class="product-detail-grid">
       <!-- Product Image Gallery / Showcase -->
       <div>
         <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md);">
@@ -567,26 +580,18 @@ Surface: Zinc passivated / black oxide</td>
   <div class="cart-drawer" id="cartDrawer">
     <div class="cart-drawer-header">
       <div class="cart-drawer-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-        <span>Your Quote List</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span>Request For Quote Cart</span>
       </div>
-      <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close Drawer">✕</button>
+      <button class="cart-close-btn" id="closeCartBtn" aria-label="Close Cart">✕</button>
     </div>
     <div class="cart-drawer-body">
-      <!-- Empty State -->
-      <div id="cartEmptyState" class="cart-empty-box">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" style="margin: 0 auto 12px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-        <h4>Your Quote List is Empty</h4>
-        <p>Browse our precision spare parts catalog and click <strong>"Add to Quote Cart"</strong> to inquire about multiple components together.</p>
-        <a href="products.html" class="btn-enquire-primary" onclick="QuoteCart.closeDrawer()" style="font-size: 0.82rem; padding: 8px 16px;">Browse Products</a>
-      </div>
-
       <!-- Items List -->
       <div id="cartItemsList" class="cart-items-list"></div>
 
       <!-- Customer Quote Request Form (Autofilled for logged in customers) -->
-      <div id="cartInquiryFormContainer" class="cart-inquiry-form" style="display: none;">
-        <h4>Submit Combined Quote Request</h4>
+      <div id="cartInquiryFormSection" class="cart-inquiry-form">
+        <h4>Submit Quotation Request</h4>
         <form id="cartInquirySubmitForm">
           <div class="form-group">
             <label class="form-label">Full Name *</label>
@@ -596,27 +601,27 @@ Surface: Zinc passivated / black oxide</td>
             <label class="form-label">Company / Mill Name</label>
             <input type="text" id="cartCompanyName" class="form-control" placeholder="Textile Mill / Company" value="">
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group">
+          <div class="form-row-2col">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Email Address *</label>
               <input type="email" id="cartEmail" class="form-control" placeholder="name@domain.com" value="" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Phone / WhatsApp *</label>
               <input type="tel" id="cartPhone" class="form-control" placeholder="+91 98765 43210" value="" required>
             </div>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group">
+          <div class="form-row-2col" style="margin-top: 12px;">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Machine Model</label>
               <input type="text" id="cartMachineModel" class="form-control" placeholder="e.g. Stork RD-4, Pegasus">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Country</label>
               <input type="text" id="cartCountry" class="form-control" value="India">
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="margin-top: 12px;">
             <label class="form-label">Requirement Details / Remarks</label>
             <textarea id="cartMessage" class="form-control" placeholder="Specify required repeat sizes, urgency, or shipping location..."></textarea>
           </div>
@@ -653,27 +658,27 @@ Surface: Zinc passivated / black oxide</td>
             <label class="form-label">Company / Mill Name</label>
             <input type="text" id="inqCompanyName" class="form-control" placeholder="Company name" value="">
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
+          <div class="form-row-2col">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Email Address *</label>
               <input type="email" id="inqEmail" class="form-control" placeholder="your@email.com" value="" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Phone / WhatsApp *</label>
               <input type="tel" id="inqPhone" class="form-control" placeholder="+91 ..." value="" required>
             </div>
           </div>
-          <div style="display: grid; grid-template-columns: 100px 1fr; gap: 12px;">
-            <div class="form-group">
+          <div class="form-row-2col" style="margin-top: 12px;">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Quantity</label>
               <input type="number" id="inqQuantity" class="form-control" value="1" min="1">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Repeat Size / Specifications</label>
               <input type="text" id="inqRepeatNotes" class="form-control" placeholder="e.g. 64R, 81.9R, or custom size">
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="margin-top: 12px;">
             <label class="form-label">Message / Details</label>
             <textarea id="inqMessage" class="form-control" placeholder="Any specific requirements..."></textarea>
           </div>
@@ -739,7 +744,15 @@ Surface: Zinc passivated / black oxide</td>
       <div class="footer-top-row">
         <!-- Footer Brand -->
         <div class="footer-brand">
-          <img src="static/images/logo.png" alt="DIVYA TRADING CO." class="footer-logo">
+          <a href="index.html" class="brand-logo-link" style="text-decoration: none;">
+            <div class="brand-logo-combo">
+              <img src="static/images/dtc_emblem.png" alt="DTC Emblem" class="brand-emblem-icon" style="height: 48px; width: 48px; background: white; padding: 2px;">
+              <div class="brand-text-block">
+                <span class="brand-main-title" style="font-size: 1.35rem; color: white;">DIVYA TRADING CO.</span>
+                <span class="brand-sub-tagline" style="font-size: 0.58rem; color: #93C5FD;">TEXTILE MACHINERY PRECISION SPARES</span>
+              </div>
+            </div>
+          </a>
         </div>
 
         <!-- Footer Contact Info -->

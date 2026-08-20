@@ -40,34 +40,34 @@
         <form action="{{ url_for('customer_register') }}" method="POST">
           <input type="hidden" name="next" value="{{ next_url }}">
           
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-            <div class="form-group">
+          <div class="form-row-2col">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Your Full Name *</label>
               <input type="text" name="name" class="form-control" placeholder="e.g. John Doe / Rajesh Patel" required autofocus style="padding: 10px 12px;">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Company / Mill Name</label>
               <input type="text" name="company_name" class="form-control" placeholder="Textile Mills Pvt Ltd" style="padding: 10px 12px;">
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-            <div class="form-group">
+          <div class="form-row-2col" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Email Address *</label>
               <input type="email" name="email" class="form-control" placeholder="name@company.com" required style="padding: 10px 12px;">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Phone / WhatsApp *</label>
               <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210" required style="padding: 10px 12px;">
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-            <div class="form-group">
+          <div class="form-row-2col" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Country *</label>
               <input type="text" name="country" class="form-control" value="India" required style="padding: 10px 12px;">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">City / State</label>
               <input type="text" name="city" class="form-control" placeholder="Surat / Ahmedabad / Dhaka" style="padding: 10px 12px;">
             </div>
