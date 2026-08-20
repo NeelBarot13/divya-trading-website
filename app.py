@@ -41,8 +41,16 @@ def generate_inquiry_ref():
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'admin_user_id' not in session:
+        admin_id = session.get('admin_user_id')
+        if not admin_id:
             flash('Please log in to access the admin area.', 'warning')
+            return redirect(url_for('admin_login', next=request.url))
+        admin = AdminUser.query.get(admin_id)
+        if not admin:
+            session.pop('admin_user_id', None)
+            session.pop('admin_username', None)
+            session.pop('admin_role', None)
+            flash('Admin session expired. Please log in again.', 'warning')
             return redirect(url_for('admin_login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -51,8 +59,17 @@ def admin_required(f):
 def customer_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'customer_id' not in session:
+        cust_id = session.get('customer_id')
+        if not cust_id:
             flash('Please sign in or create an account to view your quotes.', 'info')
+            return redirect(url_for('customer_login', next=request.url))
+        customer = CustomerUser.query.get(cust_id)
+        if not customer:
+            session.pop('customer_id', None)
+            session.pop('customer_name', None)
+            session.pop('customer_email', None)
+            session.pop('customer_company', None)
+            flash('Your session has expired. Please sign in again.', 'info')
             return redirect(url_for('customer_login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -70,6 +87,11 @@ def inject_global_data():
     current_customer = None
     if 'customer_id' in session:
         current_customer = CustomerUser.query.get(session['customer_id'])
+        if not current_customer:
+            session.pop('customer_id', None)
+            session.pop('customer_name', None)
+            session.pop('customer_email', None)
+            session.pop('customer_company', None)
         
     return {
         'nav_categories': categories,
@@ -99,22 +121,30 @@ def home():
     categories = Category.query.order_by(Category.order_index).all()
     machines = MachineMake.query.all()
     
-    # Parse brand pills from settings and match to machine makes for clickable URLs
-    raw_brands = settings.get('hero_brands', 'STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC')
-    brand_names = [b.strip() for b in raw_brands.split(',') if b.strip()]
+    # Parse brand pills from structured JSON or fallback
+    import json
     brand_pills = []
-    for b in brand_names:
-        # Match against MachineMake database records
-        matched_make = MachineMake.query.filter(MachineMake.name.ilike(f"%{b}%")).first()
-        if matched_make:
-            brand_url = url_for('products', machine=matched_make.slug)
-        else:
-            brand_url = url_for('products', q=b)
-        brand_pills.append({
-            'name': b,
-            'slug': slugify(b),
-            'url': brand_url
-        })
+    hero_json = settings.get('hero_brands_json')
+    if hero_json:
+        try:
+            brand_pills = json.loads(hero_json)
+        except Exception:
+            brand_pills = []
+            
+    if not brand_pills:
+        raw_brands = settings.get('hero_brands', 'STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC')
+        brand_names = [b.strip() for b in raw_brands.split(',') if b.strip()]
+        for b in brand_names:
+            matched_make = MachineMake.query.filter(MachineMake.name.ilike(f"%{b}%")).first()
+            if matched_make:
+                brand_url = url_for('products', machine=matched_make.slug)
+            else:
+                brand_url = url_for('products', q=b)
+            brand_pills.append({
+                'name': b,
+                'slug': slugify(b),
+                'url': brand_url
+            })
     
     return render_template(
         'index.html',
@@ -308,7 +338,14 @@ def customer_logout():
 @app.route('/customer/dashboard')
 @customer_required
 def customer_dashboard():
-    customer = CustomerUser.query.get(session['customer_id'])
+    customer = CustomerUser.query.get(session.get('customer_id'))
+    if not customer:
+        session.pop('customer_id', None)
+        session.pop('customer_name', None)
+        session.pop('customer_email', None)
+        session.pop('customer_company', None)
+        return redirect(url_for('customer_login'))
+        
     inquiries = Inquiry.query.filter(
         (Inquiry.customer_id == customer.id) | (Inquiry.email == customer.email)
     ).order_by(Inquiry.id.desc()).all()
@@ -1122,20 +1159,49 @@ def admin_settings():
         action = request.form.get('action')
         
         if action == 'save_settings':
-            # 1. Update text inputs
+            # 1. Process dynamic Hero Brand Badges (Names and URLs)
+            import json
+            hero_brand_names = request.form.getlist('hero_brand_name[]')
+            hero_brand_urls = request.form.getlist('hero_brand_url[]')
+            if hero_brand_names:
+                badges_list = []
+                for name, url in zip(hero_brand_names, hero_brand_urls):
+                    name_clean = name.strip()
+                    url_clean = url.strip()
+                    if name_clean:
+                        badges_list.append({
+                            'name': name_clean,
+                            'url': url_clean if url_clean else f"/products?q={name_clean}"
+                        })
+                setting_json = SiteSetting.query.filter_by(key='hero_brands_json').first()
+                if setting_json:
+                    setting_json.value = json.dumps(badges_list)
+                else:
+                    db.session.add(SiteSetting(key='hero_brands_json', value=json.dumps(badges_list)))
+                    
+                setting_plain = SiteSetting.query.filter_by(key='hero_brands').first()
+                plain_val = ", ".join([b['name'] for b in badges_list])
+                if setting_plain:
+                    setting_plain.value = plain_val
+                else:
+                    db.session.add(SiteSetting(key='hero_brands', value=plain_val))
+
+            # 2. Update standard text inputs
             for key, value in request.form.items():
-                if key not in ('action', 'show_hero_brands', 'show_product_range', 'show_quality_banner', 
-                               'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 'show_whatsapp_button'):
+                if key not in ('action', 'hero_brand_name[]', 'hero_brand_url[]', 'show_hero_brands', 'show_product_range', 
+                               'show_quality_banner', 'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 
+                               'show_whatsapp_button', 'show_mobile_sticky_bar'):
                     setting = SiteSetting.query.filter_by(key=key).first()
                     if setting:
                         setting.value = value
                     else:
                         db.session.add(SiteSetting(key=key, value=value))
                         
-            # 2. Update Checkbox Toggles
+            # 3. Update Checkbox Toggles
             toggle_keys = [
                 'show_hero_brands', 'show_product_range', 'show_quality_banner',
-                'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 'show_whatsapp_button'
+                'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 
+                'show_whatsapp_button', 'show_mobile_sticky_bar'
             ]
             for t_key in toggle_keys:
                 val = 'true' if t_key in request.form else 'false'
@@ -1145,7 +1211,7 @@ def admin_settings():
                 else:
                     db.session.add(SiteSetting(key=t_key, value=val))
                     
-            # 3. Handle File Uploads for Banners and Logo
+            # 4. Handle File Uploads for Banners and Logo
             upload_files = {
                 'site_logo_file': 'site_logo',
                 'hero_image_file': 'hero_image',
@@ -1167,7 +1233,7 @@ def admin_settings():
                             db.session.add(SiteSetting(key=setting_key, value=img_val))
                             
             db.session.commit()
-            flash('Website CMS, homepage banners, and appearance settings saved successfully!', 'success')
+            flash('Website CMS, homepage hero badges, and appearance settings saved successfully!', 'success')
             
         elif action == 'test_email':
             test_target = request.form.get('test_email_recipient', 'divya.trading06@gmail.com').strip()
@@ -1189,10 +1255,29 @@ def admin_settings():
     settings = {s.key: s.value for s in settings_records}
     email_logs = list(reversed(EMAIL_ACTIVITY_LOGS[-30:]))
     
+    # Parse hero badges for admin builder
+    import json
+    hero_badges_list = []
+    hero_json = settings.get('hero_brands_json')
+    if hero_json:
+        try:
+            hero_badges_list = json.loads(hero_json)
+        except Exception:
+            hero_badges_list = []
+    if not hero_badges_list:
+        raw_brands = settings.get('hero_brands', 'STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC')
+        for b in [x.strip() for x in raw_brands.split(',') if x.strip()]:
+            matched_make = MachineMake.query.filter(MachineMake.name.ilike(f"%{b}%")).first()
+            hero_badges_list.append({
+                'name': b,
+                'url': url_for('products', machine=matched_make.slug) if matched_make else url_for('products', q=b)
+            })
+            
     return render_template(
         'admin/settings.html',
         settings=settings,
-        email_logs=email_logs
+        email_logs=email_logs,
+        hero_badges_list=hero_badges_list
     )
 
 

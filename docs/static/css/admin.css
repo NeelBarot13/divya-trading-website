@@ -508,3 +508,74 @@ body.admin-body {
   font-size: 0.82rem;
   color: var(--admin-muted);
 }
+
+/* ==========================================================================
+   ADMIN MOBILE & TABLET RESPONSIVE RULES
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 220px;
+  }
+  .admin-main {
+    margin-left: 220px;
+    padding: 24px 20px;
+    width: calc(100% - 220px);
+  }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body.admin-body {
+    flex-direction: column;
+  }
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+  }
+  .sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 4px;
+  }
+  .sidebar-nav-item {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+  .sidebar-footer {
+    display: none;
+  }
+  .admin-main {
+    margin-left: 0;
+    width: 100%;
+    padding: 16px 12px;
+  }
+  .admin-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .cms-tabs-nav {
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    gap: 8px;
+    padding-bottom: 8px;
+  }
+  .badge-row {
+    grid-template-columns: 1fr !important;
+  }
+}
