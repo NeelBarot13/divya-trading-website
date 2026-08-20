@@ -21,7 +21,9 @@
     <div class="container header-inner">
       <!-- Brand Logo -->
       <a href="index.html" class="brand-logo-link" id="headerLogoLink" title="Divya Trading Co.">
-        <img src="static/images/logo.png" alt="DIVYA TRADING CO." class="brand-logo-img">
+        <div class="brand-logo-combo">
+          <img src="static/images/logo.png" alt="DIVYA TRADING CO." class="brand-logo-img">
+        </div>
       </a>
 
       <!-- Desktop Navigation Links -->
@@ -144,13 +146,177 @@
       <div class="header-actions">
         
 
-        <!-- Mobile Toggle -->
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation">
-          <span></span><span></span><span></span>
+        <!-- Mobile Drawer Hamburger Toggle Button -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu">
+          <span class="bar-line"></span>
+          <span class="bar-line"></span>
+          <span class="bar-line"></span>
         </button>
       </div>
     </div>
   </header>
+
+  <!-- Mobile Slide Drawer Backdrop -->
+  <div class="mobile-drawer-overlay" id="mobileDrawerOverlay"></div>
+
+  <!-- Modern Mobile Slide-Out Navigation Drawer -->
+  <aside class="mobile-drawer" id="mobileDrawer">
+    <div class="mobile-drawer-header">
+      <a href="index.html" class="mobile-drawer-brand">
+        <img src="static/images/logo.png" alt="DIVYA TRADING CO." class="mobile-drawer-logo">
+      </a>
+      <button class="mobile-drawer-close-btn" id="mobileDrawerCloseBtn" aria-label="Close Navigation">✕</button>
+    </div>
+
+    <div class="mobile-drawer-body">
+      <!-- User Auth State Card -->
+      
+      <div class="mobile-auth-actions">
+        <a href="/customer/login" class="btn-mobile-auth-login">Sign In</a>
+        <a href="/customer/register" class="btn-mobile-auth-register">Register ➔</a>
+      </div>
+      
+
+      <!-- Mobile Navigation Links List -->
+      <div class="mobile-nav-links-list">
+        <a href="index.html" class="mobile-nav-row ">
+          <span class="mobile-nav-icon">🏠</span>
+          <span class="mobile-nav-text">Home</span>
+        </a>
+        <a href="about.html" class="mobile-nav-row ">
+          <span class="mobile-nav-icon">🏢</span>
+          <span class="mobile-nav-text">About Us</span>
+        </a>
+
+        <!-- Expandable Products Accordion -->
+        <div class="mobile-drawer-accordion">
+          <button type="button" class="mobile-accordion-header" id="mobileProductsAccordion">
+            <span class="mobile-nav-icon">📦</span>
+            <span class="mobile-nav-text">Products Catalog</span>
+            <span class="mobile-accordion-arrow">▾</span>
+          </button>
+          <div class="mobile-accordion-body">
+            <a href="products.html" class="mobile-accordion-item special-all">
+              <strong>All Products Catalog ➔</strong>
+            </a>
+            
+            <a href="products.html?category=screen-head-parts" class="mobile-accordion-item">
+              <span>Screen Head Parts</span>
+            </a>
+            
+            <a href="products.html?category=machine-components" class="mobile-accordion-item">
+              <span>Machine Components</span>
+            </a>
+            
+            <a href="products.html?category=gears-and-gear-sets" class="mobile-accordion-item">
+              <span>Gears &amp; Gear Sets</span>
+            </a>
+            
+            <a href="products.html?category=rollers-and-shafts" class="mobile-accordion-item">
+              <span>Rollers &amp; Shafts</span>
+            </a>
+            
+            <a href="products.html?category=pumps-and-accessories" class="mobile-accordion-item">
+              <span>Pumps &amp; Accessories</span>
+            </a>
+            
+            <a href="products.html?category=squeegee-blades-and-suspensions" class="mobile-accordion-item">
+              <span>Squeegee Blades &amp; Suspensions</span>
+            </a>
+            
+            <a href="products.html?category=spares-for-stovec-and-stenter" class="mobile-accordion-item">
+              <span>Spares for Stovec &amp; Stenter</span>
+            </a>
+            
+            <a href="products.html?category=magnetic-and-blade-printing" class="mobile-accordion-item">
+              <span>Magnetic &amp; Blade Printing</span>
+            </a>
+            
+            <a href="products.html?category=washing-and-cleaning-units" class="mobile-accordion-item">
+              <span>Washing and Cleaning Units</span>
+            </a>
+            
+          </div>
+        </div>
+
+        <!-- Expandable Machines Accordion -->
+        <div class="mobile-drawer-accordion">
+          <button type="button" class="mobile-accordion-header" id="mobileMachinesAccordion">
+            <span class="mobile-nav-icon">⚙️</span>
+            <span class="mobile-nav-text">Supported Machines</span>
+            <span class="mobile-accordion-arrow">▾</span>
+          </button>
+          <div class="mobile-accordion-body">
+            <a href="machines.html" class="mobile-accordion-item special-all">
+              <strong>All Machine Makes ➔</strong>
+            </a>
+            
+            <a href="products.html?machine=harish" class="mobile-accordion-item">
+              <span>Harish</span>
+            </a>
+            
+            <a href="products.html?machine=ichinose" class="mobile-accordion-item">
+              <span>Ichinose</span>
+            </a>
+            
+            <a href="products.html?machine=mbk" class="mobile-accordion-item">
+              <span>MBK</span>
+            </a>
+            
+            <a href="products.html?machine=mhn-ragging-machine" class="mobile-accordion-item">
+              <span>MHN / Ragging Machine</span>
+            </a>
+            
+            <a href="products.html?machine=pegasus-rd-dd" class="mobile-accordion-item">
+              <span>Pegasus / RD-DD</span>
+            </a>
+            
+            <a href="products.html?machine=reggiani" class="mobile-accordion-item">
+              <span>Reggiani</span>
+            </a>
+            
+            <a href="products.html?machine=stork-rd-3-rd-4" class="mobile-accordion-item">
+              <span>Stork (RD-3 &amp; RD-4)</span>
+            </a>
+            
+            <a href="products.html?machine=stormac" class="mobile-accordion-item">
+              <span>Stormac</span>
+            </a>
+            
+            <a href="products.html?machine=stovec" class="mobile-accordion-item">
+              <span>Stovec</span>
+            </a>
+            
+            <a href="products.html?machine=zimmer" class="mobile-accordion-item">
+              <span>Zimmer</span>
+            </a>
+            
+          </div>
+        </div>
+
+        <a href="download_catalog.html" class="mobile-nav-row ">
+          <span class="mobile-nav-icon">📥</span>
+          <span class="mobile-nav-text">Download Catalog</span>
+        </a>
+        <a href="contact.html" class="mobile-nav-row ">
+          <span class="mobile-nav-icon">📞</span>
+          <span class="mobile-nav-text">Contact Us</span>
+        </a>
+
+        
+      </div>
+
+      <!-- Quick Contact Direct Call & WhatsApp in Mobile Drawer -->
+      <div class="mobile-drawer-contacts">
+        <a href="tel:+91 83208 21579" class="btn-drawer-quick btn-drawer-call">
+          <span>📞 Call Sales Engineering</span>
+        </a>
+        <a href="https://wa.me/918320821579" target="_blank" rel="noopener" class="btn-drawer-quick btn-drawer-wa">
+          <span>💬 WhatsApp Instant Quote</span>
+        </a>
+      </div>
+    </div>
+  </aside>
 
   <!-- Main Body Content Block -->
   <main>
@@ -551,6 +717,33 @@ High temperature and chemical resistance</td>
       </div>
     </div>
   </footer>
+
+  <!-- Mobile Bottom Sticky Quick-Action Bar -->
+  <div class="mobile-sticky-bottom-bar" id="mobileStickyBottomBar">
+    <a href="tel:+91 83208 21579" class="sticky-bar-item" title="Call Us">
+      <span class="sticky-icon">📞</span>
+      <span class="sticky-label">Call</span>
+    </a>
+    <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.%2C%20I%20would%20like%20to%20inquire%20about%20rotary%20printing%20machine%20spare%20parts." 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       class="sticky-bar-item sticky-item-wa" 
+       title="WhatsApp">
+      <span class="sticky-icon">💬</span>
+      <span class="sticky-label">WhatsApp</span>
+    </a>
+    <a href="products.html" class="sticky-bar-item " title="Products">
+      <span class="sticky-icon">📦</span>
+      <span class="sticky-label">Catalog</span>
+    </a>
+    <button type="button" class="sticky-bar-item btn-open-quote-cart" title="Quote List">
+      <span class="sticky-icon-wrapper">
+        <span class="sticky-icon">📋</span>
+        <span class="cart-badge-count" id="stickyCartBadge">0</span>
+      </span>
+      <span class="sticky-label">Quotes</span>
+    </button>
+  </div>
 
   <!-- Scripts -->
   <script src="static/js/main.js"></script>

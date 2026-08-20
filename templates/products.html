@@ -112,7 +112,7 @@
       <!-- Right Main: Product Grid -->
       <main class="catalog-main">
         <!-- Results count bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
           <span style="font-size: 0.88rem; color: var(--text-muted);">
             Showing <strong>{{ products|length }}</strong> precision parts
           </span>
@@ -122,9 +122,21 @@
           </button>
         </div>
 
+        <!-- Mobile Quick-Filter Pills (Horizontal Touch Carousel) -->
+        <div class="mobile-catalog-filter-pills">
+          <a href="{{ url_for('products', machine=selected_machine.slug if selected_machine else None) }}" class="catalog-pill-btn {% if not selected_category %}active{% endif %}">
+            All ({{ products|length }})
+          </a>
+          {% for cat in categories %}
+          <a href="{{ url_for('products', category=cat.slug, machine=selected_machine.slug if selected_machine else None) }}" class="catalog-pill-btn {% if selected_category and selected_category.id == cat.id %}active{% endif %}">
+            {{ cat.name }}
+          </a>
+          {% endfor %}
+        </div>
+
         <!-- Product Cards Grid -->
         {% if products %}
-        <div class="product-grid">
+        <div class="products-grid">
           {% for prod in products %}
           <div class="product-card">
             {% if prod.is_featured %}

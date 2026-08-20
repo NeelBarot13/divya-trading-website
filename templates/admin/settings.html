@@ -151,6 +151,9 @@
       <button type="button" class="cms-tab-btn active" onclick="switchCmsTab('tab-hero', this)">
         <span>🖼️</span> Hero Banner & Badges
       </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-mobile', this)">
+        <span>📱</span> Mobile View & Actions
+      </button>
       <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-showcase', this)">
         <span>✨</span> Product Showcase & Toggles
       </button>
@@ -235,6 +238,64 @@
                 <span style="font-size: 0.75rem; color: #64748b;">Upload a new image or leave empty to keep current.</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB: MOBILE VIEW & ACTIONS CONFIGURATION
+           =================================================================== -->
+      <div id="tab-mobile" class="cms-tab-content">
+        <div class="admin-card" style="padding: 28px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
+            Mobile Experience & Floating Action Bar Settings
+          </h3>
+
+          <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 24px;">
+            Configure mobile-specific navigation, quick touch buttons, and layout responsiveness.
+          </p>
+
+          <!-- Toggle Sticky Bar -->
+          <div class="toggle-card">
+            <div>
+              <strong>Show Mobile Sticky Bottom Quick Bar</strong>
+              <span>Displays a persistent floating bar at the bottom of mobile phones for instant Call, WhatsApp, Catalog, and Quote Cart access.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" name="show_mobile_sticky_bar" value="true" {% if settings.show_mobile_sticky_bar != 'false' %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label class="form-label">Mobile Direct Call Number</label>
+              <input type="text" name="phone_primary" class="form-control" value="{{ settings.phone_primary or '+918320821579' }}">
+              <span style="font-size: 0.75rem; color: #64748b;">Phone number called when users tap "Call" on mobile bar or drawer.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">WhatsApp Quick Inquiry Number</label>
+              <input type="text" name="whatsapp_number" class="form-control" value="{{ settings.whatsapp_number or '+918320821579' }}">
+              <span style="font-size: 0.75rem; color: #64748b;">WhatsApp number opened when users tap "WhatsApp" on mobile.</span>
+            </div>
+          </div>
+
+          <!-- Hero Brand Pills -->
+          <div class="form-group" style="margin-top: 10px; margin-bottom: 20px;">
+            <label class="form-label">Interactive Hero Brand Badges (Comma-separated)</label>
+            <input type="text" name="hero_brands" class="form-control" value="{{ settings.hero_brands or 'STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC' }}">
+            <span style="font-size: 0.75rem; color: #64748b;">These brand badges are automatically rendered as clickable interactive pills on both mobile and desktop.</span>
+          </div>
+
+          <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-top: 14px;">
+            <strong style="color: #1e40af; font-size: 0.88rem; display: block; margin-bottom: 4px;">⚡ Mobile Optimization Live:</strong>
+            <ul style="font-size: 0.82rem; color: #1e3a8a; line-height: 1.6; padding-left: 18px; list-style: disc;">
+              <li>Mobile Drawer slide-out menu with category & machine accordions.</li>
+              <li>Clean 2-column mobile category cards & 2-column product catalog grid.</li>
+              <li>2x2 responsive stats grid and touch-friendly quote actions.</li>
+              <li>Automatic iOS Safari font-scaling protection (prevents auto-zoom).</li>
+            </ul>
           </div>
         </div>
       </div>

@@ -21,7 +21,9 @@
     <div class="container header-inner">
       <!-- Brand Logo -->
       <a href="{{ url_for('home') }}" class="brand-logo-link" id="headerLogoLink" title="Divya Trading Co.">
-        <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="{{ site_settings.company_name or 'Divya Trading Co.' }}" class="brand-logo-img">
+        <div class="brand-logo-combo">
+          <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="{{ site_settings.company_name or 'Divya Trading Co.' }}" class="brand-logo-img">
+        </div>
       </a>
 
       <!-- Desktop Navigation Links -->
@@ -75,38 +77,150 @@
       <!-- Header Actions: Circular Profile Icon when Logged In -->
       <div class="header-actions">
         {% if current_customer %}
-          <!-- Circular Profile Icon & Dropdown -->
+          <!-- Circular Profile Icon & Dropdown (Clean action buttons without user header) -->
           <div class="nav-item-dropdown profile-dropdown-wrapper">
             <button class="profile-circle-btn" id="profileCircleBtn" title="{{ current_customer.name }}">
               <span class="profile-circle-initials">{{ current_customer.name[:2]|upper }}</span>
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-              <div class="profile-menu-header">
-                <span class="profile-header-role">Customer Account</span>
-                <strong class="profile-header-name">{{ current_customer.name }}</strong>
-                <span class="profile-header-email">{{ current_customer.email }}</span>
-              </div>
               <a href="{{ url_for('customer_dashboard') }}" class="dropdown-item">
+                <span class="dropdown-icon">📋</span>
                 <span>My Quotes & Status</span>
               </a>
               <a href="{{ url_for('products') }}" class="dropdown-item">
+                <span class="dropdown-icon">➕</span>
                 <span>Request New Quote</span>
               </a>
               <div class="dropdown-divider"></div>
               <a href="{{ url_for('customer_logout') }}" class="dropdown-item text-danger">
+                <span class="dropdown-icon">🚪</span>
                 <span>Sign Out</span>
               </a>
             </div>
           </div>
         {% endif %}
 
-        <!-- Mobile Toggle -->
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation">
-          <span></span><span></span><span></span>
+        <!-- Mobile Drawer Hamburger Toggle Button -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu">
+          <span class="bar-line"></span>
+          <span class="bar-line"></span>
+          <span class="bar-line"></span>
         </button>
       </div>
     </div>
   </header>
+
+  <!-- Mobile Slide Drawer Backdrop -->
+  <div class="mobile-drawer-overlay" id="mobileDrawerOverlay"></div>
+
+  <!-- Modern Mobile Slide-Out Navigation Drawer -->
+  <aside class="mobile-drawer" id="mobileDrawer">
+    <div class="mobile-drawer-header">
+      <a href="{{ url_for('home') }}" class="mobile-drawer-brand">
+        <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="{{ site_settings.company_name or 'Divya Trading Co.' }}" class="mobile-drawer-logo">
+      </a>
+      <button class="mobile-drawer-close-btn" id="mobileDrawerCloseBtn" aria-label="Close Navigation">✕</button>
+    </div>
+
+    <div class="mobile-drawer-body">
+      <!-- User Auth State Card -->
+      {% if current_customer %}
+      <div class="mobile-user-card">
+        <div class="mobile-user-avatar">{{ current_customer.name[:2]|upper }}</div>
+        <div class="mobile-user-details">
+          <strong class="mobile-user-name">{{ current_customer.name }}</strong>
+          <span class="mobile-user-email">{{ current_customer.email }}</span>
+        </div>
+        <a href="{{ url_for('customer_dashboard') }}" class="btn-mobile-myquotes">Quotes</a>
+      </div>
+      {% else %}
+      <div class="mobile-auth-actions">
+        <a href="{{ url_for('customer_login') }}" class="btn-mobile-auth-login">Sign In</a>
+        <a href="{{ url_for('customer_register') }}" class="btn-mobile-auth-register">Register ➔</a>
+      </div>
+      {% endif %}
+
+      <!-- Mobile Navigation Links List -->
+      <div class="mobile-nav-links-list">
+        <a href="{{ url_for('home') }}" class="mobile-nav-row {% if request.endpoint == 'home' %}active{% endif %}">
+          <span class="mobile-nav-icon">🏠</span>
+          <span class="mobile-nav-text">Home</span>
+        </a>
+        <a href="{{ url_for('about') }}" class="mobile-nav-row {% if request.endpoint == 'about' %}active{% endif %}">
+          <span class="mobile-nav-icon">🏢</span>
+          <span class="mobile-nav-text">About Us</span>
+        </a>
+
+        <!-- Expandable Products Accordion -->
+        <div class="mobile-drawer-accordion">
+          <button type="button" class="mobile-accordion-header" id="mobileProductsAccordion">
+            <span class="mobile-nav-icon">📦</span>
+            <span class="mobile-nav-text">Products Catalog</span>
+            <span class="mobile-accordion-arrow">▾</span>
+          </button>
+          <div class="mobile-accordion-body">
+            <a href="{{ url_for('products') }}" class="mobile-accordion-item special-all">
+              <strong>All Products Catalog ➔</strong>
+            </a>
+            {% for cat in nav_categories %}
+            <a href="{{ url_for('products', category=cat.slug) }}" class="mobile-accordion-item">
+              <span>{{ cat.name }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Expandable Machines Accordion -->
+        <div class="mobile-drawer-accordion">
+          <button type="button" class="mobile-accordion-header" id="mobileMachinesAccordion">
+            <span class="mobile-nav-icon">⚙️</span>
+            <span class="mobile-nav-text">Supported Machines</span>
+            <span class="mobile-accordion-arrow">▾</span>
+          </button>
+          <div class="mobile-accordion-body">
+            <a href="{{ url_for('machines') }}" class="mobile-accordion-item special-all">
+              <strong>All Machine Makes ➔</strong>
+            </a>
+            {% for m in nav_machines %}
+            <a href="{{ url_for('products', machine=m.slug) }}" class="mobile-accordion-item">
+              <span>{{ m.name }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <a href="{{ url_for('download_catalog') }}" class="mobile-nav-row {% if request.endpoint == 'download_catalog' %}active{% endif %}">
+          <span class="mobile-nav-icon">📥</span>
+          <span class="mobile-nav-text">Download Catalog</span>
+        </a>
+        <a href="{{ url_for('contact') }}" class="mobile-nav-row {% if request.endpoint == 'contact' %}active{% endif %}">
+          <span class="mobile-nav-icon">📞</span>
+          <span class="mobile-nav-text">Contact Us</span>
+        </a>
+
+        {% if current_customer %}
+        <a href="{{ url_for('customer_dashboard') }}" class="mobile-nav-row">
+          <span class="mobile-nav-icon">📋</span>
+          <span class="mobile-nav-text">My Quotes & Inquiries</span>
+        </a>
+        <a href="{{ url_for('customer_logout') }}" class="mobile-nav-row text-danger">
+          <span class="mobile-nav-icon">🚪</span>
+          <span class="mobile-nav-text">Sign Out</span>
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Quick Contact Direct Call & WhatsApp in Mobile Drawer -->
+      <div class="mobile-drawer-contacts">
+        <a href="tel:{{ site_settings.phone_primary or '+918320821579' }}" class="btn-drawer-quick btn-drawer-call">
+          <span>📞 Call Sales Engineering</span>
+        </a>
+        <a href="https://wa.me/{{ (site_settings.whatsapp_number or '918320821579')|replace('+', '')|replace(' ', '') }}" target="_blank" rel="noopener" class="btn-drawer-quick btn-drawer-wa">
+          <span>💬 WhatsApp Instant Quote</span>
+        </a>
+      </div>
+    </div>
+  </aside>
 
   <!-- Main Body Content Block -->
   <main>
@@ -328,6 +442,33 @@
       </div>
     </div>
   </footer>
+
+  <!-- Mobile Bottom Sticky Quick-Action Bar -->
+  <div class="mobile-sticky-bottom-bar" id="mobileStickyBottomBar">
+    <a href="tel:{{ site_settings.phone_primary or '+918320821579' }}" class="sticky-bar-item" title="Call Us">
+      <span class="sticky-icon">📞</span>
+      <span class="sticky-label">Call</span>
+    </a>
+    <a href="https://wa.me/{{ (site_settings.whatsapp_number or '918320821579')|replace('+', '')|replace(' ', '') }}?text={{ (site_settings.whatsapp_default_message or 'Hello Divya Trading Co., I would like to inquire about rotary printing machine spare parts.')|urlencode }}" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       class="sticky-bar-item sticky-item-wa" 
+       title="WhatsApp">
+      <span class="sticky-icon">💬</span>
+      <span class="sticky-label">WhatsApp</span>
+    </a>
+    <a href="{{ url_for('products') }}" class="sticky-bar-item {% if request.endpoint == 'products' %}active{% endif %}" title="Products">
+      <span class="sticky-icon">📦</span>
+      <span class="sticky-label">Catalog</span>
+    </a>
+    <button type="button" class="sticky-bar-item btn-open-quote-cart" title="Quote List">
+      <span class="sticky-icon-wrapper">
+        <span class="sticky-icon">📋</span>
+        <span class="cart-badge-count" id="stickyCartBadge">0</span>
+      </span>
+      <span class="sticky-label">Quotes</span>
+    </button>
+  </div>
 
   <!-- Scripts -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>

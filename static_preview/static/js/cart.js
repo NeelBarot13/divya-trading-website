@@ -79,11 +79,15 @@ const QuoteCart = {
   },
 
   updateBadge() {
-    const badges = document.querySelectorAll('.cart-badge');
+    const badges = document.querySelectorAll('.cart-badge, .cart-badge-count, #stickyCartBadge');
     const count = this.items.length;
     badges.forEach(badge => {
       badge.textContent = count;
-      badge.style.display = count > 0 ? 'inline-block' : 'inline-block';
+      if (count > 0) {
+        badge.classList.add('has-items');
+      } else {
+        badge.classList.remove('has-items');
+      }
     });
   },
 

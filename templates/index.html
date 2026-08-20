@@ -19,11 +19,14 @@
           {{ site_settings.hero_subtitle or 'Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines' }}
         </p>
 
-        <!-- Brand Compatibility Pills (Toggleable & Configurable from Admin) -->
+        <!-- Brand Compatibility Pills (Clickable & Configurable from Admin) -->
         {% if site_settings.show_hero_brands != 'false' and brand_pills %}
         <div class="brand-pills-container">
           {% for b in brand_pills %}
-          <span class="brand-pill">{{ b }}</span>
+          <a href="{{ b.url }}" class="brand-pill" title="View {{ b.name }} Compatible Spare Parts">
+            <span>{{ b.name }}</span>
+            <span class="pill-arrow">➔</span>
+          </a>
           {% endfor %}
         </div>
         {% endif %}

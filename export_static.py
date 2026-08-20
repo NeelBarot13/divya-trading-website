@@ -66,11 +66,12 @@ with app.app_context():
         
         return content
 
+    client = app.test_client()
+
     for url_path, filename in main_pages:
         try:
-            req = urllib.request.Request(base + url_path, headers={'User-Agent': 'Mozilla/5.0'})
-            resp = urllib.request.urlopen(req)
-            raw_html = resp.read().decode('utf-8')
+            resp = client.get(url_path)
+            raw_html = resp.get_data(as_text=True)
             clean_html = transform_html(raw_html)
             
             for target_dir in [docs_dir, preview_dir]:
@@ -85,9 +86,8 @@ with app.app_context():
     print(f"\nGenerating all {len(products)} individual product detail pages...")
     for p in products:
         try:
-            req = urllib.request.Request(base + f'/product/{p.slug}', headers={'User-Agent': 'Mozilla/5.0'})
-            resp = urllib.request.urlopen(req)
-            raw_html = resp.read().decode('utf-8')
+            resp = client.get(f'/product/{p.slug}')
+            raw_html = resp.get_data(as_text=True)
             clean_html = transform_html(raw_html)
             
             prod_filename = f"product_{p.slug}.html"

@@ -99,9 +99,22 @@ def home():
     categories = Category.query.order_by(Category.order_index).all()
     machines = MachineMake.query.all()
     
-    # Parse brand pills from settings
+    # Parse brand pills from settings and match to machine makes for clickable URLs
     raw_brands = settings.get('hero_brands', 'STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC')
-    brand_pills = [b.strip() for b in raw_brands.split(',') if b.strip()]
+    brand_names = [b.strip() for b in raw_brands.split(',') if b.strip()]
+    brand_pills = []
+    for b in brand_names:
+        # Match against MachineMake database records
+        matched_make = MachineMake.query.filter(MachineMake.name.ilike(f"%{b}%")).first()
+        if matched_make:
+            brand_url = url_for('products', machine=matched_make.slug)
+        else:
+            brand_url = url_for('products', q=b)
+        brand_pills.append({
+            'name': b,
+            'slug': slugify(b),
+            'url': brand_url
+        })
     
     return render_template(
         'index.html',

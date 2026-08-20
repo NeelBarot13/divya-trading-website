@@ -13,14 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 2. Mobile Menu Toggle
-  const mobileToggle = document.querySelector('.mobile-nav-toggle');
-  const mainNav = document.querySelector('.main-nav');
-  if (mobileToggle && mainNav) {
-    mobileToggle.addEventListener('click', () => {
-      mainNav.classList.toggle('active');
-    });
-  }
+  // 2. Modern Mobile Drawer Navigation Setup
+  setupMobileDrawer();
 
   // 3. Guest Auth Prompt Modal Controls
   setupGuestAuthPrompt();
@@ -31,6 +25,69 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. Client-Side Catalog Search & URL Filter Handler (for Static / GitHub Pages Mode)
   setupClientSideCatalogFilter();
 });
+
+/**
+ * Mobile Drawer Navigation and Accordion Submenu Controller
+ */
+function setupMobileDrawer() {
+  const toggleBtn = document.getElementById('mobileNavToggle');
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileDrawerOverlay');
+  const closeBtn = document.getElementById('mobileDrawerCloseBtn');
+
+  if (!toggleBtn || !drawer) return;
+
+  const openDrawer = () => {
+    drawer.classList.add('active');
+    overlay?.classList.add('active');
+    toggleBtn.classList.add('active');
+    document.body.classList.add('drawer-open');
+  };
+
+  const closeDrawer = () => {
+    drawer.classList.remove('active');
+    overlay?.classList.remove('active');
+    toggleBtn.classList.remove('active');
+    document.body.classList.remove('drawer-open');
+  };
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (drawer.classList.contains('active')) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
+  });
+
+  closeBtn?.addEventListener('click', closeDrawer);
+  overlay?.addEventListener('click', closeDrawer);
+
+  // Close drawer on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('active')) {
+      closeDrawer();
+    }
+  });
+
+  // Mobile Accordions inside Drawer
+  const accordionHeaders = drawer.querySelectorAll('.mobile-accordion-header');
+  accordionHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+      const parent = header.closest('.mobile-drawer-accordion');
+      const isOpen = parent.classList.contains('open');
+      
+      // Close other accordions
+      accordionHeaders.forEach(h => {
+        h.closest('.mobile-drawer-accordion')?.classList.remove('open');
+      });
+
+      if (!isOpen) {
+        parent.classList.add('open');
+      }
+    });
+  });
+}
 
 /**
  * Toast Notification Utility
