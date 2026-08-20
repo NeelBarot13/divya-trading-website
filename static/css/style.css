@@ -2276,261 +2276,343 @@ body.drawer-open {
     display: flex;
   }
 
+  /* Hide duplicate floating WhatsApp button on mobile since bottom sticky bar has instant WhatsApp button */
   .floating-whatsapp-btn {
-    bottom: 76px; /* Above the sticky bar */
-    left: 14px;
-    padding: 8px 14px;
-    font-size: 0.78rem;
-    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+    display: none !important;
   }
 
   .header-inner {
-    height: 68px;
+    height: 64px;
+    padding: 0 14px;
   }
 
   .brand-logo-img {
-    height: 46px;
-    max-width: 200px;
+    height: 44px;
+    max-width: 185px;
   }
 
   .profile-circle-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
   }
 
   .profile-circle-initials {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
 
   .hero-section {
-    padding: 32px 0 44px;
+    padding: 24px 0 36px;
   }
 
   .hero-title {
-    font-size: 2.1rem;
-    line-height: 1.16;
+    font-size: 1.85rem;
+    line-height: 1.18;
   }
 
   .hero-subtitle {
-    font-size: 0.95rem;
-    margin-bottom: 20px;
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+    line-height: 1.45;
   }
 
   .brand-pills-container {
-    gap: 8px;
-    margin-bottom: 22px;
+    gap: 6px;
+    margin-bottom: 18px;
   }
 
   .brand-pill {
-    padding: 5px 11px;
-    font-size: 0.76rem;
+    padding: 5px 10px;
+    font-size: 0.72rem;
   }
 
   .hero-trust-badges {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding-top: 16px;
+    gap: 10px;
+    padding-top: 14px;
     text-align: left;
   }
 
   .trust-badge-item {
-    gap: 10px;
+    gap: 8px;
   }
 
   .trust-badge-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
   }
 
   .trust-badge-text h4 {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
   }
 
   .trust-badge-text p {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
 
-  /* Categories Grid on Mobile (2 clean columns) */
+  /* Categories Grid on Mobile (2 clean crisp columns) */
   .categories-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
   }
 
   .category-card {
-    padding: 16px 14px;
+    padding: 12px 10px;
+    border-radius: 8px;
   }
 
   .cat-card-img-wrapper {
-    height: 120px;
-    margin-bottom: 12px;
+    height: 110px;
+    margin-bottom: 10px;
+    border-radius: 6px;
   }
 
   .cat-card-title {
-    font-size: 0.92rem;
-    margin-bottom: 6px;
+    font-size: 0.86rem;
+    margin-bottom: 4px;
+    font-weight: 700;
   }
 
   .cat-card-desc {
-    font-size: 0.78rem;
-    line-height: 1.4;
-    margin-bottom: 14px;
+    font-size: 0.74rem;
+    line-height: 1.35;
+    margin-bottom: 10px;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
   .btn-view-products {
-    font-size: 0.76rem;
-    padding: 7px 10px;
+    font-size: 0.72rem;
+    padding: 6px 8px;
+    border-radius: 4px;
   }
 
   /* Quality Banner on Mobile */
   .quality-banner-wrapper {
-    padding: 32px 20px;
+    padding: 24px 16px;
+    gap: 20px;
   }
 
   .quality-banner-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 
   .quality-banner-text {
-    font-size: 0.88rem;
-    line-height: 1.5;
+    font-size: 0.84rem;
+    line-height: 1.45;
   }
 
-  /* 6 Pillars Grid on Mobile */
+  /* 6 Pillars Grid on Mobile (2 clean columns) */
   .pillars-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
   }
 
   .pillar-card {
-    padding: 18px 14px;
+    padding: 14px 10px;
+    border-radius: 8px;
   }
 
   .pillar-icon-box {
-    width: 44px;
-    height: 44px;
-    font-size: 1.3rem;
-    margin-bottom: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+    border-radius: 6px;
   }
 
   .pillar-title {
-    font-size: 0.85rem;
-    margin-bottom: 6px;
+    font-size: 0.78rem;
+    margin-bottom: 4px;
+    min-height: 2.4em;
   }
 
   .pillar-desc {
-    font-size: 0.76rem;
-    line-height: 1.4;
-  }
-
-  /* Stats Ribbon 2x2 Grid Fix */
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 14px;
-  }
-
-  .stat-item {
-    padding: 14px 10px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .stat-number {
-    font-size: 1.65rem;
-  }
-
-  .stat-label {
     font-size: 0.72rem;
+    line-height: 1.35;
   }
 
-  /* Featured Products on Mobile (2 columns) */
-  .featured-4-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px;
+  /* Featured Products & Catalog Grid on Mobile (2 clean columns) */
+  .featured-4-grid, .products-grid, .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
   }
 
   .product-card {
     padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .product-card-img-wrap {
-    height: 130px;
+    height: 120px;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .product-card-img-wrap img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
   }
 
   .product-card-body {
-    padding: 8px 4px 4px;
+    padding: 6px 2px 2px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+
+  .product-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .product-part-no {
+    font-size: 0.66rem;
+    padding: 2px 5px;
+    background: #EFF6FF;
+    color: #0052CC;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .product-make-badge {
+    font-size: 0.66rem;
+    padding: 2px 5px;
+    background: #F1F5F9;
+    color: #475569;
+    border-radius: 4px;
+    font-weight: 600;
   }
 
   .product-title {
-    font-size: 0.88rem;
-    min-height: 2.4em;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 4px 0 6px;
+    min-height: 2.6em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .product-specs-summary {
-    font-size: 0.75rem;
-    margin-bottom: 10px;
+    display: none; /* Keep mobile product cards neat and uncluttered */
   }
 
   .product-card-actions {
+    display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
+    margin-top: 6px;
   }
 
   .btn-card-inquire, .btn-card-add-cart {
     width: 100%;
-    padding: 7px 10px;
-    font-size: 0.78rem;
+    padding: 6px 8px;
+    font-size: 0.74rem;
+    font-weight: 700;
     justify-content: center;
+    border-radius: 4px;
   }
 
   /* Catalog Page on Mobile */
   .catalog-header-bar {
-    padding: 24px 0;
+    padding: 18px 0;
   }
 
-  .catalog-header-bar h1 {
-    font-size: 1.6rem !important;
+  .catalog-page-title {
+    font-size: 1.35rem !important;
+    line-height: 1.25;
+  }
+
+  .catalog-header-bar p {
+    font-size: 0.82rem;
   }
 
   .catalog-header-bar form {
     width: 100% !important;
-    min-width: 100% !important;
+    max-width: 100% !important;
   }
 
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px;
+  .mobile-catalog-filter-pills {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 6px;
+    padding: 4px 2px 14px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .mobile-catalog-filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalog-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+
+  .catalog-pill-btn:hover, .catalog-pill-btn.active {
+    background: var(--primary-navy);
+    color: white;
+    border-color: var(--primary-navy);
+    box-shadow: 0 2px 8px rgba(10, 37, 64, 0.2);
   }
 
   /* Footer on Mobile */
   .footer-top-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+    gap: 16px;
+    padding-bottom: 18px;
   }
 
   .footer-contact-items {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
   }
 
   .footer-bottom-row {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     text-align: center;
   }
 
   .footer-bottom-links {
     justify-content: center;
     flex-wrap: wrap;
-    gap: 8px 14px;
+    gap: 6px 12px;
+    font-size: 0.76rem;
   }
 
   /* Cart Drawer and Modals on Mobile */
@@ -2546,12 +2628,12 @@ body.drawer-open {
   }
 
   .modal-header {
-    padding: 14px 18px;
+    padding: 14px 16px;
   }
 
   .modal-body {
-    padding: 16px 18px;
-    max-height: 82vh;
+    padding: 16px;
+    max-height: 80vh;
     overflow-y: auto;
   }
 
@@ -2561,38 +2643,33 @@ body.drawer-open {
   }
 }
 
-/* Very narrow devices (iPhone SE / 375px) */
+/* Extra small devices (iPhone SE / 375px) */
 @media (max-width: 480px) {
   .hero-title {
-    font-size: 1.75rem;
+    font-size: 1.65rem;
   }
 
-  .categories-grid {
-    grid-template-columns: 1fr !important;
+  .categories-grid, .featured-4-grid, .products-grid, .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
 
   .cat-card-img-wrapper {
-    height: 160px;
-  }
-
-  .featured-4-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .products-grid {
-    grid-template-columns: 1fr !important;
+    height: 95px;
   }
 
   .product-card-img-wrap {
-    height: 160px;
+    height: 105px;
   }
 
   .pillars-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
   }
 
   .hero-trust-badges {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
 }
 

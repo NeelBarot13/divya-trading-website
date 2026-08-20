@@ -10,7 +10,7 @@
 <body class="admin-body">
 
   <!-- Sidebar -->
-  <aside class="admin-sidebar">
+  <aside class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-header">
       <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
       <div class="sidebar-title">
@@ -56,6 +56,18 @@
     </div>
   </aside>
 
+  <!-- Admin Mobile Top Header Bar -->
+  <div class="admin-mobile-header">
+    <div class="admin-mobile-brand">
+      <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" style="height: 32px; background: white; border-radius: 4px; padding: 2px;">
+      <span style="font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; color: white;">DIVYA TRADING</span>
+    </div>
+    <button type="button" class="admin-sidebar-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Menu">
+      ☰
+    </button>
+  </div>
+  <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
   <!-- Main Content -->
   <main class="admin-main">
     <div class="admin-top-bar">
@@ -70,7 +82,7 @@
         <h3>Total Registered Customers ({{ customers|length }})</h3>
       </div>
 
-      <div class="admin-table-wrap">
+      <div class="table-responsive">
         <table class="admin-table">
           <thead>
             <tr>
@@ -122,6 +134,15 @@
       </div>
     </div>
   </main>
+
+  <script>
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+      sidebar?.classList.toggle('open');
+      overlay?.classList.toggle('active');
+    }
+  </script>
 
 </body>
 </html>

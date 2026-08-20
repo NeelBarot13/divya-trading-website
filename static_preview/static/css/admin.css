@@ -510,8 +510,53 @@ body.admin-body {
 }
 
 /* ==========================================================================
-   ADMIN MOBILE & TABLET RESPONSIVE RULES
+   ADMIN MOBILE & TABLET RESPONSIVE SYSTEM
    ========================================================================== */
+.admin-mobile-header {
+  display: none;
+}
+
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 37, 64, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.admin-sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.admin-sidebar-toggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 @media (max-width: 1024px) {
   .admin-sidebar {
     width: 220px;
@@ -526,56 +571,150 @@ body.admin-body {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
   body.admin-body {
     flex-direction: column;
-  }
-  .admin-sidebar {
-    position: relative;
+    overflow-x: hidden;
     width: 100%;
-    min-height: auto;
   }
-  .sidebar-nav {
+
+  .admin-mobile-header {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 10px;
-    gap: 4px;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    background: var(--admin-sidebar);
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  .sidebar-nav-item {
-    font-size: 0.8rem;
-    padding: 8px 12px;
+
+  .admin-mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .sidebar-footer {
-    display: none;
+
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    z-index: 2000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.35);
   }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
   .admin-main {
-    margin-left: 0;
-    width: 100%;
-    padding: 16px 12px;
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 14px 60px !important;
+    box-sizing: border-box;
   }
+
   .admin-top-bar {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    margin-bottom: 20px;
   }
+
+  .admin-top-actions {
+    width: 100%;
+  }
+
+  .btn-admin-export {
+    width: 100%;
+    justify-content: center;
+  }
+
   .stats-row {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 20px;
   }
+
+  .stat-card {
+    padding: 14px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stat-card-value {
+    font-size: 1.45rem;
+  }
+
+  .stat-card-label {
+    font-size: 0.68rem;
+  }
+
+  .stat-card-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
   .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
-    margin-bottom: 16px;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    background: white;
+    margin-bottom: 20px;
   }
-  .cms-tabs-nav {
+
+  .admin-table {
+    min-width: 680px;
+    width: 100%;
+  }
+
+  .admin-filter-tabs {
     overflow-x: auto;
     white-space: nowrap;
     display: flex;
     gap: 8px;
     padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
   }
+
+  .filter-tab {
+    flex-shrink: 0;
+  }
+
+  .cms-tabs-nav {
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    gap: 8px;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cms-tab-btn {
+    flex-shrink: 0;
+    padding: 9px 15px;
+    font-size: 0.82rem;
+  }
+
   .badge-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-row {
     grid-template-columns: 1fr !important;
   }
 }
