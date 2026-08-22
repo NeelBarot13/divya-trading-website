@@ -253,6 +253,7 @@ def customer_login():
         
         user = CustomerUser.query.filter_by(email=email).first()
         if user and user.check_password(password):
+            session.permanent = True
             session['customer_id'] = user.id
             session['customer_name'] = user.name
             session['customer_email'] = user.email
@@ -312,6 +313,7 @@ def customer_register():
         Inquiry.query.filter_by(email=email).update({'customer_id': user.id})
         db.session.commit()
         
+        session.permanent = True
         session['customer_id'] = user.id
         session['customer_name'] = user.name
         session['customer_email'] = user.email
@@ -604,6 +606,7 @@ def admin_login():
         
         admin = AdminUser.query.filter_by(username=username).first()
         if admin and admin.check_password(password):
+            session.permanent = True
             session['admin_user_id'] = admin.id
             session['admin_username'] = admin.username
             session['admin_role'] = admin.role

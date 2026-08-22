@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -6,28 +7,45 @@ load_dotenv()
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'divya-trading-secret-key-2026-precision-parts')
+    # Stable Persistent Secret Key
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'divya-trading-co-fixed-secret-key-2026-prod-auth-v2')
     
-    # Database Configuration: MySQL with SQLite fallback
-    # If MYSQL_URL or MYSQL_HOST is provided, PyMySQL URI is constructed.
-    # Default fallback to sqlite:///divya_trading.db for instant zero-config launch.
-    MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
-    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', '')
-    MYSQL_HOST = os.environ.get('MYSQL_HOST', 'localhost')
-    MYSQL_PORT = os.environ.get('MYSQL_PORT', '3306')
-    MYSQL_DB = os.environ.get('MYSQL_DB', 'divya_trading_db')
+    # 60-Day Permanent Session Persistence Configuration
+    PERMANENT_SESSION_LIFETIME = timedelta(days=60)
+    SESSION_COOKIE_NAME = 'dtc_auth_session'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = False
+    SESSION_REFRESH_EACH_REQUEST = True
     
+    # Database Configuration: PostgreSQL (Render) / MySQL / Persistent SQLite
     DATABASE_URL = os.environ.get('DATABASE_URL')
+    
+    # Check if Render persistent disk exists at /var/data
+    RENDER_DATA_DIR = '/var/data'
+    if os.path.exists(RENDER_DATA_DIR) and os.path.isdir(RENDER_DATA_DIR):
+        DEFAULT_SQLITE_PATH = os.path.join(RENDER_DATA_DIR, 'divya_trading.db')
+    else:
+        DEFAULT_SQLITE_PATH = os.path.join(BASE_DIR, 'divya_trading.db')
+
     if DATABASE_URL:
+        # Render PostgreSQL uses postgres:// which SQLAlchemy requires as postgresql://
+        if DATABASE_URL.startswith('postgres://'):
+            DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
     elif os.environ.get('USE_MYSQL', 'false').lower() in ('true', '1', 'yes'):
+        MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
+        MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', '')
+        MYSQL_HOST = os.environ.get('MYSQL_HOST', 'localhost')
+        MYSQL_PORT = os.environ.get('MYSQL_PORT', '3306')
+        MYSQL_DB = os.environ.get('MYSQL_DB', 'divya_trading_db')
         if MYSQL_PASSWORD:
             SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
         else:
             SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
     else:
-        # Default SQLite database in project directory
-        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'divya_trading.db')}"
+        # Default SQLite database
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{DEFAULT_SQLITE_PATH}"
         
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     

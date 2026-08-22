@@ -102,23 +102,27 @@
 
                 <!-- Status Badge -->
                 {% if inq.status == 'new' %}
-                  <span style="background: #FEF3C7; color: #92400E; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
-                    🟡 Under Engineering Review
+                  <span style="background: #FEF3C7; color: #92400E; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #D97706;"></span>
+                    <span>Engineering Review</span>
                   </span>
                 {% elif inq.status == 'contacted' %}
-                  <span style="background: #EFF6FF; color: #1E40AF; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
-                    🔵 In Review by Sales Team
+                  <span style="background: #EFF6FF; color: #1E40AF; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #2563EB;"></span>
+                    <span>Sales In Review</span>
                   </span>
                 {% elif inq.status == 'quoted' %}
-                  <span style="background: #ECFDF5; color: #065F46; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid #A7F3D0;">
-                    🎉 Quotation Prepared & Ready
+                  <span style="background: #ECFDF5; color: #065F46; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid #A7F3D0; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Quotation Ready</span>
                   </span>
                 {% elif inq.status == 'completed' %}
-                  <span style="background: #E0E7FF; color: #3730A3; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
-                    🟢 Order Confirmed / Fulfilled
+                  <span style="background: #E0E7FF; color: #3730A3; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Order Fulfilled</span>
                   </span>
                 {% else %}
-                  <span style="background: #F1F5F9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+                  <span style="background: #F1F5F9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-full); text-transform: uppercase;">
                     Closed
                   </span>
                 {% endif %}
@@ -131,9 +135,9 @@
             </div>
 
             <!-- View Quote Detail Button -->
-            <a href="{{ url_for('customer_quote_detail', inquiry_number=inq.inquiry_number) }}" class="btn-enquire-primary" style="font-size: 0.84rem; padding: 8px 16px;">
-              <span>View Quote & Chat</span>
-              <span>➔</span>
+            <a href="{{ url_for('customer_quote_detail', inquiry_number=inq.inquiry_number) }}" class="btn-enquire-primary" style="font-size: 0.84rem; padding: 8px 16px; display: inline-flex; align-items: center;">
+              <span>View Quote & Discussion</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 6px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
 
@@ -146,41 +150,41 @@
                 {{ inq.quote_amount }}
               </div>
             </div>
-            {% if inq.delivery_timeline %}
-            <div>
-              <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Lead Time</span>
-              <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary-navy);">{{ inq.delivery_timeline }}</div>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+              {% if inq.delivery_timeline %}
+              <div style="font-size: 0.82rem; color: #166534;">
+                <span style="color: #64748b;">Delivery:</span> <strong>{{ inq.delivery_timeline }}</strong>
+              </div>
+              {% endif %}
+              {% if inq.payment_terms %}
+              <div style="font-size: 0.82rem; color: #166534;">
+                <span style="color: #64748b;">Terms:</span> <strong>{{ inq.payment_terms }}</strong>
+              </div>
+              {% endif %}
             </div>
-            {% endif %}
-            {% if inq.payment_terms %}
-            <div>
-              <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Payment Terms</span>
-              <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);">{{ inq.payment_terms }}</div>
-            </div>
-            {% endif %}
           </div>
           {% endif %}
 
-          <!-- Requested Items Preview -->
-          <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px;">
-            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; display: block; margin-bottom: 8px;">
-              Requested Parts ({{ inq.items|length }} items):
-            </span>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-              {% for item in inq.items %}
-              <div style="background: white; border: 1px solid #CBD5E1; border-radius: 4px; padding: 4px 10px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+          <!-- Inquiry Items Summary Table -->
+          <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; margin-top: 10px;">
+            {% for item in inq.items %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; font-size: 0.82rem; border-bottom: 1px solid #F1F5F9; {% if loop.last %}border-bottom:none;{% endif %}">
+              <div>
                 <strong style="color: var(--primary-navy);">{{ item.product_name }}</strong>
-                {% if item.part_number %}<span style="color: var(--dtc-blue); font-size: 0.74rem;">({{ item.part_number }})</span>{% endif %}
-                <span style="background: #E2E8F0; padding: 1px 6px; border-radius: 3px; font-weight: 700; font-size: 0.72rem;">Qty: {{ item.quantity }}</span>
+                {% if item.part_number %}<span style="color: var(--text-light); margin-left: 6px;">({{ item.part_number }})</span>{% endif %}
               </div>
-              {% endfor %}
+              <div style="font-weight: 700; color: var(--dtc-blue);">
+                Qty: {{ item.quantity }}
+              </div>
             </div>
+            {% endfor %}
           </div>
 
           <!-- Discussion count pill if messages exist -->
           {% if inq.messages %}
-          <div style="margin-top: 10px; font-size: 0.8rem; color: var(--dtc-blue); font-weight: 600; display: flex; align-items: center; gap: 4px;">
-            <span>💬</span>
+          <div style="margin-top: 10px; font-size: 0.8rem; color: var(--dtc-blue); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             <span>{{ inq.messages|length }} message(s) in discussion thread</span>
           </div>
           {% endif %}
@@ -192,15 +196,18 @@
       {% else %}
       <!-- Empty State -->
       <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
-        <span style="font-size: 3.5rem; display: block; margin-bottom: 12px;">📦</span>
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: #F1F5F9; color: #64748B; margin-bottom: 14px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        </div>
         <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 6px;">
           No Quote Requests Found Yet
         </h3>
         <p style="font-size: 0.9rem; max-width: 480px; margin: 0 auto 24px;">
           Explore our extensive catalog of rotary printing spare parts, screen heads, gears, and shafts to request an official quotation.
         </p>
-        <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.9rem; padding: 11px 24px;">
-          Explore Products Catalog ➔
+        <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.9rem; padding: 11px 24px; display: inline-flex; align-items: center; gap: 6px;">
+          Explore Products Catalog
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
       {% endif %}
