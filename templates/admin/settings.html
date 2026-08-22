@@ -686,6 +686,33 @@
               </button>
             </div>
 
+            <!-- System Database Backup & 30-Day Auto Archive -->
+            <div class="admin-card" style="padding: 24px; margin-bottom: 20px;">
+              <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 8px;">
+                Complete Database Backup & Archive
+              </h4>
+              <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 14px;">
+                Download or email full database snapshot (Products, Categories, Inquiries, Quotes, Accounts).
+              </p>
+              
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="{{ url_for('admin_download_backup') }}" class="btn-admin-primary" style="width: 100%; justify-content: center; text-decoration: none;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Download Complete Backup (.json)</span>
+                </a>
+              </div>
+
+              <form action="{{ url_for('admin_email_backup') }}" method="POST" style="margin-top: 12px;">
+                <div style="display: flex; gap: 6px;">
+                  <input type="email" name="email" class="form-control" value="neelbarot585@gmail.com" style="font-size: 0.8rem; padding: 6px 10px;">
+                  <button type="submit" class="btn-action-sm" style="background: #0052CC; color: white; border: none; font-weight: 700; white-space: nowrap; padding: 6px 12px;">
+                    Email Backup
+                  </button>
+                </div>
+                <span style="font-size: 0.72rem; color: #94A3B8; margin-top: 4px; display: block;">Sends full system backup directly to this inbox.</span>
+              </form>
+            </div>
+
             <!-- Email Activity Audit Log -->
             <div class="admin-card" style="padding: 20px;">
               <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Recent Email Activity ({{ email_logs|length }})</h4>

@@ -1,4 +1,5 @@
 import os
+import json
 import time
 import random
 import string
@@ -10,7 +11,7 @@ from werkzeug.utils import secure_filename
 from config import Config
 from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, InquiryMessage, CustomerUser, AdminUser, SiteSetting
 from seed_data import seed_database, slugify
-from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, EMAIL_ACTIVITY_LOGS
+from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS
 from export_service import export_inquiries_csv, export_products_csv
 
 app = Flask(__name__)
@@ -1060,6 +1061,127 @@ def admin_export_products():
         mimetype='text/csv',
         headers={'Content-Disposition': f'attachment; filename={filename}'}
     )
+
+
+# ==========================================
+# AUTOMATED 30-DAY BACKUP & DATA DUMP
+# ==========================================
+
+def generate_system_backup_dict():
+    """Compiles complete system database data into a structured dictionary"""
+    products = Product.query.all()
+    categories = Category.query.all()
+    machines = MachineMake.query.all()
+    customers = CustomerUser.query.all()
+    inquiries = Inquiry.query.all()
+    
+    return {
+        'generated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+        'company': 'Divya Trading Co.',
+        'version': '2.0-Production',
+        'stats': {
+            'products_count': len(products),
+            'categories_count': len(categories),
+            'machine_makes_count': len(machines),
+            'customers_count': len(customers),
+            'inquiries_count': len(inquiries)
+        },
+        'products': [{
+            'id': p.id,
+            'name': p.name,
+            'slug': p.slug,
+            'part_number': p.part_number,
+            'category': p.category.name if p.category else None,
+            'machine_make': p.machine_make.name if p.machine_make else None,
+            'repeat_sizes': p.repeat_sizes,
+            'material': p.material,
+            'stock_status': p.stock_status,
+            'is_active': p.is_active,
+            'is_featured': p.is_featured,
+            'short_description': p.short_description,
+            'description': p.description,
+            'specifications': p.specifications,
+            'image_url': p.image_url
+        } for p in products],
+        'categories': [{'id': c.id, 'name': c.name, 'slug': c.slug} for c in categories],
+        'machine_makes': [{'id': m.id, 'name': m.name, 'slug': m.slug, 'manufacturer': m.manufacturer} for m in machines],
+        'customers': [{
+            'id': u.id,
+            'name': u.name,
+            'email': u.email,
+            'phone': u.phone,
+            'company_name': u.company_name,
+            'city': u.city,
+            'country': u.country,
+            'created_at': u.created_at.strftime('%Y-%m-%d %H:%M:%S') if u.created_at else None
+        } for u in customers],
+        'inquiries': [{
+            'id': inq.id,
+            'inquiry_number': inq.inquiry_number,
+            'customer_name': inq.customer_name,
+            'company_name': inq.company_name,
+            'email': inq.email,
+            'phone': inq.phone,
+            'machine_model': inq.machine_model,
+            'status': inq.status,
+            'message': inq.message,
+            'items': [{
+                'product_name': item.product_name,
+                'part_number': item.part_number,
+                'quantity': item.quantity,
+                'notes': item.notes
+            } for item in inq.items],
+            'created_at': inq.created_at.strftime('%Y-%m-%d %H:%M:%S') if inq.created_at else None
+        } for inq in inquiries]
+    }
+
+
+@app.route('/admin/backup/download')
+@admin_required
+def admin_download_backup():
+    """Downloads instant full system database backup JSON"""
+    backup_data = generate_system_backup_dict()
+    json_content = json.dumps(backup_data, indent=2)
+    filename = f"DTC_Complete_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+    
+    return Response(
+        json_content,
+        mimetype='application/json',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
+
+
+@app.route('/admin/backup/email', methods=['POST'])
+@admin_required
+def admin_email_backup():
+    """Triggers and emails full database backup JSON to neelbarot585@gmail.com"""
+    recipient = request.form.get('email') or 'neelbarot585@gmail.com'
+    backup_data = generate_system_backup_dict()
+    json_content = json.dumps(backup_data, indent=2)
+    filename = f"DTC_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+    
+    success, msg = send_database_backup_email(json_content, filename, app.config, recipient_email=recipient)
+    if success:
+        flash(f'Database backup successfully sent to {recipient}!', 'success')
+    else:
+        flash(f'Backup generated. Status: {msg}', 'info')
+    return redirect(url_for('admin_settings'))
+
+
+@app.route('/api/cron/backup', methods=['GET', 'POST'])
+def cron_backup_webhook():
+    """Automated 30-Day Backup Cron Webhook"""
+    backup_data = generate_system_backup_dict()
+    json_content = json.dumps(backup_data, indent=2)
+    filename = f"DTC_Auto_30Day_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+    
+    success, msg = send_database_backup_email(json_content, filename, app.config, recipient_email='neelbarot585@gmail.com')
+    return jsonify({
+        'success': success,
+        'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+        'message': msg,
+        'records': backup_data['stats']
+    })
 
 
 # ==========================================
