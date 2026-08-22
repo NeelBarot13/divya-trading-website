@@ -205,10 +205,38 @@
         </div>
       </div>
 
+      <!-- Floating Bulk Actions Toolbar -->
+      <div id="bulkActionsToolbar" class="bulk-actions-toolbar" style="display: none;">
+        <div class="bulk-toolbar-inner">
+          <div class="bulk-toolbar-left">
+            <span id="bulkSelectedCount" class="bulk-badge-count">0 Selected</span>
+            <span style="font-size: 0.85rem; color: #94A3B8; font-weight: 600;">Bulk Actions:</span>
+          </div>
+          <div class="bulk-toolbar-actions">
+            <button type="button" class="btn-bulk btn-bulk-activate" onclick="executeBulkAction('activate')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Activate</span>
+            </button>
+            <button type="button" class="btn-bulk btn-bulk-deactivate" onclick="executeBulkAction('deactivate')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+              <span>Deactivate</span>
+            </button>
+            <button type="button" class="btn-bulk btn-bulk-delete" onclick="executeBulkAction('delete')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Delete</span>
+            </button>
+            <button type="button" class="btn-bulk-close" onclick="deselectAllProducts()" title="Deselect All">✕</button>
+          </div>
+        </div>
+      </div>
+
       <div class="admin-table-wrap">
         <table class="admin-table">
           <thead>
             <tr>
+              <th style="width: 38px; text-align: center;">
+                <input type="checkbox" id="selectAllProducts" onclick="toggleSelectAllProducts(this)" style="cursor: pointer; transform: scale(1.15);" title="Select All Products">
+              </th>
               <th>Thumb</th>
               <th>Part No.</th>
               <th>Product Name</th>
@@ -222,6 +250,9 @@
           <tbody>
             {% for prod in products %}
             <tr id="prod-row-{{ prod.id }}">
+              <td style="text-align: center;">
+                <input type="checkbox" class="product-select-chk" value="{{ prod.id }}" onchange="updateBulkActionToolbar()" style="cursor: pointer; transform: scale(1.15);">
+              </td>
               <td>
                 <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
               </td>
@@ -245,9 +276,9 @@
               <!-- 1-Click Stock Status Dropdown -->
               <td>
                 <select class="stock-select-badge {{ prod.stock_status or 'in_stock' }}" onchange="updateProductStock({{ prod.id }}, this)">
-                  <option value="in_stock" {% if prod.stock_status == 'in_stock' or not prod.stock_status %}selected{% endif %}>🟢 In Stock</option>
-                  <option value="out_of_stock" {% if prod.stock_status == 'out_of_stock' %}selected{% endif %}>🔴 Out of Stock</option>
-                  <option value="made_to_order" {% if prod.stock_status == 'made_to_order' %}selected{% endif %}>🟡 Made to Order</option>
+                  <option value="in_stock" {% if prod.stock_status == 'in_stock' or not prod.stock_status %}selected{% endif %}>In Stock</option>
+                  <option value="out_of_stock" {% if prod.stock_status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                  <option value="made_to_order" {% if prod.stock_status == 'made_to_order' %}selected{% endif %}>Made to Order</option>
                 </select>
               </td>
 
@@ -567,6 +598,90 @@
       const overlay = document.getElementById('adminSidebarOverlay');
       sidebar?.classList.toggle('open');
       overlay?.classList.toggle('active');
+    }
+
+    // ==========================================
+    // MULTI-SELECT BULK ACTIONS LOGIC
+    // ==========================================
+    function toggleSelectAllProducts(masterCheckbox) {
+      const checkboxes = document.querySelectorAll('.product-select-chk');
+      checkboxes.forEach(cb => {
+        cb.checked = masterCheckbox.checked;
+        const row = document.getElementById(`prod-row-${cb.value}`);
+        if (row) row.classList.toggle('product-row-selected', masterCheckbox.checked);
+      });
+      updateBulkActionToolbar();
+    }
+
+    function updateBulkActionToolbar() {
+      const selected = document.querySelectorAll('.product-select-chk:checked');
+      const count = selected.length;
+      const toolbar = document.getElementById('bulkActionsToolbar');
+      const countBadge = document.getElementById('bulkSelectedCount');
+      
+      if (count > 0) {
+        toolbar.style.display = 'flex';
+        countBadge.textContent = `${count} Selected`;
+      } else {
+        toolbar.style.display = 'none';
+      }
+      
+      // Highlight selected rows
+      document.querySelectorAll('.product-select-chk').forEach(cb => {
+        const row = document.getElementById(`prod-row-${cb.value}`);
+        if (row) row.classList.toggle('product-row-selected', cb.checked);
+      });
+      
+      // Update master checkbox
+      const total = document.querySelectorAll('.product-select-chk').length;
+      const master = document.getElementById('selectAllProducts');
+      if (master) {
+        master.checked = count === total && total > 0;
+        master.indeterminate = count > 0 && count < total;
+      }
+    }
+
+    function deselectAllProducts() {
+      const master = document.getElementById('selectAllProducts');
+      if (master) master.checked = false;
+      document.querySelectorAll('.product-select-chk').forEach(cb => {
+        cb.checked = false;
+        const row = document.getElementById(`prod-row-${cb.value}`);
+        if (row) row.classList.remove('product-row-selected');
+      });
+      updateBulkActionToolbar();
+    }
+
+    async function executeBulkAction(action) {
+      const selected = Array.from(document.querySelectorAll('.product-select-chk:checked')).map(cb => cb.value);
+      if (!selected.length) return;
+      
+      const actionLabels = {
+        'activate': 'ACTIVATE on live catalog',
+        'deactivate': 'DEACTIVATE / DISABLE from catalog',
+        'delete': 'PERMANENTLY DELETE'
+      };
+      
+      const confirmMsg = `Are you sure you want to ${actionLabels[action] || action} the ${selected.length} selected product(s)?`;
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/admin/products/bulk-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: action, product_ids: selected })
+        });
+        const data = await res.json();
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert(data.message || 'Error executing bulk action.');
+        }
+      } catch (err) {
+        alert('Failed to execute bulk action. Please try again.');
+      }
     }
   </script>
 

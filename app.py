@@ -979,6 +979,75 @@ def admin_delete_product(product_id):
     return redirect(url_for('admin_products'))
 
 
+@app.route('/admin/products/bulk-action', methods=['POST'])
+@admin_required
+def admin_bulk_product_action():
+    """Bulk activate, deactivate, update stock, or delete multiple products in 1 click"""
+    data = request.get_json() or {}
+    action = data.get('action')
+    product_ids = data.get('product_ids', [])
+    
+    if not product_ids or not isinstance(product_ids, list):
+        return jsonify({'success': False, 'message': 'No products selected.'}), 400
+    
+    # Cast to integers safely
+    valid_ids = []
+    for pid in product_ids:
+        try:
+            valid_ids.append(int(pid))
+        except (ValueError, TypeError):
+            pass
+            
+    if not valid_ids:
+        return jsonify({'success': False, 'message': 'No valid product IDs provided.'}), 400
+        
+    products = Product.query.filter(Product.id.in_(valid_ids)).all()
+    count = len(products)
+    
+    if count == 0:
+        return jsonify({'success': False, 'message': 'No matching products found.'}), 404
+        
+    if action == 'activate':
+        for p in products:
+            p.is_active = True
+        db.session.commit()
+        msg = f'Successfully activated {count} product(s).'
+    elif action == 'deactivate':
+        for p in products:
+            p.is_active = False
+        db.session.commit()
+        msg = f'Successfully deactivated {count} product(s).'
+    elif action == 'delete':
+        for p in products:
+            db.session.delete(p)
+        db.session.commit()
+        msg = f'Successfully deleted {count} product(s).'
+    elif action == 'stock_in':
+        for p in products:
+            p.stock_status = 'in_stock'
+        db.session.commit()
+        msg = f'Updated {count} product(s) to In Stock.'
+    elif action == 'stock_out':
+        for p in products:
+            p.stock_status = 'out_of_stock'
+        db.session.commit()
+        msg = f'Updated {count} product(s) to Out of Stock.'
+    elif action == 'stock_order':
+        for p in products:
+            p.stock_status = 'made_to_order'
+        db.session.commit()
+        msg = f'Updated {count} product(s) to Made to Order.'
+    else:
+        return jsonify({'success': False, 'message': f'Unknown action: {action}'}), 400
+        
+    return jsonify({
+        'success': True,
+        'action': action,
+        'count': count,
+        'message': msg
+    })
+
+
 @app.route('/admin/export/products')
 @admin_required
 def admin_export_products():
