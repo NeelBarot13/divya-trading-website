@@ -43,14 +43,27 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         admin_id = session.get('admin_user_id')
-        if not admin_id:
-            flash('Please log in to access the admin area.', 'warning')
+        login_time = session.get('admin_login_time')
+        now = time.time()
+
+        # 1-Hour strict automatic session expiration (3600 seconds)
+        if not admin_id or not login_time or (now - float(login_time) > 3600):
+            session.pop('admin_user_id', None)
+            session.pop('admin_username', None)
+            session.pop('admin_role', None)
+            session.pop('admin_login_time', None)
+            if admin_id and login_time:
+                flash('Your admin session has expired (1 hour limit). Please log in again.', 'warning')
+            else:
+                flash('Please log in to access the admin area.', 'warning')
             return redirect(url_for('admin_login', next=request.url))
+
         admin = AdminUser.query.get(admin_id)
         if not admin:
             session.pop('admin_user_id', None)
             session.pop('admin_username', None)
             session.pop('admin_role', None)
+            session.pop('admin_login_time', None)
             flash('Admin session expired. Please log in again.', 'warning')
             return redirect(url_for('admin_login', next=request.url))
         return f(*args, **kwargs)
@@ -658,6 +671,7 @@ def admin_login():
             session['admin_user_id'] = admin.id
             session['admin_username'] = admin.username
             session['admin_role'] = admin.role
+            session['admin_login_time'] = time.time()
             flash('Welcome to Divya Trading Co. Admin Portal.', 'success')
             next_page = request.args.get('next') or url_for('admin_dashboard')
             return redirect(next_page)
@@ -672,6 +686,7 @@ def admin_logout():
     session.pop('admin_user_id', None)
     session.pop('admin_username', None)
     session.pop('admin_role', None)
+    session.pop('admin_login_time', None)
     flash('Logged out successfully.', 'info')
     return redirect(url_for('admin_login'))
 
