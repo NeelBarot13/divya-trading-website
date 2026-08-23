@@ -104,6 +104,15 @@ def inject_global_data():
 
 
 # ==========================================
+# HEALTH / KEEP-ALIVE ROUTE
+# ==========================================
+@app.route('/health')
+@app.route('/ping')
+def health_check():
+    return jsonify({"status": "ok", "service": "divya-trading-b2b"}), 200
+
+
+# ==========================================
 # PUBLIC FRONTEND ROUTES
 # ==========================================
 
