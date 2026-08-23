@@ -658,43 +658,72 @@
               SMTP Email Notification Configuration
             </h3>
             <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">
-              Every single-part inquiry and multi-part quote request automatically generates email notifications.
+              Every single-part inquiry and multi-part quote request automatically generates email notifications to your team and the customer.
             </p>
 
             <div class="form-group" style="margin-bottom: 14px;">
-              <label class="form-label">Admin Alert Recipient Emails (comma separated)</label>
-              <input type="text" name="ADMIN_NOTIFICATION_EMAIL" class="form-control" value="{{ config.ADMIN_NOTIFICATION_EMAIL or 'divya.trading06@gmail.com,neelbarot585@gmail.com' }}">
+              <label class="form-label" style="font-weight: 700;">Admin Alert Recipient Emails (comma separated)</label>
+              <input type="text" name="admin_notification_email" class="form-control" value="{{ settings.admin_notification_email or config.ADMIN_NOTIFICATION_EMAIL or 'divya.trading06@gmail.com,neelbarot585@gmail.com' }}">
               <span style="font-size: 0.75rem; color: #64748b;">Inquiries will be immediately dispatched to these email addresses.</span>
             </div>
 
+            <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-bottom: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700;">SMTP Mail Server</label>
+                <input type="text" name="mail_server" class="form-control" value="{{ settings.mail_server or config.MAIL_SERVER or 'smtp.gmail.com' }}" placeholder="smtp.gmail.com">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700;">SMTP Port</label>
+                <input type="number" name="mail_port" class="form-control" value="{{ settings.mail_port or config.MAIL_PORT or 587 }}">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700;">SMTP Username / Email</label>
+                <input type="email" name="mail_username" class="form-control" value="{{ settings.mail_username or config.MAIL_USERNAME or '' }}" placeholder="your-email@gmail.com">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700;">SMTP App Password / Secret</label>
+                <input type="password" name="mail_password" class="form-control" value="{{ settings.mail_password or config.MAIL_PASSWORD or '' }}" placeholder="16-character app password">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label" style="font-weight: 700;">Default Sender Email / From Header</label>
+              <input type="email" name="mail_default_sender" class="form-control" value="{{ settings.mail_default_sender or config.MAIL_DEFAULT_SENDER or 'divya.trading06@gmail.com' }}">
+            </div>
+
             <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 14px; margin-top: 18px; font-size: 0.82rem; color: #1e3a8a;">
-              <strong>Live Delivery Mode:</strong> To configure production SMTP (Gmail / SendGrid / Office365), add your credentials in <code>.env</code>. When offline or unconfigured, emails are logged in simulated mode in the audit log below with zero downtime!
+              <strong>Tip for Gmail Users:</strong> Enable 2-Step Verification on your Google Account and generate an <strong>App Password</strong> (16 characters) from <em>Google Account &gt; Security &gt; App passwords</em>. Enter that password above to start receiving live inquiries directly to your inbox.
             </div>
           </div>
 
-          <!-- Test Email Box -->
+          <!-- Email Actions & Backup Operations Column -->
           <div>
+            <!-- Test Email Box -->
             <div class="admin-card" style="padding: 24px; margin-bottom: 20px;">
               <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Send Test Email</h4>
               <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 14px;">Verify email delivery directly from here.</p>
               
               <div class="form-group" style="margin-bottom: 12px;">
-                <input type="email" id="testEmailTarget" class="form-control" placeholder="your@email.com" value="divya.trading06@gmail.com">
+                <input type="email" id="testEmailTarget" class="form-control" placeholder="your@email.com" value="neelbarot585@gmail.com">
               </div>
               <button type="button" onclick="sendTestEmailAjax()" class="btn-admin-primary" style="width: 100%; justify-content: center; background: #059669;">
                 Send Test Email ✉
               </button>
             </div>
 
-            <!-- System Database Backup & 30-Day Auto Archive -->
+            <!-- Complete Database Backup & Restore -->
             <div class="admin-card" style="padding: 24px; margin-bottom: 20px;">
               <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 8px;">
-                Complete Database Backup & Archive
+                Complete Database Backup & Restore
               </h4>
               <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 14px;">
-                Download or email full database snapshot (Products, Categories, Inquiries, Quotes, Accounts).
+                Export or import full database snapshot (Products, Categories, Inquiries, Quotes, Customer Accounts, CMS Settings).
               </p>
               
+              <!-- Download Backup -->
               <div style="display: flex; flex-direction: column; gap: 8px;">
                 <a href="{{ url_for('admin_download_backup') }}" class="btn-admin-primary" style="width: 100%; justify-content: center; text-decoration: none;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -702,15 +731,29 @@
                 </a>
               </div>
 
-              <form action="{{ url_for('admin_email_backup') }}" method="POST" style="margin-top: 12px;">
+              <!-- Email Instant Backup -->
+              <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--admin-border);">
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--admin-navy); display: block; margin-bottom: 4px;">Email Backup to Inbox:</label>
                 <div style="display: flex; gap: 6px;">
-                  <input type="email" name="email" class="form-control" value="neelbarot585@gmail.com" style="font-size: 0.8rem; padding: 6px 10px;">
-                  <button type="submit" class="btn-action-sm" style="background: #0052CC; color: white; border: none; font-weight: 700; white-space: nowrap; padding: 6px 12px;">
-                    Email Backup
+                  <input type="email" id="emailBackupTarget" class="form-control" value="neelbarot585@gmail.com" style="font-size: 0.8rem; padding: 6px 10px;">
+                  <button type="button" onclick="triggerEmailBackupAjax()" class="btn-action-sm" style="background: #0052CC; color: white; border: none; font-weight: 700; white-space: nowrap; padding: 6px 12px; cursor: pointer; border-radius: 4px;">
+                    Email Now
                   </button>
                 </div>
-                <span style="font-size: 0.72rem; color: #94A3B8; margin-top: 4px; display: block;">Sends full system backup directly to this inbox.</span>
-              </form>
+                <span style="font-size: 0.72rem; color: #94A3B8; margin-top: 4px; display: block;">Dispatches full database backup directly as a .json email attachment.</span>
+              </div>
+
+              <!-- Upload / Restore Backup File -->
+              <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--admin-border);">
+                <label style="font-size: 0.76rem; font-weight: 700; color: var(--admin-navy); display: block; margin-bottom: 4px;">Restore From Backup File (.json):</label>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <input type="file" id="backupFileInput" accept=".json" class="form-control" style="font-size: 0.76rem; padding: 4px 6px;">
+                  <button type="button" onclick="triggerRestoreBackupAjax()" class="btn-action-sm" style="background: #D97706; color: white; border: none; font-weight: 700; white-space: nowrap; padding: 6px 12px; cursor: pointer; border-radius: 4px;">
+                    Restore Data
+                  </button>
+                </div>
+                <span style="font-size: 0.72rem; color: #64748B; margin-top: 4px; display: block;">Upload any previously exported backup JSON to restore all products, customer quotes, and settings.</span>
+              </div>
             </div>
 
             <!-- Email Activity Audit Log -->
@@ -797,6 +840,50 @@
         return;
       }
       row.remove();
+    }
+
+    async function triggerEmailBackupAjax() {
+      const email = document.getElementById('emailBackupTarget').value;
+      if (!email) return alert('Please enter a recipient email.');
+      
+      const formData = new FormData();
+      formData.append('email', email);
+      
+      try {
+        const res = await fetch('{{ url_for("admin_email_backup") }}', {
+          method: 'POST',
+          body: formData
+        });
+        alert('Database backup dispatch initiated to ' + email + '! Check your inbox and the email log.');
+        window.location.reload();
+      } catch (e) {
+        alert('Error sending backup email.');
+      }
+    }
+
+    async function triggerRestoreBackupAjax() {
+      const fileInput = document.getElementById('backupFileInput');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        return alert('Please select a .json backup file to restore.');
+      }
+      
+      if (!confirm('Are you sure you want to restore the database from this backup file? This will merge and update all products, categories, customer accounts, and settings.')) {
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('backup_file', fileInput.files[0]);
+      
+      try {
+        const res = await fetch('{{ url_for("admin_restore_backup") }}', {
+          method: 'POST',
+          body: formData
+        });
+        alert('Database restore process completed! The page will now reload.');
+        window.location.reload();
+      } catch (e) {
+        alert('Error uploading or restoring backup file.');
+      }
     }
 
     function toggleAdminSidebar() {

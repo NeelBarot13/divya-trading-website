@@ -73,9 +73,20 @@
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom: 24px;">
+          <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Choose Password *</label>
             <input type="password" name="password" class="form-control" placeholder="Create a secure password" required minlength="4" style="padding: 10px 12px;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px; background: #F8FAFC; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 700; color: var(--primary-navy); font-size: 0.82rem;">🛡️ Anti-Bot Verification:</label>
+              <span id="regCaptchaQ" style="font-weight: 800; color: var(--dtc-blue); background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1; font-size: 0.88rem;">Loading...</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" name="captcha" id="regCaptchaInput" class="form-control" placeholder="Answer (e.g. 8)" required style="padding: 8px 12px; font-size: 0.85rem;">
+              <button type="button" onclick="loadRegCaptcha()" style="background: #E2E8F0; border: none; border-radius: 6px; padding: 0 12px; font-size: 0.8rem; cursor: pointer; color: #475569;" title="Refresh">↻ Refresh</button>
+            </div>
           </div>
 
           <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm);">
@@ -83,6 +94,17 @@
             <span>➔</span>
           </button>
         </form>
+
+        <script>
+          async function loadRegCaptcha() {
+            try {
+              const res = await fetch('/api/captcha/generate');
+              const data = await res.json();
+              document.getElementById('regCaptchaQ').textContent = data.question;
+            } catch(e) {}
+          }
+          document.addEventListener('DOMContentLoaded', loadRegCaptcha);
+        </script>
 
         <div style="text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color);">
           <p style="font-size: 0.88rem; color: var(--text-muted);">

@@ -153,6 +153,16 @@ function setupQuickInquiryModal() {
 
   if (!modalOverlay || !form) return;
 
+  async function loadModalCaptcha() {
+    try {
+      const res = await fetch('/api/captcha/generate');
+      const data = await res.json();
+      const qEl = document.getElementById('quickInqCaptchaQ');
+      if (qEl) qEl.textContent = data.question;
+    } catch (e) {}
+  }
+  window.loadModalCaptcha = loadModalCaptcha;
+
   const openInquiryModalForProduct = (btn) => {
     const productId = btn.dataset.productId || '';
     const productName = btn.dataset.productName || 'Precision Spare Part';
@@ -168,6 +178,7 @@ function setupQuickInquiryModal() {
       repeatNotesField.placeholder = `e.g. ${repeatSizes}`;
     }
 
+    loadModalCaptcha();
     modalOverlay.classList.add('active');
   };
 
@@ -212,7 +223,8 @@ function setupQuickInquiryModal() {
       phone: document.getElementById('inqPhone').value,
       quantity: document.getElementById('inqQuantity').value || 1,
       repeat_notes: document.getElementById('inqRepeatNotes')?.value || '',
-      message: document.getElementById('inqMessage')?.value || ''
+      message: document.getElementById('inqMessage')?.value || '',
+      captcha: document.getElementById('quickInqCaptchaInput')?.value || ''
     };
 
     try {
@@ -228,15 +240,11 @@ function setupQuickInquiryModal() {
         form.reset();
         closeModal();
       } else {
-        showToast(resData.message || 'Thank you! Your quote request has been recorded.', 'success');
-        form.reset();
-        closeModal();
+        showToast(resData.message || 'Error sending inquiry.', 'error');
+        loadModalCaptcha();
       }
     } catch (err) {
-      // In static mode, provide immediate confirmation
-      showToast('Thank you! Your quote request has been submitted to DTC Sales Engineering.', 'success');
-      form.reset();
-      closeModal();
+      showToast('Network error submitting quote request. Please retry.', 'error');
     } finally {
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;

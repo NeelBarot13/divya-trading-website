@@ -104,12 +104,34 @@ def inject_global_data():
 
 
 # ==========================================
-# HEALTH / KEEP-ALIVE ROUTE
+# HEALTH / KEEP-ALIVE & SECURITY CAPTCHA
 # ==========================================
 @app.route('/health')
 @app.route('/ping')
 def health_check():
     return jsonify({"status": "ok", "service": "divya-trading-b2b"}), 200
+
+
+@app.route('/api/captcha/generate')
+def generate_captcha():
+    """Generates a simple random math captcha challenge stored in session"""
+    num1 = random.randint(2, 9)
+    num2 = random.randint(1, 9)
+    answer = num1 + num2
+    session['captcha_answer'] = str(answer)
+    return jsonify({
+        'question': f"What is {num1} + {num2}?",
+        'num1': num1,
+        'num2': num2
+    })
+
+
+def verify_captcha_answer(user_answer):
+    """Verifies captcha if required/provided"""
+    if not user_answer:
+        return False
+    expected = session.get('captcha_answer')
+    return str(user_answer).strip() == str(expected)
 
 
 # ==========================================
@@ -297,7 +319,12 @@ def customer_register():
         country = request.form.get('country', 'India').strip()
         city = request.form.get('city', '').strip()
         password = request.form.get('password', '')
+        captcha = request.form.get('captcha')
         
+        if captcha is not None and not verify_captcha_answer(captcha):
+            flash('Incorrect security captcha answer. Please try again.', 'danger')
+            return render_template('customer/register.html', next_url=next_url)
+            
         if not name or not email or not phone or not password:
             flash('Name, email, phone, and password are required.', 'danger')
             return render_template('customer/register.html', next_url=next_url)
@@ -466,6 +493,11 @@ def api_inquire():
     customer_name = data.get('customer_name', '').strip()
     email = data.get('email', '').strip().lower()
     phone = data.get('phone', '').strip()
+    captcha = data.get('captcha')
+    
+    # Verify Captcha if submitted
+    if captcha is not None and not verify_captcha_answer(captcha):
+        return jsonify({'success': False, 'message': 'Incorrect security captcha. Please solve the simple math problem again.'}), 400
     
     if not customer_name or not email or not phone:
         return jsonify({'success': False, 'message': 'Name, email, and phone number are required.'}), 400
@@ -521,8 +553,9 @@ def api_inquire():
     db.session.commit()
     
     # Send email notifications
-    notify_admin_new_inquiry(inquiry, app.config)
-    send_customer_acknowledgment(inquiry, app.config)
+    smtp_cfg = get_smtp_config()
+    notify_admin_new_inquiry(inquiry, smtp_cfg)
+    send_customer_acknowledgment(inquiry, smtp_cfg)
     
     return jsonify({
         'success': True,
@@ -544,7 +577,11 @@ def api_inquiry_cart_submit():
     customer_name = customer.get('name', '').strip()
     email = customer.get('email', '').strip().lower()
     phone = customer.get('phone', '').strip()
+    captcha = data.get('captcha')
     
+    if captcha is not None and not verify_captcha_answer(captcha):
+        return jsonify({'success': False, 'message': 'Incorrect security captcha. Please solve the simple math problem again.'}), 400
+        
     if not customer_name or not email or not phone:
         return jsonify({'success': False, 'message': 'Customer Name, Email, and Phone are required.'}), 400
         
@@ -591,8 +628,9 @@ def api_inquiry_cart_submit():
     db.session.commit()
     
     # Dispatched emails
-    notify_admin_new_inquiry(inquiry, app.config)
-    send_customer_acknowledgment(inquiry, app.config)
+    smtp_cfg = get_smtp_config()
+    notify_admin_new_inquiry(inquiry, smtp_cfg)
+    send_customer_acknowledgment(inquiry, smtp_cfg)
     
     return jsonify({
         'success': True,
@@ -1073,16 +1111,36 @@ def admin_export_products():
 
 
 # ==========================================
-# AUTOMATED 30-DAY BACKUP & DATA DUMP
+# SYSTEM BACKUP, RESTORE & 24-HOUR AUTO ARCHIVE
 # ==========================================
 
+def get_smtp_config():
+    """
+    Returns effective SMTP configuration by checking database SiteSetting first,
+    then falling back to app.config / environment variables.
+    """
+    settings = {s.key: s.value for s in SiteSetting.query.all()}
+    return {
+        'MAIL_SERVER': settings.get('mail_server') or app.config.get('MAIL_SERVER', 'smtp.gmail.com'),
+        'MAIL_PORT': int(settings.get('mail_port') or app.config.get('MAIL_PORT', 587)),
+        'MAIL_USE_TLS': (settings.get('mail_use_tls') or str(app.config.get('MAIL_USE_TLS', True))).lower() in ('true', '1', 'yes'),
+        'MAIL_USE_SSL': (settings.get('mail_use_ssl') or str(app.config.get('MAIL_USE_SSL', False))).lower() in ('true', '1', 'yes'),
+        'MAIL_USERNAME': settings.get('mail_username') or app.config.get('MAIL_USERNAME', ''),
+        'MAIL_PASSWORD': settings.get('mail_password') or app.config.get('MAIL_PASSWORD', ''),
+        'MAIL_DEFAULT_SENDER': settings.get('mail_default_sender') or app.config.get('MAIL_DEFAULT_SENDER', 'divya.trading06@gmail.com'),
+        'ADMIN_NOTIFICATION_EMAIL': settings.get('admin_notification_email') or app.config.get('ADMIN_NOTIFICATION_EMAIL', 'divya.trading06@gmail.com,neelbarot585@gmail.com')
+    }
+
+
 def generate_system_backup_dict():
-    """Compiles complete system database data into a structured dictionary"""
+    """Compiles complete system database data into a structured dictionary for download/export"""
     products = Product.query.all()
     categories = Category.query.all()
     machines = MachineMake.query.all()
     customers = CustomerUser.query.all()
     inquiries = Inquiry.query.all()
+    settings = SiteSetting.query.all()
+    admins = AdminUser.query.all()
     
     return {
         'generated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
@@ -1093,15 +1151,34 @@ def generate_system_backup_dict():
             'categories_count': len(categories),
             'machine_makes_count': len(machines),
             'customers_count': len(customers),
-            'inquiries_count': len(inquiries)
+            'inquiries_count': len(inquiries),
+            'settings_count': len(settings),
+            'admins_count': len(admins)
         },
+        'site_settings': {s.key: s.value for s in settings},
+        'categories': [{
+            'id': c.id,
+            'name': c.name,
+            'slug': c.slug,
+            'description': c.description,
+            'image': c.image,
+            'order_index': c.order_index
+        } for c in categories],
+        'machine_makes': [{
+            'id': m.id,
+            'name': m.name,
+            'slug': m.slug,
+            'description': m.description
+        } for m in machines],
         'products': [{
             'id': p.id,
             'name': p.name,
             'slug': p.slug,
             'part_number': p.part_number,
-            'category': p.category.name if p.category else None,
-            'machine_make': p.machine_make.name if p.machine_make else None,
+            'category_slug': p.category.slug if p.category else None,
+            'category_name': p.category.name if p.category else None,
+            'machine_make_slug': p.machine_make.slug if p.machine_make else None,
+            'machine_make_name': p.machine_make.name if p.machine_make else None,
             'repeat_sizes': p.repeat_sizes,
             'material': p.material,
             'stock_status': p.stock_status,
@@ -1112,8 +1189,6 @@ def generate_system_backup_dict():
             'specifications': p.specifications,
             'image_url': p.image_url
         } for p in products],
-        'categories': [{'id': c.id, 'name': c.name, 'slug': c.slug} for c in categories],
-        'machine_makes': [{'id': m.id, 'name': m.name, 'slug': m.slug, 'manufacturer': m.manufacturer} for m in machines],
         'customers': [{
             'id': u.id,
             'name': u.name,
@@ -1122,75 +1197,307 @@ def generate_system_backup_dict():
             'company_name': u.company_name,
             'city': u.city,
             'country': u.country,
+            'password_hash': u.password_hash,
             'created_at': u.created_at.strftime('%Y-%m-%d %H:%M:%S') if u.created_at else None
         } for u in customers],
         'inquiries': [{
             'id': inq.id,
             'inquiry_number': inq.inquiry_number,
+            'customer_email': inq.customer_user.email if inq.customer_user else None,
             'customer_name': inq.customer_name,
             'company_name': inq.company_name,
             'email': inq.email,
             'phone': inq.phone,
+            'country': inq.country,
             'machine_model': inq.machine_model,
             'status': inq.status,
             'message': inq.message,
+            'quote_amount': inq.quote_amount,
+            'delivery_timeline': inq.delivery_timeline,
+            'payment_terms': inq.payment_terms,
+            'quote_valid_until': inq.quote_valid_until,
+            'admin_notes': inq.admin_notes,
+            'created_at': inq.created_at.strftime('%Y-%m-%d %H:%M:%S') if inq.created_at else None,
             'items': [{
                 'product_name': item.product_name,
                 'part_number': item.part_number,
                 'quantity': item.quantity,
                 'notes': item.notes
             } for item in inq.items],
-            'created_at': inq.created_at.strftime('%Y-%m-%d %H:%M:%S') if inq.created_at else None
+            'messages': [{
+                'sender_type': msg.sender_type,
+                'sender_name': msg.sender_name,
+                'message': msg.message,
+                'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M:%S') if msg.created_at else None
+            } for msg in inq.messages]
         } for inq in inquiries]
     }
+
+
+def restore_system_backup_from_dict(data):
+    """
+    Restores the complete database state from a backup dictionary.
+    Handles Categories, Machine Makes, Products, Customer Accounts, Inquiries, and CMS Settings.
+    """
+    if not isinstance(data, dict):
+        return False, "Invalid backup format: root must be a JSON object."
+
+    try:
+        # 1. Restore Site Settings
+        settings_dict = data.get('site_settings', {})
+        for k, v in settings_dict.items():
+            setting = SiteSetting.query.filter_by(key=k).first()
+            if setting:
+                setting.value = str(v)
+            else:
+                db.session.add(SiteSetting(key=k, value=str(v)))
+
+        # 2. Restore Categories
+        cat_map = {}
+        for c in data.get('categories', []):
+            cat = Category.query.filter_by(slug=c.get('slug')).first() or Category.query.filter_by(name=c.get('name')).first()
+            if not cat:
+                cat = Category(
+                    name=c.get('name'),
+                    slug=c.get('slug') or slugify(c.get('name')),
+                    description=c.get('description', ''),
+                    image=c.get('image', ''),
+                    order_index=c.get('order_index', 0)
+                )
+                db.session.add(cat)
+                db.session.flush()
+            else:
+                cat.description = c.get('description', cat.description)
+                cat.image = c.get('image', cat.image)
+                cat.order_index = c.get('order_index', cat.order_index)
+            cat_map[cat.slug] = cat
+            cat_map[cat.name] = cat
+
+        # 3. Restore Machine Makes
+        make_map = {}
+        for m in data.get('machine_makes', []):
+            make = MachineMake.query.filter_by(slug=m.get('slug')).first() or MachineMake.query.filter_by(name=m.get('name')).first()
+            if not make:
+                make = MachineMake(
+                    name=m.get('name'),
+                    slug=m.get('slug') or slugify(m.get('name')),
+                    description=m.get('description', '')
+                )
+                db.session.add(make)
+                db.session.flush()
+            else:
+                make.description = m.get('description', make.description)
+            make_map[make.slug] = make
+            make_map[make.name] = make
+
+        # 4. Restore Products
+        for p in data.get('products', []):
+            prod = Product.query.filter_by(slug=p.get('slug')).first() or Product.query.filter_by(part_number=p.get('part_number')).first()
+            
+            # Resolve category & make
+            cat = cat_map.get(p.get('category_slug')) or cat_map.get(p.get('category_name'))
+            make = make_map.get(p.get('machine_make_slug')) or make_map.get(p.get('machine_make_name'))
+            
+            if not prod:
+                prod = Product(
+                    name=p.get('name'),
+                    part_number=p.get('part_number'),
+                    slug=p.get('slug') or slugify(p.get('name')),
+                    category_id=cat.id if cat else (Category.query.first().id if Category.query.first() else 1),
+                    machine_make_id=make.id if make else None,
+                    short_description=p.get('short_description', ''),
+                    description=p.get('description', ''),
+                    specifications=p.get('specifications', ''),
+                    repeat_sizes=p.get('repeat_sizes', ''),
+                    material=p.get('material', ''),
+                    image_url=p.get('image_url', ''),
+                    is_featured=p.get('is_featured', False),
+                    is_active=p.get('is_active', True),
+                    stock_status=p.get('stock_status', 'in_stock')
+                )
+                db.session.add(prod)
+            else:
+                prod.name = p.get('name', prod.name)
+                if cat: prod.category_id = cat.id
+                if make: prod.machine_make_id = make.id
+                prod.short_description = p.get('short_description', prod.short_description)
+                prod.description = p.get('description', prod.description)
+                prod.specifications = p.get('specifications', prod.specifications)
+                prod.repeat_sizes = p.get('repeat_sizes', prod.repeat_sizes)
+                prod.material = p.get('material', prod.material)
+                prod.image_url = p.get('image_url', prod.image_url)
+                prod.is_featured = p.get('is_featured', prod.is_featured)
+                prod.is_active = p.get('is_active', prod.is_active)
+                prod.stock_status = p.get('stock_status', prod.stock_status)
+
+        # 5. Restore Customer Accounts
+        cust_map = {}
+        for u in data.get('customers', []):
+            cust = CustomerUser.query.filter_by(email=u.get('email')).first()
+            if not cust:
+                cust = CustomerUser(
+                    name=u.get('name'),
+                    company_name=u.get('company_name', ''),
+                    email=u.get('email'),
+                    phone=u.get('phone', ''),
+                    country=u.get('country', 'India'),
+                    city=u.get('city', ''),
+                    password_hash=u.get('password_hash') or ''
+                )
+                if not u.get('password_hash'):
+                    cust.set_password('123456')
+                db.session.add(cust)
+                db.session.flush()
+            cust_map[cust.email] = cust
+
+        # 6. Restore Inquiries
+        for inq_data in data.get('inquiries', []):
+            inq_num = inq_data.get('inquiry_number')
+            inquiry = Inquiry.query.filter_by(inquiry_number=inq_num).first()
+            
+            cust = cust_map.get(inq_data.get('customer_email') or inq_data.get('email'))
+            if not inquiry:
+                inquiry = Inquiry(
+                    inquiry_number=inq_num,
+                    customer_id=cust.id if cust else None,
+                    customer_name=inq_data.get('customer_name', ''),
+                    company_name=inq_data.get('company_name', ''),
+                    email=inq_data.get('email', ''),
+                    phone=inq_data.get('phone', ''),
+                    country=inq_data.get('country', 'India'),
+                    machine_model=inq_data.get('machine_model', ''),
+                    message=inq_data.get('message', ''),
+                    status=inq_data.get('status', 'new'),
+                    quote_amount=inq_data.get('quote_amount'),
+                    delivery_timeline=inq_data.get('delivery_timeline'),
+                    payment_terms=inq_data.get('payment_terms'),
+                    quote_valid_until=inq_data.get('quote_valid_until'),
+                    admin_notes=inq_data.get('admin_notes')
+                )
+                db.session.add(inquiry)
+                db.session.flush()
+
+                for item in inq_data.get('items', []):
+                    prod = Product.query.filter_by(part_number=item.get('part_number')).first() if item.get('part_number') else None
+                    inq_item = InquiryItem(
+                        inquiry_id=inquiry.id,
+                        product_id=prod.id if prod else None,
+                        product_name=item.get('product_name', 'Precision Spare Part'),
+                        part_number=item.get('part_number', ''),
+                        quantity=int(item.get('quantity', 1)),
+                        notes=item.get('notes', '')
+                    )
+                    db.session.add(inq_item)
+
+                for msg in inq_data.get('messages', []):
+                    inq_msg = InquiryMessage(
+                        inquiry_id=inquiry.id,
+                        sender_type=msg.get('sender_type', 'customer'),
+                        sender_name=msg.get('sender_name', 'Customer'),
+                        message=msg.get('message', '')
+                    )
+                    db.session.add(inq_msg)
+
+        db.session.commit()
+        return True, "Backup restored successfully!"
+    except Exception as e:
+        db.session.rollback()
+        return False, f"Restore failed: {str(e)}"
 
 
 @app.route('/admin/backup/download')
 @admin_required
 def admin_download_backup():
-    """Downloads instant full system database backup JSON"""
-    backup_data = generate_system_backup_dict()
-    json_content = json.dumps(backup_data, indent=2)
-    filename = f"DTC_Complete_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
-    
-    return Response(
-        json_content,
-        mimetype='application/json',
-        headers={'Content-Disposition': f'attachment; filename={filename}'}
-    )
+    """Downloads instant complete system database backup JSON"""
+    try:
+        backup_data = generate_system_backup_dict()
+        json_content = json.dumps(backup_data, indent=2)
+        filename = f"DTC_Complete_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        return Response(
+            json_content,
+            mimetype='application/json',
+            headers={'Content-Disposition': f'attachment; filename={filename}'}
+        )
+    except Exception as e:
+        flash(f'Failed to generate backup download: {str(e)}', 'danger')
+        return redirect(url_for('admin_settings'))
+
+
+@app.route('/admin/backup/restore', methods=['POST'])
+@admin_required
+def admin_restore_backup():
+    """Uploads and restores full system backup JSON file"""
+    if 'backup_file' not in request.files:
+        flash('No backup file selected.', 'danger')
+        return redirect(url_for('admin_settings'))
+        
+    file = request.files['backup_file']
+    if not file or not file.filename:
+        flash('Please choose a valid JSON backup file.', 'danger')
+        return redirect(url_for('admin_settings'))
+        
+    try:
+        content = file.read().decode('utf-8')
+        data = json.loads(content)
+        success, msg = restore_system_backup_from_dict(data)
+        if success:
+            flash('Success! Complete database restored from backup file.', 'success')
+        else:
+            flash(msg, 'danger')
+    except Exception as e:
+        flash(f'Invalid backup file format: {str(e)}', 'danger')
+        
+    return redirect(url_for('admin_settings'))
 
 
 @app.route('/admin/backup/email', methods=['POST'])
 @admin_required
 def admin_email_backup():
-    """Triggers and emails full database backup JSON to neelbarot585@gmail.com"""
+    """Triggers and emails full database backup JSON to designated recipient"""
     recipient = request.form.get('email') or 'neelbarot585@gmail.com'
-    backup_data = generate_system_backup_dict()
-    json_content = json.dumps(backup_data, indent=2)
-    filename = f"DTC_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
-    
-    success, msg = send_database_backup_email(json_content, filename, app.config, recipient_email=recipient)
-    if success:
-        flash(f'Database backup successfully sent to {recipient}!', 'success')
-    else:
-        flash(f'Backup generated. Status: {msg}', 'info')
+    try:
+        backup_data = generate_system_backup_dict()
+        json_content = json.dumps(backup_data, indent=2)
+        filename = f"DTC_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        smtp_cfg = get_smtp_config()
+        success, msg = send_database_backup_email(json_content, filename, smtp_cfg, recipient_email=recipient)
+        if success:
+            flash(f'Database backup successfully sent to {recipient}!', 'success')
+        else:
+            flash(f'Backup generated. Status: {msg}', 'info')
+    except Exception as e:
+        flash(f'Error generating backup email: {str(e)}', 'danger')
+        
     return redirect(url_for('admin_settings'))
 
 
 @app.route('/api/cron/backup', methods=['GET', 'POST'])
 def cron_backup_webhook():
-    """Automated 30-Day Backup Cron Webhook"""
-    backup_data = generate_system_backup_dict()
-    json_content = json.dumps(backup_data, indent=2)
-    filename = f"DTC_Auto_30Day_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
-    
-    success, msg = send_database_backup_email(json_content, filename, app.config, recipient_email='neelbarot585@gmail.com')
-    return jsonify({
-        'success': success,
-        'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
-        'message': msg,
-        'records': backup_data['stats']
-    })
+    """Automated 24-Hour Backup Cron Webhook - Dispatches full backup to neelbarot585@gmail.com"""
+    try:
+        backup_data = generate_system_backup_dict()
+        json_content = json.dumps(backup_data, indent=2)
+        filename = f"DTC_Auto_Daily_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        smtp_cfg = get_smtp_config()
+        recipient = smtp_cfg.get('ADMIN_NOTIFICATION_EMAIL', 'neelbarot585@gmail.com').split(',')[0].strip() or 'neelbarot585@gmail.com'
+        success, msg = send_database_backup_email(json_content, filename, smtp_cfg, recipient_email=recipient)
+        return jsonify({
+            'success': success,
+            'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+            'message': msg,
+            'recipient': recipient,
+            'records': backup_data['stats']
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
+        }), 500
+
 
 
 # ==========================================
@@ -1446,7 +1753,8 @@ def admin_settings():
             <p>If you are receiving this, your email configuration is working properly!</p>
             <p>Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
             """
-            success, msg = send_email(test_subject, test_target, test_body, app.config)
+            smtp_cfg = get_smtp_config()
+            success, msg = send_email(test_subject, test_target, test_body, smtp_cfg)
             if success:
                 flash(f'Test email dispatched to {test_target}. Status: {msg}', 'success')
             else:
