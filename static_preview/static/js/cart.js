@@ -97,6 +97,7 @@ const QuoteCart = {
     drawer?.classList.add('active');
     overlay?.classList.add('active');
     this.render();
+    if (window.loadCartCaptcha) window.loadCartCaptcha();
   },
 
   closeDrawer() {
@@ -175,6 +176,16 @@ const QuoteCart = {
       }
     });
 
+    // Load Cart Captcha
+    window.loadCartCaptcha = async function() {
+      try {
+        const res = await fetch('/api/captcha/generate');
+        const data = await res.json();
+        const qEl = document.getElementById('cartCaptchaQ');
+        if (qEl) qEl.textContent = data.question;
+      } catch (e) {}
+    };
+
     // Handle Cart Multi-Product Submission
     const form = document.getElementById('cartInquirySubmitForm');
     if (form) {
@@ -200,7 +211,8 @@ const QuoteCart = {
             machine_model: document.getElementById('cartMachineModel')?.value || '',
             message: document.getElementById('cartMessage')?.value || ''
           },
-          items: this.items
+          items: this.items,
+          captcha: document.getElementById('cartCaptchaInput')?.value || ''
         };
 
         try {
@@ -218,6 +230,7 @@ const QuoteCart = {
             this.closeDrawer();
           } else {
             showToast(result.message || 'Failed to submit quote request.', 'error');
+            if (window.loadCartCaptcha) window.loadCartCaptcha();
           }
         } catch (err) {
           showToast('Error submitting quote request. Please try again.', 'error');

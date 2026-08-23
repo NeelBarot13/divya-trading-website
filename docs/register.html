@@ -413,9 +413,20 @@
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom: 24px;">
+          <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Choose Password *</label>
             <input type="password" name="password" class="form-control" placeholder="Create a secure password" required minlength="4" style="padding: 10px 12px;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px; background: #F8FAFC; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 700; color: var(--primary-navy); font-size: 0.82rem;">🛡️ Anti-Bot Verification:</label>
+              <span id="regCaptchaQ" style="font-weight: 800; color: var(--dtc-blue); background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1; font-size: 0.88rem;">Loading...</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" name="captcha" id="regCaptchaInput" class="form-control" placeholder="Answer (e.g. 8)" required style="padding: 8px 12px; font-size: 0.85rem;">
+              <button type="button" onclick="loadRegCaptcha()" style="background: #E2E8F0; border: none; border-radius: 6px; padding: 0 12px; font-size: 0.8rem; cursor: pointer; color: #475569;" title="Refresh">↻ Refresh</button>
+            </div>
           </div>
 
           <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm);">
@@ -423,6 +434,17 @@
             <span>➔</span>
           </button>
         </form>
+
+        <script>
+          async function loadRegCaptcha() {
+            try {
+              const res = await fetch('/api/captcha/generate');
+              const data = await res.json();
+              document.getElementById('regCaptchaQ').textContent = data.question;
+            } catch(e) {}
+          }
+          document.addEventListener('DOMContentLoaded', loadRegCaptcha);
+        </script>
 
         <div style="text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color);">
           <p style="font-size: 0.88rem; color: var(--text-muted);">
@@ -485,11 +507,18 @@
               <input type="text" id="cartCountry" class="form-control" value="India">
             </div>
           </div>
-          <div class="form-group" style="margin-top: 12px;">
-            <label class="form-label">Requirement Details / Remarks</label>
-            <textarea id="cartMessage" class="form-control" placeholder="Specify required repeat sizes, urgency, or shipping location..."></textarea>
+          <div class="form-group" style="margin-top: 12px; background: #F8FAFC; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0; font-size: 0.78rem; font-weight: 700; color: var(--primary-navy);">🛡️ Anti-Bot Verification:</label>
+              <span id="cartCaptchaQ" style="font-size: 0.85rem; font-weight: 800; color: var(--dtc-blue); background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1;">Loading...</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="cartCaptchaInput" class="form-control" placeholder="Answer (e.g. 5)" required style="padding: 6px 10px; font-size: 0.82rem;">
+              <button type="button" onclick="loadCartCaptcha()" style="background: #E2E8F0; border: none; border-radius: 4px; padding: 0 10px; font-size: 0.75rem; cursor: pointer; color: #475569;" title="Refresh">↻</button>
+            </div>
           </div>
-          <button type="submit" class="btn-submit-cart-inquiry" id="submitCartQuoteBtn">
+
+          <button type="submit" class="btn-submit-cart-inquiry" id="submitCartQuoteBtn" style="margin-top: 12px;">
             <span>Send Quote Request</span>
             <span>➔</span>
           </button>
@@ -542,11 +571,18 @@
               <input type="text" id="inqRepeatNotes" class="form-control" placeholder="e.g. 64R, 81.9R, or custom size">
             </div>
           </div>
-          <div class="form-group" style="margin-top: 12px;">
-            <label class="form-label">Message / Details</label>
-            <textarea id="inqMessage" class="form-control" placeholder="Any specific requirements..."></textarea>
+          <div class="form-group" style="margin-top: 12px; background: #F8FAFC; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0; font-size: 0.78rem; font-weight: 700; color: var(--primary-navy);">🛡️ Anti-Bot Verification:</label>
+              <span id="quickInqCaptchaQ" style="font-size: 0.85rem; font-weight: 800; color: var(--dtc-blue); background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1;">Loading...</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="quickInqCaptchaInput" class="form-control" placeholder="Answer (e.g. 5)" required style="padding: 6px 10px; font-size: 0.82rem;">
+              <button type="button" onclick="loadModalCaptcha()" style="background: #E2E8F0; border: none; border-radius: 4px; padding: 0 10px; font-size: 0.75rem; cursor: pointer; color: #475569;" title="Refresh">↻</button>
+            </div>
           </div>
-          <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center;">
+
+          <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; margin-top: 12px;">
             Submit Part Inquiry
           </button>
         </form>

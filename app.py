@@ -751,7 +751,17 @@ def admin_update_quote_details(inquiry_id):
     """Update formal quotation price, delivery, and payment terms"""
     inquiry = Inquiry.query.get_or_404(inquiry_id)
     
-    quote_amount = request.form.get('quote_amount', '').strip()
+    raw_amount = request.form.get('quote_amount', '').strip()
+    if raw_amount:
+        if not (raw_amount.startswith('₹') or raw_amount.upper().startswith('INR') or raw_amount.startswith('Rs.')):
+            if raw_amount.startswith('$'):
+                raw_amount = raw_amount[1:].strip()
+            quote_amount = f"₹ {raw_amount}"
+        else:
+            quote_amount = raw_amount
+    else:
+        quote_amount = ''
+
     delivery_timeline = request.form.get('delivery_timeline', '').strip()
     payment_terms = request.form.get('payment_terms', '').strip()
     quote_valid_until = request.form.get('quote_valid_until', '').strip()

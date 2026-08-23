@@ -97,16 +97,22 @@
     <!-- Official Quotation Response (If admin entered quotation details) -->
     {% if inquiry.quote_amount or inquiry.admin_notes %}
     <div style="background: #F0FDF4; border: 2px solid #86EFAC; border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-        <span style="font-size: 1.5rem;">📋</span>
-        <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #14532D; margin: 0;">
-          Divya Trading Co. Formal Quotation Details
-        </h3>
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">📋</span>
+          <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #14532D; margin: 0;">
+            Divya Trading Co. Formal Quotation (in Indian Rupees ₹)
+          </h3>
+        </div>
+        <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20I%20reviewed%20Quote%20%23{{ inquiry.inquiry_number }}%20({{ inquiry.quote_amount }}).%20I%20would%20like%20to%20proceed/discuss." target="_blank" style="background: #25D366; color: white; padding: 7px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          <span>Discuss on WhatsApp</span>
+        </a>
       </div>
 
       <div class="quote-meta-grid" style="align-items: center; margin-bottom: 16px;">
         <div style="background: white; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px 16px;">
-          <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Quotation Price</span>
+          <span style="font-size: 0.75rem; font-weight: 700; color: #166534; text-transform: uppercase;">Quotation Price (INR ₹)</span>
           <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: #15803D; line-height: 1.1;">
             {{ inquiry.quote_amount }}
           </div>
@@ -192,14 +198,17 @@
 
     <!-- Two-Way Discussion Thread / Direct Customer-Admin Chat -->
     <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;">
-      <div style="background: var(--primary-navy); padding: 18px 24px; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div style="background: var(--primary-navy); padding: 18px 24px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.3rem;">💬</span>
           <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin: 0;">
             Discussion & Messages Thread with Divya Trading Co.
           </h3>
         </div>
-        <span style="font-size: 0.8rem; color: #93C5FD;">Live Engineering Support</span>
+        <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20regarding%20Quote%20%23{{ inquiry.inquiry_number }}:" target="_blank" style="background: #25D366; color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          <span>Chat on WhatsApp</span>
+        </a>
       </div>
 
       <div style="padding: 24px;">
@@ -226,11 +235,16 @@
                         background: #F8FAFC; border: 1px solid #CBD5E1; border-left: 4px solid #0A2540;
                       {% endif %}">
             
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <strong style="{% if msg.sender_type == 'admin' %}color: #0052CC;{% else %}color: var(--primary-navy);{% endif %}">
                 {% if msg.sender_type == 'admin' %}👔 {{ msg.sender_name }}{% else %}👤 {{ msg.sender_name }} (You){% endif %}
               </strong>
-              <span style="font-size: 0.75rem; color: var(--text-light);">{{ msg.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 0.75rem; color: var(--text-light);">{{ msg.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+                <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20regarding%20Quote%20%23{{ inquiry.inquiry_number }}:%0A%0A{{ msg.message|urlencode }}" target="_blank" title="Forward/Reply on WhatsApp" style="color: #25D366; text-decoration: none; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
+                  <span>WhatsApp ↗</span>
+                </a>
+              </div>
             </div>
 
             <p style="margin: 0; color: var(--text-main); line-height: 1.5; white-space: pre-wrap;">{{ msg.message }}</p>
@@ -240,25 +254,44 @@
         </div>
 
         <!-- Add Reply Form -->
-        <form action="{{ url_for('customer_add_comment', inquiry_number=inquiry.inquiry_number) }}" method="POST" style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+        <form id="customerReplyForm" action="{{ url_for('customer_add_comment', inquiry_number=inquiry.inquiry_number) }}" method="POST" style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
           <h4 style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 10px;">
             Reply or Add Comments / Requirements
           </h4>
           
           <div class="form-group" style="margin-bottom: 12px;">
-            <textarea name="message" class="form-control" placeholder="Ask questions, confirm quantity adjustments, specify delivery location, or accept this quotation..." required style="min-height: 80px;"></textarea>
+            <textarea id="customerReplyMessage" name="message" class="form-control" placeholder="Ask questions, confirm quantity adjustments, specify delivery location, or accept this quotation..." required style="min-height: 80px;"></textarea>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <span style="font-size: 0.78rem; color: var(--text-light);">
               Our sales team in Ahmedabad will be notified immediately upon submission.
             </span>
-            <button type="submit" class="btn-enquire-primary" style="font-size: 0.86rem; padding: 9px 20px;">
-              <span>Send Message</span>
-              <span>➔</span>
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn-enquire-primary" style="font-size: 0.86rem; padding: 9px 18px;">
+                <span>Send Message ➔</span>
+              </button>
+              <button type="button" onclick="sendAndOpenWhatsAppCustomer()" class="btn-enquire-primary" style="background: #25D366; font-size: 0.86rem; padding: 9px 16px; border: none; display: inline-flex; align-items: center; gap: 6px;">
+                <span>Send & Open in WhatsApp 💬</span>
+              </button>
+            </div>
           </div>
         </form>
+
+        <script>
+          function sendAndOpenWhatsAppCustomer() {
+            const textarea = document.getElementById('customerReplyMessage');
+            const text = textarea ? textarea.value.trim() : '';
+            if (!text) {
+              alert('Please enter a message to send.');
+              return;
+            }
+            const inqRef = "{{ inquiry.inquiry_number }}";
+            const waText = encodeURIComponent(`Hello Divya Trading Co., regarding my Quote #${inqRef}:\n\n${text}`);
+            window.open(`https://wa.me/918320821579?text=${waText}`, '_blank');
+            document.getElementById('customerReplyForm').submit();
+          }
+        </script>
 
       </div>
     </div>
