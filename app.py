@@ -13,12 +13,26 @@ from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, Inq
 from seed_data import seed_database, slugify
 from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS
 from export_service import export_inquiries_csv, export_products_csv
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Enable WAL Mode, Foreign Keys & Busy Timeout for rock-solid SQLite reliability
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    try:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA busy_timeout=5000")
+        cursor.close()
+    except Exception:
+        pass
 
 # Initialize DB
 db.init_app(app)
