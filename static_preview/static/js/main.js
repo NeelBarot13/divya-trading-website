@@ -280,6 +280,9 @@ function setupClientSideCatalogFilter() {
   const productCards = Array.from(productsGrid.querySelectorAll('.product-card'));
   if (productCards.length === 0) return;
 
+  const resultsCountEl = document.querySelector('.catalog-results-bar span');
+  const totalCount = productCards.length;
+
   const filterCards = () => {
     const query = searchInput.value.toLowerCase().trim();
     let visibleCount = 0;
@@ -296,9 +299,12 @@ function setupClientSideCatalogFilter() {
       }
     });
 
-    const countHeader = document.querySelector('.catalog-results-bar span, .catalog-header-bar p');
-    if (countHeader && query) {
-      countHeader.innerHTML = `Showing <strong>${visibleCount}</strong> matching spare parts`;
+    if (resultsCountEl) {
+      if (query) {
+        resultsCountEl.innerHTML = `Showing <strong>${visibleCount}</strong> matching spare parts`;
+      } else {
+        resultsCountEl.innerHTML = `Showing <strong>${totalCount}</strong> precision parts`;
+      }
     }
   };
 

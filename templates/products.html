@@ -157,6 +157,9 @@
               <div class="product-meta-row">
                 <span class="product-part-no">{{ prod.part_number }}</span>
                 <span class="product-make-badge">{{ prod.machine_make.name if prod.machine_make else 'Universal' }}</span>
+                {% if prod.category %}
+                <span class="product-category-tag" style="display:none;">{{ prod.category.name }}</span>
+                {% endif %}
               </div>
               
               <h3 class="product-title">
