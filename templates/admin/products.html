@@ -294,22 +294,9 @@
               </td>
 
               <td>
+                <script type="application/json" id="prod-data-{{ prod.id }}">{{ prod.to_dict()|tojson|safe }}</script>
                 <div style="display: flex; gap: 6px;">
-                  <button class="btn-action-sm btn-edit-product" 
-                          data-id="{{ prod.id }}"
-                          data-name="{{ prod.name }}"
-                          data-part-number="{{ prod.part_number }}"
-                          data-category-id="{{ prod.category_id }}"
-                          data-machine-id="{{ prod.machine_make_id or '' }}"
-                          data-repeat-sizes="{{ prod.repeat_sizes or '' }}"
-                          data-material="{{ prod.material or '' }}"
-                          data-stock-status="{{ prod.stock_status or 'in_stock' }}"
-                          data-short-description="{{ prod.short_description or '' }}"
-                          data-description="{{ prod.description or '' }}"
-                          data-specifications="{{ prod.specifications or '' }}"
-                          data-is-featured="{{ prod.is_featured }}"
-                          data-is-active="{{ prod.is_active }}"
-                          data-image-url="{{ prod.image_url }}">
+                  <button type="button" class="btn-action-sm btn-edit-product" data-id="{{ prod.id }}">
                     Edit
                   </button>
                   <form action="{{ url_for('admin_delete_product', product_id=prod.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');" style="display: inline;">
@@ -572,22 +559,33 @@
     // Edit Product Modal Populate
     document.querySelectorAll('.btn-edit-product').forEach(btn => {
       btn.addEventListener('click', () => {
-        const form = document.getElementById('editProductForm');
-        form.action = `/admin/products/${btn.dataset.id}/edit`;
+        const prodId = btn.dataset.id;
+        const jsonEl = document.getElementById(`prod-data-${prodId}`);
+        if (!jsonEl) return;
         
-        document.getElementById('editName').value = btn.dataset.name;
-        document.getElementById('editPartNumber').value = btn.dataset.partNumber;
-        document.getElementById('editCategoryId').value = btn.dataset.categoryId;
-        document.getElementById('editMachineId').value = btn.dataset.machineId;
-        document.getElementById('editStockStatus').value = btn.dataset.stockStatus || 'in_stock';
-        document.getElementById('editRepeatSizes').value = btn.dataset.repeatSizes;
-        document.getElementById('editMaterial').value = btn.dataset.material;
-        document.getElementById('editShortDescription').value = btn.dataset.shortDescription || '';
-        document.getElementById('editDescription').value = btn.dataset.description;
-        document.getElementById('editSpecifications').value = btn.dataset.specifications;
-        document.getElementById('editIsFeatured').checked = btn.dataset.isFeatured === 'True';
-        document.getElementById('editIsActive').checked = btn.dataset.isActive === 'True';
-        document.getElementById('editImagePreview').src = btn.dataset.imageUrl;
+        let p;
+        try {
+          p = JSON.parse(jsonEl.textContent);
+        } catch (e) {
+          return;
+        }
+
+        const form = document.getElementById('editProductForm');
+        form.action = `/admin/products/${prodId}/edit`;
+        
+        document.getElementById('editName').value = p.name || '';
+        document.getElementById('editPartNumber').value = p.part_number || '';
+        document.getElementById('editCategoryId').value = p.category_id || '';
+        document.getElementById('editMachineId').value = p.machine_make_id || '';
+        document.getElementById('editStockStatus').value = p.stock_status || 'in_stock';
+        document.getElementById('editRepeatSizes').value = p.repeat_sizes || '';
+        document.getElementById('editMaterial').value = p.material || '';
+        document.getElementById('editShortDescription').value = p.short_description || '';
+        document.getElementById('editDescription').value = p.description || '';
+        document.getElementById('editSpecifications').value = p.specifications || '';
+        document.getElementById('editIsFeatured').checked = Boolean(p.is_featured);
+        document.getElementById('editIsActive').checked = Boolean(p.is_active);
+        document.getElementById('editImagePreview').src = p.image_url || '/static/images/hero_parts.jpg';
         
         document.getElementById('editProductModal').classList.add('active');
       });

@@ -157,8 +157,19 @@ const QuoteCart = {
       });
     });
 
-    document.getElementById('cartCloseBtn')?.addEventListener('click', () => this.closeDrawer());
-    document.getElementById('cartOverlay')?.addEventListener('click', () => this.closeDrawer());
+    const closeCartElements = document.querySelectorAll('#closeCartBtn, #cartCloseBtn, .cart-close-btn, #cartOverlay');
+    closeCartElements.forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.closeDrawer();
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeDrawer();
+      }
+    });
 
     // Add to Cart buttons on product cards
     document.addEventListener('click', (e) => {

@@ -88,19 +88,59 @@ def customer_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         cust_id = session.get('customer_id')
+        login_time = session.get('customer_login_time')
+        now = time.time()
+
         if not cust_id:
             flash('Please sign in or create an account to view your quotes.', 'info')
             return redirect(url_for('customer_login', next=request.url))
+
+        # 1-Hour strict automatic session expiration (3600 seconds)
+        if not login_time or (now - float(login_time) > 3600):
+            session.pop('customer_id', None)
+            session.pop('customer_name', None)
+            session.pop('customer_email', None)
+            session.pop('customer_company', None)
+            session.pop('customer_login_time', None)
+            flash('Your session has expired (1 hour limit). Please sign in again.', 'warning')
+            return redirect(url_for('customer_login', next=request.url))
+
         customer = CustomerUser.query.get(cust_id)
         if not customer:
             session.pop('customer_id', None)
             session.pop('customer_name', None)
             session.pop('customer_email', None)
             session.pop('customer_company', None)
+            session.pop('customer_login_time', None)
             flash('Your session has expired. Please sign in again.', 'info')
             return redirect(url_for('customer_login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
+
+
+# Global Session Lifetime Enforcement (1 Hour / 3600 Seconds Auto-Logout Watchdog)
+@app.before_request
+def enforce_session_timeout():
+    now = time.time()
+    
+    # 1. Customer User Auto-Logout Check on public pages
+    if 'customer_id' in session and request.endpoint not in ('customer_dashboard', 'customer_quote_detail', 'customer_add_comment'):
+        cust_login_time = session.get('customer_login_time')
+        if not cust_login_time or (now - float(cust_login_time) > 3600):
+            session.pop('customer_id', None)
+            session.pop('customer_name', None)
+            session.pop('customer_email', None)
+            session.pop('customer_company', None)
+            session.pop('customer_login_time', None)
+            
+    # 2. Admin User Auto-Logout Check on public pages
+    if 'admin_user_id' in session and not request.path.startswith('/admin'):
+        admin_login_time = session.get('admin_login_time')
+        if not admin_login_time or (now - float(admin_login_time) > 3600):
+            session.pop('admin_user_id', None)
+            session.pop('admin_username', None)
+            session.pop('admin_role', None)
+            session.pop('admin_login_time', None)
 
 
 # Context Processor for Global Template Variables
@@ -114,12 +154,22 @@ def inject_global_data():
     
     current_customer = None
     if 'customer_id' in session:
-        current_customer = CustomerUser.query.get(session['customer_id'])
-        if not current_customer:
+        login_time = session.get('customer_login_time')
+        now = time.time()
+        if not login_time or (now - float(login_time) > 3600):
             session.pop('customer_id', None)
             session.pop('customer_name', None)
             session.pop('customer_email', None)
             session.pop('customer_company', None)
+            session.pop('customer_login_time', None)
+        else:
+            current_customer = CustomerUser.query.get(session['customer_id'])
+            if not current_customer:
+                session.pop('customer_id', None)
+                session.pop('customer_name', None)
+                session.pop('customer_email', None)
+                session.pop('customer_company', None)
+                session.pop('customer_login_time', None)
         
     return {
         'nav_categories': categories,
@@ -236,12 +286,19 @@ def products():
             
     if search_query:
         search_pattern = f"%{search_query}%"
-        query = query.filter(
-            (Product.name.ilike(search_pattern)) |
-            (Product.part_number.ilike(search_pattern)) |
-            (Product.description.ilike(search_pattern)) |
-            (Product.repeat_sizes.ilike(search_pattern))
-        )
+        query = query.outerjoin(Category, Product.category_id == Category.id)\
+                     .outerjoin(MachineMake, Product.machine_make_id == MachineMake.id)\
+                     .filter(
+                         (Product.name.ilike(search_pattern)) |
+                         (Product.part_number.ilike(search_pattern)) |
+                         (Product.short_description.ilike(search_pattern)) |
+                         (Product.description.ilike(search_pattern)) |
+                         (Product.specifications.ilike(search_pattern)) |
+                         (Product.material.ilike(search_pattern)) |
+                         (Product.repeat_sizes.ilike(search_pattern)) |
+                         (Category.name.ilike(search_pattern)) |
+                         (MachineMake.name.ilike(search_pattern))
+                     ).distinct()
         
     all_products = query.order_by(Product.id.desc()).all()
     categories = Category.query.order_by(Category.order_index).all()
@@ -317,6 +374,7 @@ def customer_login():
             session['customer_name'] = user.name
             session['customer_email'] = user.email
             session['customer_company'] = user.company_name or ''
+            session['customer_login_time'] = time.time()
             
             # Automatically link past guest inquiries matching this email
             Inquiry.query.filter_by(email=email, customer_id=None).update({'customer_id': user.id})
@@ -382,6 +440,7 @@ def customer_register():
         session['customer_name'] = user.name
         session['customer_email'] = user.email
         session['customer_company'] = user.company_name or ''
+        session['customer_login_time'] = time.time()
         
         flash(f'Account created successfully! Welcome to Divya Trading Co., {user.name}.', 'success')
         return redirect(next_url)
@@ -396,6 +455,7 @@ def customer_logout():
     session.pop('customer_name', None)
     session.pop('customer_email', None)
     session.pop('customer_company', None)
+    session.pop('customer_login_time', None)
     flash('You have been logged out of your customer portal.', 'info')
     return redirect(url_for('home'))
 
@@ -502,11 +562,19 @@ def api_products():
         query = query.filter_by(machine_make_id=machine_id)
     if query_str:
         pattern = f"%{query_str}%"
-        query = query.filter(
-            (Product.name.ilike(pattern)) |
-            (Product.part_number.ilike(pattern)) |
-            (Product.description.ilike(pattern))
-        )
+        query = query.outerjoin(Category, Product.category_id == Category.id)\
+                     .outerjoin(MachineMake, Product.machine_make_id == MachineMake.id)\
+                     .filter(
+                         (Product.name.ilike(pattern)) |
+                         (Product.part_number.ilike(pattern)) |
+                         (Product.short_description.ilike(pattern)) |
+                         (Product.description.ilike(pattern)) |
+                         (Product.specifications.ilike(pattern)) |
+                         (Product.material.ilike(pattern)) |
+                         (Product.repeat_sizes.ilike(pattern)) |
+                         (Category.name.ilike(pattern)) |
+                         (MachineMake.name.ilike(pattern))
+                     ).distinct()
         
     products_list = query.all()
     return jsonify([p.to_dict() for p in products_list])
@@ -718,13 +786,17 @@ def admin_dashboard():
         query = query.filter_by(status=status_filter)
     if search_q:
         pattern = f"%{search_q}%"
-        query = query.filter(
-            (Inquiry.inquiry_number.ilike(pattern)) |
-            (Inquiry.customer_name.ilike(pattern)) |
-            (Inquiry.company_name.ilike(pattern)) |
-            (Inquiry.email.ilike(pattern)) |
-            (Inquiry.phone.ilike(pattern))
-        )
+        query = query.outerjoin(InquiryItem, Inquiry.id == InquiryItem.inquiry_id)\
+                     .filter(
+                         (Inquiry.inquiry_number.ilike(pattern)) |
+                         (Inquiry.customer_name.ilike(pattern)) |
+                         (Inquiry.company_name.ilike(pattern)) |
+                         (Inquiry.email.ilike(pattern)) |
+                         (Inquiry.phone.ilike(pattern)) |
+                         (Inquiry.machine_model.ilike(pattern)) |
+                         (InquiryItem.product_name.ilike(pattern)) |
+                         (InquiryItem.part_number.ilike(pattern))
+                     ).distinct()
         
     inquiries = query.order_by(Inquiry.id.desc()).all()
     
@@ -909,12 +981,19 @@ def admin_products():
         
     if search_q:
         pattern = f"%{search_q}%"
-        query = query.filter(
-            (Product.name.ilike(pattern)) |
-            (Product.part_number.ilike(pattern)) |
-            (Product.description.ilike(pattern)) |
-            (Product.repeat_sizes.ilike(pattern))
-        )
+        query = query.outerjoin(Category, Product.category_id == Category.id)\
+                     .outerjoin(MachineMake, Product.machine_make_id == MachineMake.id)\
+                     .filter(
+                         (Product.name.ilike(pattern)) |
+                         (Product.part_number.ilike(pattern)) |
+                         (Product.short_description.ilike(pattern)) |
+                         (Product.description.ilike(pattern)) |
+                         (Product.specifications.ilike(pattern)) |
+                         (Product.material.ilike(pattern)) |
+                         (Product.repeat_sizes.ilike(pattern)) |
+                         (Category.name.ilike(pattern)) |
+                         (MachineMake.name.ilike(pattern))
+                     ).distinct()
         
     products_list = query.order_by(Product.id.desc()).all()
     categories = Category.query.order_by(Category.order_index).all()

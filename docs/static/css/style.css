@@ -1555,22 +1555,30 @@ button, input, select, textarea {
 }
 
 .cart-close-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: var(--transition);
 }
 
-.cart-close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+.cart-close-btn:hover,
+.cart-close-btn:active {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.05);
 }
 
 .cart-drawer-body {
@@ -1799,17 +1807,30 @@ textarea.form-control {
 }
 
 .modal-close-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: var(--transition);
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:active {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.05);
 }
 
 .modal-body {
@@ -1961,25 +1982,31 @@ textarea.form-control {
 }
 
 .mobile-drawer-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
   border-radius: 50%;
   background: var(--bg-light);
   border: 1px solid var(--border-color);
   color: var(--primary-navy);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: var(--transition);
 }
 
-.mobile-drawer-close-btn:hover {
+.mobile-drawer-close-btn:hover,
+.mobile-drawer-close-btn:active {
   background: #FEF2F2;
   color: #DC2626;
   border-color: #FECACA;
+  transform: scale(1.05);
 }
 
 .mobile-drawer-body {

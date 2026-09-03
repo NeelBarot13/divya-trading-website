@@ -10,8 +10,8 @@ class Config:
     # Stable Persistent Secret Key
     SECRET_KEY = os.environ.get('SECRET_KEY', 'divya-trading-co-fixed-secret-key-2026-prod-auth-v2')
     
-    # 60-Day Permanent Session Persistence Configuration
-    PERMANENT_SESSION_LIFETIME = timedelta(days=60)
+    # 1-Hour Strict Automatic Session Expiration Configuration (3600 seconds)
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
     SESSION_COOKIE_NAME = 'dtc_auth_session'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'

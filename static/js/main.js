@@ -60,10 +60,25 @@ function setupMobileDrawer() {
     }
   });
 
-  closeBtn?.addEventListener('click', closeDrawer);
-  overlay?.addEventListener('click', closeDrawer);
+  closeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeDrawer();
+  });
 
-  // Close drawer on ESC
+  overlay?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+  });
+
+  // Close drawer on clicking navigation links inside drawer
+  drawer.querySelectorAll('.mobile-nav-row, .mobile-accordion-item, .btn-mobile-auth-login, .btn-mobile-auth-register, .btn-mobile-myquotes').forEach(link => {
+    link.addEventListener('click', () => {
+      closeDrawer();
+    });
+  });
+
+  // Close drawer on ESC key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && drawer.classList.contains('active')) {
       closeDrawer();
@@ -73,7 +88,8 @@ function setupMobileDrawer() {
   // Mobile Accordions inside Drawer
   const accordionHeaders = drawer.querySelectorAll('.mobile-accordion-header');
   accordionHeaders.forEach(header => {
-    header.addEventListener('click', () => {
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
       const parent = header.closest('.mobile-drawer-accordion');
       const isOpen = parent.classList.contains('open');
       
@@ -254,42 +270,23 @@ function setupQuickInquiryModal() {
 
 /**
  * Client-Side Catalog Search and Filter Handler
- * Enables 100% interactive search and category filtering in static hosting / GitHub Pages mode
+ * Enables responsive live search across all visible product cards in the catalog
  */
 function setupClientSideCatalogFilter() {
   const productsGrid = document.querySelector('.products-grid');
-  if (!productsGrid) return;
+  const searchInput = document.querySelector('input[name="q"]');
+  if (!productsGrid || !searchInput) return;
 
   const productCards = Array.from(productsGrid.querySelectorAll('.product-card'));
   if (productCards.length === 0) return;
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const categoryParam = urlParams.get('category');
-  const machineParam = urlParams.get('machine');
-  const searchParam = urlParams.get('q');
-
   const filterCards = () => {
-    const qInput = document.querySelector('input[name="q"]');
-    const query = (qInput ? qInput.value : (searchParam || '')).toLowerCase().trim();
-
+    const query = searchInput.value.toLowerCase().trim();
     let visibleCount = 0;
-    productCards.forEach(card => {
-      const title = (card.querySelector('.product-title')?.textContent || '').toLowerCase();
-      const partNo = (card.querySelector('.product-part-no')?.textContent || '').toLowerCase();
-      const cat = (card.querySelector('.product-category-tag')?.textContent || '').toLowerCase();
-      const specs = (card.querySelector('.product-specs-summary')?.textContent || '').toLowerCase();
-      const text = `${title} ${partNo} ${cat} ${specs}`;
 
-      let match = true;
-      if (query && !text.includes(query)) match = false;
-      if (categoryParam) {
-        const catClean = categoryParam.replace(/-/g, ' ').toLowerCase();
-        if (!cat.includes(catClean) && !text.includes(catClean)) match = false;
-      }
-      if (machineParam) {
-        const makeClean = machineParam.replace(/-/g, ' ').toLowerCase();
-        if (!text.includes(makeClean)) match = false;
-      }
+    productCards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      const match = !query || text.includes(query);
 
       if (match) {
         card.style.display = '';
@@ -299,21 +296,25 @@ function setupClientSideCatalogFilter() {
       }
     });
 
-    const countHeader = document.querySelector('.catalog-header-bar p');
-    if (countHeader && (query || categoryParam || machineParam)) {
-      countHeader.textContent = `Showing ${visibleCount} matching spare parts`;
+    const countHeader = document.querySelector('.catalog-results-bar span, .catalog-header-bar p');
+    if (countHeader && query) {
+      countHeader.innerHTML = `Showing <strong>${visibleCount}</strong> matching spare parts`;
     }
   };
 
-  // Search input live handler
-  const searchInput = document.querySelector('input[name="q"]');
-  if (searchInput) {
-    if (searchParam) searchInput.value = searchParam;
-    searchInput.addEventListener('input', filterCards);
-  }
-
-  // Initial filter run on page load
-  if (categoryParam || machineParam || searchParam) {
-    filterCards();
-  }
+  // Search input live handler (filters live as user types)
+  searchInput.addEventListener('input', filterCards);
 }
+
+// Global Modal & Overlay Close Handlers (Backdrop click and ESC key)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active, .cart-overlay.active, .mobile-drawer-overlay.active').forEach(el => {
+      el.classList.remove('active');
+    });
+    document.querySelectorAll('.modal-overlay, .cart-drawer, .mobile-drawer').forEach(el => {
+      el.classList.remove('active');
+    });
+    document.body.classList.remove('drawer-open');
+  }
+});
