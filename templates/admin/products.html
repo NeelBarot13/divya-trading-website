@@ -153,7 +153,15 @@
         <p>1-Click activate/deactivate products, manage 2-tier descriptions, stock availability, and specifications.</p>
       </div>
 
-      <div class="admin-top-actions">
+      <div class="admin-top-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="{{ url_for('admin_download_product_template') }}" class="btn-admin-export" style="background: #f0fdf4; color: #166534; border-color: #bbf7d0;" title="Download ready-to-use Excel template with sample products & instructions">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+          <span>Demo Excel File (.xlsx)</span>
+        </a>
+        <button type="button" class="btn-admin-export" style="background: #0284c7; color: white; border-color: #0284c7;" onclick="document.getElementById('bulkImportModal').classList.add('active')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <span>Bulk Product Upload</span>
+        </button>
         <a href="{{ url_for('admin_export_products') }}" class="btn-admin-export">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           <span>Export Catalog CSV</span>
@@ -311,6 +319,90 @@
       </div>
     </div>
   </main>
+
+  <!-- Bulk Product Import Modal -->
+  <div class="modal-overlay" id="bulkImportModal">
+    <div class="modal-box" style="max-width: 620px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">📊</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem;">Bulk Product Upload (Excel / CSV)</h3>
+            <p style="margin: 2px 0 0; font-size: 0.78rem; color: #64748B;">Add multiple products at once by uploading your spreadsheet</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('bulkImportModal').classList.remove('active')">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 24px;">
+        <!-- Demo File Download Card -->
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+          <div>
+            <div style="font-weight: 700; color: #166534; font-size: 0.9rem; margin-bottom: 2px;">
+              📥 Need the sample Excel spreadsheet?
+            </div>
+            <div style="font-size: 0.8rem; color: #15803D;">
+              Download our pre-formatted demo template with realistic spare parts and reference guide.
+            </div>
+          </div>
+          <a href="{{ url_for('admin_download_product_template') }}" class="btn-admin-export" style="background: #16A34A; color: white; border: none; padding: 7px 14px; font-size: 0.82rem; font-weight: 700; text-decoration: none; border-radius: 6px; white-space: nowrap;">
+            Download Demo Excel (.xlsx) ➔
+          </a>
+        </div>
+
+        <form action="{{ url_for('admin_import_products') }}" method="POST" enctype="multipart/form-data">
+          <!-- File Drop Zone -->
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label" style="font-weight: 700; margin-bottom: 8px; color: #0F172A;">
+              Select Excel or CSV File *
+            </label>
+            <div style="border: 2px dashed #CBD5E1; border-radius: 10px; padding: 24px; text-align: center; background: #F8FAFC; transition: all 0.2s;" id="dropZoneContainer">
+              <div style="font-size: 2rem; margin-bottom: 8px;">📑</div>
+              <input type="file" name="excel_file" id="excelFileInput" accept=".xlsx, .xls, .csv" required style="display: none;" onchange="updateSelectedFileName(this)">
+              <button type="button" class="btn-action-sm" style="padding: 8px 18px; font-weight: 700; background: white; border: 1px solid #CBD5E1; cursor: pointer; border-radius: 6px;" onclick="document.getElementById('excelFileInput').click()">
+                Choose File from Computer
+              </button>
+              <div id="selectedFileNameDisplay" style="margin-top: 10px; font-size: 0.84rem; color: #64748B; font-weight: 600;">
+                Supported: .xlsx, .xls, .csv (Max 15MB)
+              </div>
+            </div>
+          </div>
+
+          <!-- Update Existing Option -->
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.86rem; color: #1E293B; cursor: pointer;">
+              <input type="checkbox" name="update_existing" value="1" checked style="margin-top: 3px; transform: scale(1.15);">
+              <div>
+                <strong>Update existing products if Part Number already exists</strong>
+                <div style="font-size: 0.78rem; color: #64748B; margin-top: 2px;">
+                  If checked, matching products will have their names, categories, descriptions, and stock statuses refreshed. If unchecked, duplicates are skipped.
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Helpful Highlights -->
+          <div style="font-size: 0.8rem; color: #475569; margin-bottom: 22px; line-height: 1.5; padding-left: 6px;">
+            <div style="font-weight: 700; color: #0F172A; margin-bottom: 4px;">⚡ Smart Import Highlights:</div>
+            <ul style="margin: 0; padding-left: 18px;">
+              <li><strong>Automatic Categories:</strong> New categories typed in the sheet are automatically created.</li>
+              <li><strong>Machine Makes:</strong> Supports Stork, Stormac, Pegasus, Zimmer, etc. or Universal.</li>
+              <li><strong>Stock Status:</strong> Accepts <code>in_stock</code>, <code>out_of_stock</code>, or <code>made_to_order</code>.</li>
+            </ul>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn-action-sm" onclick="document.getElementById('bulkImportModal').classList.remove('active')" style="padding: 10px 18px; font-size: 0.9rem;">
+              Cancel
+            </button>
+            <button type="submit" class="btn-admin-primary" style="padding: 10px 22px; font-size: 0.9rem; justify-content: center; background: #0284c7; border-color: #0284c7;">
+              <span>Upload & Import Products ➔</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Add Product Modal -->
   <div class="modal-overlay" id="addProductModal">
@@ -679,6 +771,17 @@
         }
       } catch (err) {
         alert('Failed to execute bulk action. Please try again.');
+      }
+    }
+
+    function updateSelectedFileName(input) {
+      const display = document.getElementById('selectedFileNameDisplay');
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const sizeKb = (file.size / 1024).toFixed(1);
+        display.innerHTML = `<span style="color: #059669; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">✓ Selected: ${file.name} (${sizeKb} KB)</span>`;
+      } else {
+        display.textContent = 'Supported: .xlsx, .xls, .csv (Max 15MB)';
       }
     }
   </script>

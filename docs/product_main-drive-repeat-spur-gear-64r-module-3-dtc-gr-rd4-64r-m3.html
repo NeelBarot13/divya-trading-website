@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <title>Sign In to Customer Portal | DIVYA TRADING CO.</title>
+  <title>Main Drive Repeat Spur Gear 64R (Module 3) | Divya Trading Co.</title>
   <meta name="description" content="Divya Trading Co. - Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines (Stork, Stormac, Ichinose, Reggiani, Harish, Zimmer, Stovec). Since 1997.">
   
   <!-- Favicon: High-Resolution Transparent Circular DTC Emblem -->
@@ -132,7 +132,7 @@
 
         <!-- Normal Text Menu Item for Login / Signup when Guest -->
         
-        <a href="/customer/login" class="nav-link nav-link-auth active">
+        <a href="/customer/login" class="nav-link nav-link-auth ">
           LOGIN / SIGNUP
         </a>
         
@@ -328,87 +328,183 @@
   <!-- Main Body Content Block -->
   <main>
     
-<div style="background: var(--bg-light); min-height: 80vh; padding: 60px 0 80px; display: flex; align-items: center;">
-  <div class="container" style="max-width: 480px;">
-    
-    <!-- Flash Messages -->
-    
-      
-    
 
-    <div style="background: var(--bg-white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); overflow: hidden;">
-      
-      <!-- Top Accent Banner -->
-      <div style="background: var(--primary-navy); padding: 32px 30px; text-align: center; color: white;">
-        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.12); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
-          👤
-        </div>
-        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
-          Customer Portal Login
-        </h2>
-        <p style="font-size: 0.85rem; color: #93C5FD; margin-top: 4px;">
-          Track previous quotes, view pricing responses, and chat directly with our engineering team.
-        </p>
-      </div>
-
-      <!-- Form Body -->
-      <div style="padding: 32px 30px;">
-        <form action="/customer/login" method="POST">
-          <input type="hidden" name="next" value="/customer/dashboard">
-          
-          <div class="form-group" style="margin-bottom: 20px;">
-            <label class="form-label" style="font-weight: 600; color: var(--primary-navy);">Email Address *</label>
-            <input type="email" name="email" class="form-control" placeholder="name@company.com" required autofocus style="padding: 12px 14px; font-size: 0.95rem;">
-          </div>
-
-          <div class="form-group" style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <label class="form-label" style="font-weight: 600; color: var(--primary-navy); margin-bottom: 0;">Password *</label>
-              <a href="forgot_password.html" style="font-size: 0.82rem; font-weight: 600; color: var(--dtc-blue); text-decoration: none;">Forgot Password?</a>
-            </div>
-            <input type="password" name="password" class="form-control" placeholder="••••••••" required style="padding: 12px 14px; font-size: 0.95rem;">
-          </div>
-
-          <button type="submit" class="btn-enquire-primary" style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm);">
-            <span>Sign In to My Quotes</span>
-            <span>➔</span>
-          </button>
-        </form>
-
-        <div style="text-align: center; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">
-            Don't have an account yet?
-            <a href="/customer/register?next=/customer/dashboard" style="font-weight: 700; color: var(--dtc-blue);">Create Account ➔</a>
-          </p>
-          <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">
-            Trouble logging in?
-            <a href="forgot_password.html" style="font-weight: 600; color: var(--dtc-blue);">Reset Password</a>
-          </p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Quick Info Feature Cards below login -->
-    <div class="form-row-2col" style="margin-top: 24px;">
-      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #EFF6FF; color: #2563EB; margin-bottom: 6px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-        </div>
-        <div style="font-weight: 700; color: var(--primary-navy); margin-bottom: 2px;">Instant Quote Status</div>
-        <span>Real-time updates on pricing & delivery timelines</span>
-      </div>
-      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #F0FDF4; color: #16A34A; margin-bottom: 6px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        </div>
-        <div style="font-weight: 700; color: var(--primary-navy); margin-bottom: 2px;">Direct Engineering Chat</div>
-        <span>Ask technical questions & specify repeat variants</span>
-      </div>
-    </div>
-
+<!-- Breadcrumb bar -->
+<div style="background: var(--bg-light); padding: 14px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+  <div class="container">
+    <a href="index.html" style="color: var(--text-light);">Home</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <a href="products.html" style="color: var(--text-light);">Products</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <a href="products.html?category=gears-transmission" style="color: var(--text-light);">Gears &amp; Transmission</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <span style="color: var(--primary-navy); font-weight: 600;">DTC-GR-RD4-64R-M3</span>
   </div>
 </div>
+
+<!-- Product Detail Main View -->
+<section style="padding: 50px 0 80px; background: var(--bg-white);">
+  <div class="container">
+    <div class="product-detail-grid">
+      <!-- Product Image Gallery / Showcase -->
+      <div>
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md);">
+          <img src="static/images/cat_gears.jpg" alt="Main Drive Repeat Spur Gear 64R (Module 3)" style="max-height: 420px; margin: 0 auto; object-fit: contain; border-radius: var(--radius-sm);">
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
+            <span style="font-size: 1.3rem;">⚙️</span>
+            <div>
+              <strong style="font-size: 0.8rem; color: var(--primary-navy); display: block;">100% In-House Made</strong>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">Precision CNC Machined</span>
+            </div>
+          </div>
+          <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
+            <span style="font-size: 1.3rem;">🌍</span>
+            <div>
+              <strong style="font-size: 0.8rem; color: var(--primary-navy); display: block;">Export Quality</strong>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">Trusted Worldwide</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Information & Inquiry Box -->
+      <div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+          <span class="product-part-no" style="font-size: 0.88rem; padding: 4px 10px;">Part Number: DTC-GR-RD4-64R-M3</span>
+          <span style="background: #e2e8f0; color: #334155; font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;">
+            Category: Gears &amp; Transmission
+          </span>
+          <span style="background: #fef3c7; color: #92400e; font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;">
+            Make: Stork (RD-3 &amp; RD-4)
+          </span>
+        </div>
+
+        <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-navy); line-height: 1.2; margin-bottom: 12px;">
+          Main Drive Repeat Spur Gear 64R (Module 3)
+        </h1>
+
+        
+        <p style="font-size: 1.05rem; font-weight: 600; color: var(--dtc-blue); line-height: 1.5; margin-bottom: 16px;">
+          Precision ground repeat gear for synchronized rotary printing drive transmission.
+        </p>
+        
+
+        <div style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;">
+          <h4 style="font-family: var(--font-heading); font-size: 0.9rem; font-weight: 700; color: var(--primary-navy); text-transform: uppercase; margin-bottom: 6px;">Product Overview & Function</h4>
+          <p style="margin: 0;">Case-hardened steel repeat gear with induction-hardened teeth providing maximum wear resistance in harsh print house environments.</p>
+        </div>
+
+        <!-- Technical Specs Table -->
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 30px;">
+          <div style="background: #f1f5f9; padding: 10px 18px; font-weight: 700; font-size: 0.85rem; color: var(--primary-navy); text-transform: uppercase;">
+            Technical Specifications
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+            
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 10px 18px; color: var(--text-light); width: 35%; font-weight: 500;">Repeat Sizes:</td>
+              <td style="padding: 10px 18px; font-weight: 600; color: var(--primary-navy);">64R, 81.9R</td>
+            </tr>
+            
+            
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 10px 18px; color: var(--text-light); font-weight: 500;">Material Grade:</td>
+              <td style="padding: 10px 18px; font-weight: 600; color: var(--primary-navy);">EN353 Case Hardened Steel</td>
+            </tr>
+            
+            
+            <tr>
+              <td style="padding: 10px 18px; color: var(--text-light); font-weight: 500; vertical-align: top;">Key Features:</td>
+              <td style="padding: 10px 18px; color: var(--text-main); white-space: pre-line;">Module: 3 | Teeth: 64 | Bore: 45mm H7 | Hardness: HRC 58-62</td>
+            </tr>
+            
+          </table>
+        </div>
+
+        <!-- Action CTAs -->
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 30px;">
+          <button class="btn-enquire-primary btn-quick-inquire" 
+                  data-product-id="2" 
+                  data-product-name="Main Drive Repeat Spur Gear 64R (Module 3)" 
+                  data-part-number="DTC-GR-RD4-64R-M3"
+                  data-repeat-sizes="64R, 81.9R"
+                  style="flex: 1; justify-content: center; padding: 14px 20px;">
+            <span>Inquire About This Part</span>
+            <span>✉</span>
+          </button>
+          
+          <button class="btn-card-add-cart btn-add-quote-cart" 
+                  data-product-id="2" 
+                  data-product-name="Main Drive Repeat Spur Gear 64R (Module 3)" 
+                  data-part-number="DTC-GR-RD4-64R-M3"
+                  data-product-image="/static/images/cat_gears.jpg"
+                  style="flex: 1; justify-content: center; padding: 14px 20px; font-size: 0.9rem; font-weight: 700;">
+            <span>+ Add to Quote List</span>
+          </button>
+        </div>
+
+        <!-- WhatsApp Quick Chat Link -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <strong style="color: #166534; font-size: 0.9rem; display: block;">Need Urgent Delivery or Custom Fitment?</strong>
+            <span style="font-size: 0.8rem; color: #15803d;">Chat directly with our textile parts engineer on WhatsApp</span>
+          </div>
+          <a href="https://wa.me/918320821579?text=Hello,%20I%20am%20interested%20in%20product%20Main Drive Repeat Spur Gear 64R (Module 3)%20(Part%20No:%20DTC-GR-RD4-64R-M3)." 
+             target="_blank" 
+             style="background: #16a34a; color: white; padding: 8px 16px; border-radius: 4px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">
+            WhatsApp Now ➔
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    
+    <div style="margin-top: 70px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 24px;">
+        Related Spares in Gears &amp; Transmission
+      </h3>
+      <div class="product-grid">
+        
+        <div class="product-card">
+          <a href="product_stork-rd-4-screen-head-ring-64r-assembly-dtc-sh-rd4-64r.html" class="product-card-img-wrap">
+            <img src="static/images/cat_screen_heads.jpg" alt="Stork RD-4 Screen Head Ring 64R Assembly">
+          </a>
+          <div class="product-card-body">
+            <div class="product-meta-row">
+              <span class="product-part-no">DTC-SH-RD4-64R</span>
+              <span class="product-make-badge">Stork (RD-3 &amp; RD-4)</span>
+            </div>
+            <h4 class="product-title" style="font-size: 0.95rem;">
+              <a href="product_stork-rd-4-screen-head-ring-64r-assembly-dtc-sh-rd4-64r.html">Stork RD-4 Screen Head Ring 64R Assembly</a>
+            </h4>
+            <div class="product-card-actions" style="margin-top: auto;">
+              <button class="btn-card-inquire btn-quick-inquire" 
+                      data-product-id="1" 
+                      data-product-name="Stork RD-4 Screen Head Ring 64R Assembly" 
+                      data-part-number="DTC-SH-RD4-64R">
+                Inquire
+              </button>
+              <button class="btn-card-add-cart btn-add-quote-cart" 
+                      data-product-id="1" 
+                      data-product-name="Stork RD-4 Screen Head Ring 64R Assembly" 
+                      data-part-number="DTC-SH-RD4-64R"
+                      data-product-image="/static/images/cat_screen_heads.jpg">
+                + List
+              </button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+</section>
+
 
   </main>
 

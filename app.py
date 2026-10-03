@@ -12,7 +12,7 @@ from config import Config
 from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, InquiryMessage, CustomerUser, AdminUser, SiteSetting
 from seed_data import seed_database, slugify
 from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS, send_password_reset_email
-from export_service import export_inquiries_csv, export_products_csv
+from export_service import export_inquiries_csv, export_products_csv, generate_product_template_excel, import_products_from_file
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -1343,6 +1343,56 @@ def admin_export_products():
         mimetype='text/csv',
         headers={'Content-Disposition': f'attachment; filename={filename}'}
     )
+
+
+@app.route('/admin/products/template')
+@admin_required
+def admin_download_product_template():
+    """
+    Downloads demo Excel template (.xlsx) with sample rows & reference guide for bulk product import.
+    """
+    excel_bytes = generate_product_template_excel()
+    filename = "DTC_Products_Import_Demo.xlsx"
+    return Response(
+        excel_bytes,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
+
+
+@app.route('/admin/products/import', methods=['POST'])
+@admin_required
+def admin_import_products():
+    """
+    Handles bulk product import from uploaded Excel (.xlsx, .xls) or CSV file.
+    """
+    if 'excel_file' not in request.files:
+        flash('Please select an Excel or CSV file to upload.', 'danger')
+        return redirect(url_for('admin_products'))
+        
+    file = request.files['excel_file']
+    if not file or not file.filename:
+        flash('No file selected for import.', 'danger')
+        return redirect(url_for('admin_products'))
+        
+    allowed_exts = ('.xlsx', '.xls', '.csv')
+    if not any(file.filename.lower().endswith(ext) for ext in allowed_exts):
+        flash('Unsupported file format. Please upload an Excel (.xlsx, .xls) or CSV file.', 'danger')
+        return redirect(url_for('admin_products'))
+        
+    update_existing = 'update_existing' in request.form
+    result = import_products_from_file(file, update_existing=update_existing)
+    
+    if result.get('success'):
+        flash(result.get('message'), 'success')
+        if result.get('errors'):
+            for err in result['errors'][:5]:
+                flash(f"Notice: {err}", 'warning')
+    else:
+        flash(result.get('message', 'Import failed.'), 'danger')
+        
+    return redirect(url_for('admin_products'))
+
 
 
 # ==========================================
