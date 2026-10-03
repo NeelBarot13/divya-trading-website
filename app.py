@@ -380,6 +380,90 @@ def contact():
     return render_template('contact.html', products=products)
 
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """
+    Dynamic XML Sitemap for search engines (Google, Bing, Yahoo).
+    Indexes all machine makes, categories, products, and core pages.
+    """
+    base_url = request.url_root.rstrip('/')
+    if 'divyatradingco.com' in base_url and not base_url.startswith('https://'):
+        base_url = base_url.replace('http://', 'https://')
+        
+    pages = [
+        {'loc': f"{base_url}/", 'changefreq': 'daily', 'priority': '1.0'},
+        {'loc': f"{base_url}/products", 'changefreq': 'daily', 'priority': '0.95'},
+        {'loc': f"{base_url}/machines", 'changefreq': 'weekly', 'priority': '0.9'},
+        {'loc': f"{base_url}/download-catalog", 'changefreq': 'monthly', 'priority': '0.7'},
+        {'loc': f"{base_url}/about", 'changefreq': 'monthly', 'priority': '0.7'},
+        {'loc': f"{base_url}/contact", 'changefreq': 'monthly', 'priority': '0.7'},
+    ]
+    
+    # Machine makes (Stormac, Laxmi, Stork, etc.)
+    for m in MachineMake.query.all():
+        pages.append({
+            'loc': f"{base_url}/products?machine={m.slug}",
+            'changefreq': 'weekly',
+            'priority': '0.85'
+        })
+        
+    # Categories
+    for c in Category.query.all():
+        pages.append({
+            'loc': f"{base_url}/products?category={c.slug}",
+            'changefreq': 'weekly',
+            'priority': '0.85'
+        })
+        
+    # Active Products
+    for p in Product.query.filter_by(is_active=True).all():
+        lastmod = p.updated_at.strftime('%Y-%m-%d') if p.updated_at else (p.created_at.strftime('%Y-%m-%d') if p.created_at else None)
+        item = {
+            'loc': f"{base_url}/product/{p.slug}",
+            'changefreq': 'weekly',
+            'priority': '0.8'
+        }
+        if lastmod:
+            item['lastmod'] = lastmod
+        pages.append(item)
+        
+    xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml_lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    for page in pages:
+        xml_lines.append('  <url>')
+        xml_lines.append(f"    <loc>{page['loc']}</loc>")
+        if 'lastmod' in page:
+            xml_lines.append(f"    <lastmod>{page['lastmod']}</lastmod>")
+        xml_lines.append(f"    <changefreq>{page['changefreq']}</changefreq>")
+        xml_lines.append(f"    <priority>{page['priority']}</priority>")
+        xml_lines.append('  </url>')
+    xml_lines.append('</urlset>')
+    
+    return Response('\n'.join(xml_lines), mimetype='application/xml')
+
+
+@app.route('/robots.txt')
+def robots():
+    """
+    Search Engine Crawling Directives.
+    """
+    base_url = request.url_root.rstrip('/')
+    if 'divyatradingco.com' in base_url and not base_url.startswith('https://'):
+        base_url = base_url.replace('http://', 'https://')
+        
+    content = f"""User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /customer/
+Disallow: /forgot-password
+Disallow: /reset-password/
+
+Sitemap: {base_url}/sitemap.xml
+"""
+    return Response(content, mimetype='text/plain')
+
+
+
 # ==========================================
 # CUSTOMER AUTHENTICATION & MY QUOTES PORTAL
 # ==========================================

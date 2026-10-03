@@ -1,6 +1,34 @@
 {% extends 'base.html' %}
 
-{% block title %}Products Catalog | Divya Trading Co. - Machine Spares{% endblock %}
+{% block title %}
+  {% if selected_machine %}
+    {{ selected_machine.name }} Rotary Printing Spare Parts | Divya Trading Co.
+  {% elif selected_category %}
+    {{ selected_category.name }} | Rotary Printing Spare Parts | Divya Trading Co.
+  {% elif search_query %}
+    {{ search_query }} | Rotary Printing Spare Parts | Divya Trading Co.
+  {% else %}
+    Rotary Printing Spare Parts Catalog | Stormac, Laxmi, Stork Machine Spares | Divya Trading Co.
+  {% endif %}
+{% endblock %}
+
+{% block meta_description %}
+  {% if selected_machine %}
+    Buy precision {{ selected_machine.name }} rotary printing spare parts. Screen head rings, repeat drive gears, pneumatic colour pumps, squeegee blades. In-house manufactured by Divya Trading Co.
+  {% elif selected_category %}
+    Explore {{ selected_category.name }} for rotary screen printing machines (Stormac, Laxmi, Stork, Zimmer). High precision components with global export quality.
+  {% else %}
+    Browse our complete catalog of Rotary Printing Spare Parts for Stormac, Laxmi, Stork, Zimmer, Reggiani textile printing machinery. Request instant quotation online.
+  {% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+  {% if selected_machine %}
+    {{ selected_machine.name.lower() }} rotary printing spare parts, {{ selected_machine.name.lower() }} rotary printing spares, {{ selected_machine.name.lower() }} machine parts, rotary printing spare parts
+  {% else %}
+    rotary printing spare parts, stormac rotary printing spare parts, laxmi rotary printing spare parts, stork rotary printing spare parts, repeat gears, screen head rings, colour pumps
+  {% endif %}
+{% endblock %}
 
 {% block content %}
 
@@ -11,13 +39,13 @@
       <div>
         <h1 class="catalog-page-title">
           {% if selected_category %}
-            {{ selected_category.name }}
+            {{ selected_category.name }} - Rotary Printing Spare Parts
           {% elif selected_machine %}
-            Spares for {{ selected_machine.name }}
+            {{ selected_machine.name }} Rotary Printing Spare Parts
           {% elif search_query %}
-            Search Results for "{{ search_query }}"
+            Search Results for "{{ search_query }}" - Rotary Printing Spares
           {% else %}
-            Rotary Machine Spares Catalog
+            Rotary Printing Spare Parts Catalog
           {% endif %}
         </h1>
         <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 4px;">

@@ -1,6 +1,89 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ product.name }} | Divya Trading Co.{% endblock %}
+{% block title %}{{ product.name }} (Part #{{ product.part_number }}) | {{ product.machine_make.name if product.machine_make else 'Rotary Printing' }} Spare Parts | Divya Trading Co.{% endblock %}
+
+{% block meta_description %}{{ product.name }} (Part Number: {{ product.part_number }}) for {{ product.machine_make.name if product.machine_make else 'rotary screen printing' }} machines. {{ (product.short_description or product.description or 'Precision CNC manufactured replacement spare parts by Divya Trading Co.')|striptags|truncate(155) }}{% endblock %}
+
+{% block meta_keywords %}{{ product.name }}, {{ product.part_number }}, {{ product.machine_make.name if product.machine_make else 'rotary printing' }} spare parts, rotary printing spare parts, textile machinery spares, {{ product.category.name if product.category else 'printing spares' }}{% endblock %}
+
+{% block og_title %}{{ product.name }} (Part #{{ product.part_number }}) | Divya Trading Co.{% endblock %}
+{% block og_description %}{{ (product.short_description or product.description or 'High precision replacement spare part by Divya Trading Co.')|striptags|truncate(155) }}{% endblock %}
+{% block og_image %}{{ product.image_url if product.image_url.startswith('http') else url_for('static', filename=product.image_url.replace('/static/', ''), _external=True) }}{% endblock %}
+
+{% block extra_head %}
+<!-- Product Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.name }}",
+  "image": [
+    "{{ product.image_url if product.image_url.startswith('http') else url_for('static', filename=product.image_url.replace('/static/', ''), _external=True) }}"
+  ],
+  "description": "{{ (product.short_description or product.description or product.name)|striptags|replace('\"', '\\\"') }}",
+  "sku": "{{ product.part_number }}",
+  "mpn": "{{ product.part_number }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ product.machine_make.name if product.machine_make else 'Divya Trading Co.' }}"
+  },
+  "manufacturer": {
+    "@type": "Organization",
+    "name": "Divya Trading Co."
+  },
+  "category": "{{ product.category.name if product.category else 'Rotary Printing Spare Parts' }}",
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.url }}",
+    "priceCurrency": "INR",
+    "price": "0",
+    "priceSpecification": {
+      "@type": "UnitPriceSpecification",
+      "priceType": "https://schema.org/InvoicePrice"
+    },
+    "availability": "https://schema.org/{% if product.stock_status == 'out_of_stock' %}OutOfStock{% else %}InStock{% endif %}",
+    "itemCondition": "https://schema.org/NewCondition",
+    "seller": {
+      "@type": "Organization",
+      "name": "Divya Trading Co."
+    }
+  }
+}
+</script>
+<!-- BreadcrumbList Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url_for('home', _external=True) }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products",
+      "item": "{{ url_for('products', _external=True) }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{{ product.category.name if product.category else 'Spare Parts' }}",
+      "item": "{{ url_for('products', category=product.category.slug, _external=True) if product.category else url_for('products', _external=True) }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "{{ product.name }}",
+      "item": "{{ request.url }}"
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 

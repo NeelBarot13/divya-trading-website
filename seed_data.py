@@ -30,6 +30,7 @@ def seed_database():
     machines_data = [
         {"name": "Stork (RD-3 & RD-4)", "desc": "Stork rotary screen printing machines spare parts & components"},
         {"name": "Stormac", "desc": "Stormac rotary printing machine precision replacement spares"},
+        {"name": "Laxmi", "desc": "High precision replacement spare parts and components for Laxmi rotary screen printing machines"},
         {"name": "Pegasus / RD-DD", "desc": "Pegasus and RD-DD series screen heads, repeats and drive parts"},
         {"name": "Ichinose", "desc": "Ichinose rotary printing machine precision components"},
         {"name": "Reggiani", "desc": "Reggiani textile rotary and flat printing spares"},
@@ -64,7 +65,7 @@ def seed_database():
         # Hero Banner Settings
         {"key": "hero_title", "val": "PRECISION PARTS.<br>PERFORMANCE ASSURED.", "desc": "Hero Main Heading"},
         {"key": "hero_subtitle", "val": "Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines", "desc": "Hero Subtitle"},
-        {"key": "hero_brands", "val": "STORMAC, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC", "desc": "Brand Compatibility Pills (comma separated)"},
+        {"key": "hero_brands", "val": "STORMAC, LAXMI, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC", "desc": "Brand Compatibility Pills (comma separated)"},
         {"key": "hero_image", "val": "/static/images/hero_parts.jpg", "desc": "Hero Showcase Image URL"},
         {"key": "trust_badge_1_title", "val": "SINCE 1997", "desc": "Trust Badge 1 Title"},
         {"key": "trust_badge_1_desc", "val": "Over Two Decades of Excellence", "desc": "Trust Badge 1 Description"},

@@ -3,19 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <title>{% block title %}{{ site_settings.company_name or 'Divya Trading Co.' }} | Precision Spare Parts for Textile Printing Machines{% endblock %}</title>
-  <meta name="description" content="Divya Trading Co. - Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines (Stork, Stormac, Ichinose, Reggiani, Harish, Zimmer, Stovec). Since 1997.">
+  <title>{% block title %}Rotary Printing Spare Parts | Stormac, Laxmi, Stork Spares Manufacturer & Exporter | Divya Trading Co.{% endblock %}</title>
   
+  <!-- Primary SEO Meta Tags -->
+  <meta name="description" content="{% block meta_description %}Divya Trading Co. is India's leading manufacturer & exporter of Rotary Printing Spare Parts for Stormac, Laxmi, Stork (RD-3/RD-4), Zimmer, Reggiani, and Ichinose printing machines. High precision screen head rings, repeat gears, pneumatic colour pumps, squeegee blades. In-house CNC manufacturing in Gujarat, India.{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}rotary printing spare parts, stormac rotary printing spare parts, laxmi rotary printing spare parts, stork rotary printing spare parts, rotary screen printing machine spare parts, stork rd4 screen head ring, repeat spur gears 64r 81.9r 91.4r, textile rotary printing machine spares manufacturer, rotary colour pumps, doctor squeegee blade coils, screen end rings, laxmi rotary parts surat, stormac spares ahmedabad, textile printing machinery spares exporter india{% endblock %}">
+  <meta name="author" content="Divya Trading Co.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="{{ request.base_url }}">
+
+  <!-- Geo & Regional Meta Tags for India & Global Export Targeting -->
+  <meta name="geo.region" content="IN-GJ">
+  <meta name="geo.placename" content="Ahmedabad, Surat, Gujarat, India">
+  <meta name="geo.position" content="23.0039;72.6139">
+  <meta name="ICBM" content="23.0039, 72.6139">
+
+  <!-- Open Graph / Facebook / LinkedIn / WhatsApp Sharing Meta Tags -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:site_name" content="Divya Trading Co. | Rotary Printing Spare Parts">
+  <meta property="og:title" content="{% block og_title %}Rotary Printing Spare Parts | Stormac, Laxmi, Stork Spares | Divya Trading Co.{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Manufacturer & Exporter of Precision Rotary Printing Spare Parts for Stormac, Laxmi, Stork, Zimmer, Reggiani machines. Screen heads, repeat gears, colour pumps.{% endblock %}">
+  <meta property="og:url" content="{{ request.base_url }}">
+  <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/hero_parts.jpg', _external=True) }}{% endblock %}">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}Rotary Printing Spare Parts | Divya Trading Co.{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Leading manufacturer of Stormac, Laxmi, and Stork rotary screen printing machine spare parts.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{{ url_for('static', filename='images/hero_parts.jpg', _external=True) }}{% endblock %}">
+
   <!-- Favicon: High-Resolution Transparent Circular DTC Emblem -->
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32.png') }}">
   <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', filename='images/favicon-64.png') }}">
   <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='images/favicon-192.png') }}">
   <link rel="apple-touch-icon" sizes="192x192" href="{{ url_for('static', filename='images/favicon-192.png') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  
+
   <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5.0">
-  
+
+  <!-- Structured Data (JSON-LD) for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "{{ url_for('home', _external=True) }}#organization",
+        "name": "Divya Trading Co.",
+        "alternateName": ["DTC", "Divya Trading Company", "Divya Trading Rotary Spares"],
+        "url": "{{ url_for('home', _external=True) }}",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "{{ url_for('static', filename='images/dtc_emblem.png', _external=True) }}",
+          "caption": "Divya Trading Co. Emblem Logo"
+        },
+        "image": "{{ url_for('static', filename='images/hero_parts.jpg', _external=True) }}",
+        "description": "Manufacturer and exporter of high precision rotary printing spare parts for Stormac, Laxmi, Stork (RD-3, RD-4, Pegasus), Zimmer, Reggiani, Harish, and Ichinose textile printing machines since 1997.",
+        "telephone": "+918320821579",
+        "email": "divya.trading06@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C.",
+          "addressLocality": "Ahmedabad",
+          "addressRegion": "Gujarat",
+          "postalCode": "380026",
+          "addressCountry": "IN"
+        },
+        "knowsAbout": [
+          "Rotary printing spare parts",
+          "Stormac rotary printing spare parts",
+          "Laxmi rotary printing spare parts",
+          "Stork rotary screen printing machine spares",
+          "Screen head rings and end rings",
+          "Repeat spur gears 64R 81.9R 91.4R",
+          "Pneumatic colour pumps",
+          "Doctor squeegee blades and holders",
+          "Textile printing machinery precision spares"
+        ],
+        "areaServed": [
+          {"@type": "Country", "name": "India"},
+          {"@type": "Country", "name": "Bangladesh"},
+          {"@type": "Country", "name": "Turkey"},
+          {"@type": "Country", "name": "Egypt"},
+          {"@type": "Country", "name": "Indonesia"},
+          {"@type": "Country", "name": "Vietnam"},
+          {"@type": "Country", "name": "Pakistan"}
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+918320821579",
+          "contactType": "sales",
+          "areaServed": "Worldwide",
+          "availableLanguage": ["English", "Hindi", "Gujarati"]
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "{{ url_for('home', _external=True) }}#website",
+        "url": "{{ url_for('home', _external=True) }}",
+        "name": "Divya Trading Co. | Rotary Printing Spare Parts",
+        "publisher": {
+          "@id": "{{ url_for('home', _external=True) }}#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "{{ url_for('products', _external=True) }}?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+  </script>
+
   {% block extra_head %}{% endblock %}
 </head>
 <body data-logged-in="{% if current_customer %}true{% else %}false{% endif %}">
@@ -470,6 +571,33 @@
             <span class="contact-icon">📍</span>
             <span>{{ site_settings.address or 'Ahmedabad, Gujarat, India' }}</span>
           </div>
+      </div>
+
+      <!-- SEO Machine Makes & Popular Spares Quick Index -->
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 22px 0 14px; margin-top: 24px;">
+        <div style="font-size: 0.78rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;">
+          Rotary Printing Machine Spares by Make & Category:
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; line-height: 1.6;">
+          <a href="{{ url_for('products', machine='stormac') }}" style="color: #CBD5E1; text-decoration: none;">Stormac Rotary Printing Spare Parts</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', machine='laxmi') }}" style="color: #CBD5E1; text-decoration: none;">Laxmi Rotary Printing Spare Parts</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', machine='stork-rd-3-rd-4') }}" style="color: #CBD5E1; text-decoration: none;">Stork RD-3 & RD-4 Spare Parts</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', machine='zimmer') }}" style="color: #CBD5E1; text-decoration: none;">Zimmer Rotary Machine Spares</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', machine='reggiani') }}" style="color: #CBD5E1; text-decoration: none;">Reggiani Printing Spares</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', machine='ichinose') }}" style="color: #CBD5E1; text-decoration: none;">Ichinose Screen Printing Spares</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', category='screen-heads-end-rings') }}" style="color: #CBD5E1; text-decoration: none;">Screen Head Rings 64R/81.9R</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', category='gears-transmission') }}" style="color: #CBD5E1; text-decoration: none;">Repeat Drive Spur Gears</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', category='colour-pumps-spares') }}" style="color: #CBD5E1; text-decoration: none;">Pneumatic Colour Pumps</a>
+          <span style="color: rgba(255,255,255,0.2);">•</span>
+          <a href="{{ url_for('products', category='squeegee-blades-holders') }}" style="color: #CBD5E1; text-decoration: none;">Doctor Squeegee Blade Coils</a>
         </div>
       </div>
 
