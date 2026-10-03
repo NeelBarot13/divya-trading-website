@@ -57,9 +57,7 @@ def seed_database():
         {"key": "company_tagline", "val": "all type rotary printing machine spares", "desc": "Company Tagline"},
         {"key": "site_logo", "val": "/static/images/dtc_emblem.png", "desc": "Site Logo URL"},
         {"key": "phone_primary", "val": "+918320821579", "desc": "Primary Phone Number"},
-        {"key": "phone_secondary", "val": "+919426002131", "desc": "Secondary Phone Number"},
         {"key": "email_primary", "val": "divya.trading06@gmail.com", "desc": "Primary Inquiries Email"},
-        {"key": "email_secondary", "val": "neelbarot585@gmail.com", "desc": "Admin Inquiries Alert Email"},
         {"key": "address", "val": "15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India", "desc": "Factory & Office Address"},
         {"key": "whatsapp_number", "val": "+918320821579", "desc": "WhatsApp Chat Number"},
         

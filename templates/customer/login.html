@@ -48,6 +48,7 @@
           <div class="form-group" style="margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
               <label class="form-label" style="font-weight: 600; color: var(--primary-navy); margin-bottom: 0;">Password *</label>
+              <a href="{{ url_for('customer_forgot_password') }}" style="font-size: 0.82rem; font-weight: 600; color: var(--dtc-blue); text-decoration: none;">Forgot Password?</a>
             </div>
             <input type="password" name="password" class="form-control" placeholder="••••••••" required style="padding: 12px 14px; font-size: 0.95rem;">
           </div>
@@ -59,9 +60,13 @@
         </form>
 
         <div style="text-align: center; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-          <p style="font-size: 0.88rem; color: var(--text-muted);">
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">
             Don't have an account yet?
             <a href="{{ url_for('customer_register', next=next_url) }}" style="font-weight: 700; color: var(--dtc-blue);">Create Account ➔</a>
+          </p>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">
+            Trouble logging in?
+            <a href="{{ url_for('customer_forgot_password') }}" style="font-weight: 600; color: var(--dtc-blue);">Reset Password</a>
           </p>
         </div>
       </div>

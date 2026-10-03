@@ -31,6 +31,7 @@ with app.app_context():
         ('/contact', 'contact.html'),
         ('/login', 'login.html'),
         ('/register', 'register.html'),
+        ('/forgot-password', 'forgot_password.html'),
     ]
 
     def transform_html(content):
@@ -43,6 +44,8 @@ with app.app_context():
         content = re.sub(r'href="/contact"', 'href="contact.html"', content)
         content = re.sub(r'href="/login"', 'href="login.html"', content)
         content = re.sub(r'href="/register"', 'href="register.html"', content)
+        content = re.sub(r'href="/forgot-password"', 'href="forgot_password.html"', content)
+        content = re.sub(r'href="/customer/forgot-password"', 'href="forgot_password.html"', content)
         content = re.sub(r'href="/"', 'href="index.html"', content)
         content = re.sub(r'href="/customer/dashboard"', 'href="login.html"', content)
         content = re.sub(r'href="/my-quotes"', 'href="login.html"', content)

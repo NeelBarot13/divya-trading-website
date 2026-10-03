@@ -223,7 +223,7 @@ def send_customer_acknowledgment(inquiry, config):
                     <h4 style="margin: 0 0 8px; color: #1e40af; font-size: 14px;">Need Immediate Assistance?</h4>
                     <p style="margin: 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
                         Reach our sales engineers directly on WhatsApp or Call:<br>
-                        📞 <strong>+91 83208 21579</strong> / <strong>+91 94260 64807</strong><br>
+                        📞 <strong>+91 83208 21579</strong><br>
                         ✉️ <a href="mailto:divya.trading06@gmail.com" style="color: #0052CC;">divya.trading06@gmail.com</a>
                     </p>
                 </div>
@@ -236,6 +236,54 @@ def send_customer_acknowledgment(inquiry, config):
     </html>
     """
     return send_email(subject, [inquiry.email], html, config)
+
+
+def send_password_reset_email(email, customer_name, reset_url, config):
+    """
+    Sends a secure password reset link to customer email.
+    """
+    subject = "🔑 Reset Your Password - Divya Trading Co. Customer Portal"
+    greeting_name = customer_name or 'Valued Customer'
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+        <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <div style="background: #0A2540; padding: 28px 24px; text-align: center; border-bottom: 4px solid #0052CC;">
+                <h2 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 0.5px;">DIVYA TRADING CO.</h2>
+                <p style="color: #93c5fd; margin: 6px 0 0; font-size: 13px;">Customer Portal Password Assistance</p>
+            </div>
+            <div style="padding: 32px 28px;">
+                <p style="font-size: 15px; color: #1e293b; margin-top: 0;">Hello <strong>{greeting_name}</strong>,</p>
+                <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+                    We received a request to reset the password for your customer account at Divya Trading Co. Click the button below to set a new password:
+                </p>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{reset_url}" style="display: inline-block; background: #0052CC; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; box-shadow: 0 3px 8px rgba(0,82,204,0.3);">
+                        Reset My Password ➔
+                    </a>
+                </div>
+
+                <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 20px;">
+                    This password reset link is valid for <strong>24 hours</strong>. If you did not request this, please disregard this email and your account password will remain unchanged.
+                </p>
+
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 16px; font-size: 12px; color: #64748b; word-break: break-all;">
+                    If the button doesn't work, copy and paste this link in your browser:<br>
+                    <a href="{reset_url}" style="color: #0052CC;">{reset_url}</a>
+                </div>
+            </div>
+            <div style="background: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b;">
+                Divya Trading Co. · 15, Nageshwar Estate, Ahmedabad, Gujarat, India<br>
+                Direct Support WhatsApp: +91 83208 21579
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(subject, [email], html, config)
 
 
 def send_database_backup_email(backup_json_str, filename, config, recipient_email='neelbarot585@gmail.com'):

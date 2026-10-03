@@ -88,10 +88,7 @@
                 <strong style="color: var(--primary-navy); display: block; font-size: 0.9rem; margin-bottom: 4px;">Phone
                   & WhatsApp:</strong>
                 <p style="font-size: 0.88rem; color: var(--text-main); font-weight: 600; margin: 0;">
-                  <a href="tel:{{ site_settings.phone_primary }}">{{ site_settings.phone_primary }}</a>
-                  {% if site_settings.phone_secondary %}
-                  <br><a href="tel:{{ site_settings.phone_secondary }}">{{ site_settings.phone_secondary }}</a>
-                  {% endif %}
+                  <a href="tel:{{ site_settings.phone_primary or '+91 83208 21579' }}">{{ site_settings.phone_primary or '+91 83208 21579' }}</a>
                 </p>
               </div>
             </div>
@@ -109,9 +106,7 @@
                 <strong style="color: var(--primary-navy); display: block; font-size: 0.9rem; margin-bottom: 4px;">Email
                   Inquiries:</strong>
                 <p style="font-size: 0.88rem; color: var(--text-main); margin: 0;">
-                  <a href="mailto:{{ site_settings.email_primary }}">{{ site_settings.email_primary }}</a><br>
-                  <a href="mailto:{{ site_settings.email_secondary or 'neelbarot585@gmail.com' }}">{{
-                    site_settings.email_secondary or 'neelbarot585@gmail.com' }}</a>
+                  <a href="mailto:{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}">{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}</a>
                 </p>
               </div>
             </div>

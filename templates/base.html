@@ -460,15 +460,11 @@
         <div class="footer-contact-items">
           <div class="footer-contact-item">
             <span class="contact-icon">📞</span>
-            <a href="tel:{{ site_settings.phone_primary }}">{{ site_settings.phone_primary }}</a>
-            {% if site_settings.phone_secondary %}
-            <span style="color:#64748b;">/</span>
-            <a href="tel:{{ site_settings.phone_secondary }}">{{ site_settings.phone_secondary }}</a>
-            {% endif %}
+            <a href="tel:{{ site_settings.phone_primary or '+91 83208 21579' }}">{{ site_settings.phone_primary or '+91 83208 21579' }}</a>
           </div>
           <div class="footer-contact-item">
             <span class="contact-icon">✉</span>
-            <a href="mailto:{{ site_settings.email_secondary or site_settings.email_primary }}">{{ site_settings.email_secondary or site_settings.email_primary }}</a>
+            <a href="mailto:{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}">{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}</a>
           </div>
           <div class="footer-contact-item">
             <span class="contact-icon">📍</span>

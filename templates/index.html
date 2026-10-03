@@ -117,57 +117,27 @@
 
 
 <!-- ==========================================================================
-     4. WHY CHOOSE DIVYA TRADING CO. (6 Pillars from Reference)
+     4. WHY CHOOSE DIVYA TRADING CO. (Dynamic Value Pillars)
      ========================================================================== -->
-{% if site_settings.show_why_choose != 'false' %}
+{% if site_settings.show_why_choose != 'false' and why_choose_pillars %}
 <section class="why-choose-section">
   <div class="container">
+    {% if site_settings.why_choose_title %}
     <div class="section-divider-title">
-      <h2>{{ site_settings.why_choose_title or 'WHY CHOOSE DIVYA TRADING CO.' }}</h2>
+      <h2>{{ site_settings.why_choose_title }}</h2>
     </div>
+    {% endif %}
 
     <div class="pillars-grid">
-      <!-- 1. Experience -->
+      {% for pillar in why_choose_pillars %}
+      {% if pillar.title or pillar.desc %}
       <div class="pillar-card">
-        <div class="pillar-icon-box">⭐</div>
-        <h3 class="pillar-title">{{ site_settings.pillar_1_title or '27+ YEARS OF EXPERIENCE' }}</h3>
-        <p class="pillar-desc">{{ site_settings.pillar_1_desc or 'Serving the textile industry since 1997 with excellence and reliability.' }}</p>
+        <div class="pillar-icon-box">{{ pillar.icon or '⭐' }}</div>
+        {% if pillar.title %}<h3 class="pillar-title">{{ pillar.title }}</h3>{% endif %}
+        {% if pillar.desc %}<p class="pillar-desc">{{ pillar.desc }}</p>{% endif %}
       </div>
-
-      <!-- 2. Premium Quality -->
-      <div class="pillar-card">
-        <div class="pillar-icon-box">🛡️</div>
-        <h3 class="pillar-title">{{ site_settings.pillar_2_title or 'PREMIUM QUALITY' }}</h3>
-        <p class="pillar-desc">{{ site_settings.pillar_2_desc or 'High precision CNC machined parts for reliable machine performance.' }}</p>
-      </div>
-
-      <!-- 3. Wide Range -->
-      <div class="pillar-card">
-        <div class="pillar-icon-box">🏭</div>
-        <h3 class="pillar-title">{{ site_settings.pillar_3_title or 'WIDE RANGE OF PRODUCTS' }}</h3>
-        <p class="pillar-desc">{{ site_settings.pillar_3_desc or 'Complete range of textile spare parts and consumables under one roof.' }}</p>
-      </div>
-
-      <!-- 4. Global Reach -->
-      <div class="pillar-card">
-        <div class="pillar-icon-box">🌐</div>
-        <h3 class="pillar-title">{{ site_settings.pillar_4_title or 'GLOBAL REACH' }}</h3>
-        <p class="pillar-desc">{{ site_settings.pillar_4_desc or 'Exporting to clients across 30+ countries with global trust.' }}</p>
-      </div>
-
-      <!-- 5. Expert Support -->
-      <div class="pillar-card">
-        <div class="pillar-icon-box">🎧</div>
-        <h3 class="pillar-title">{{ site_settings.pillar_5_title or 'EXPERT SUPPORT' }}</h3>
-        <p class="pillar-desc">{{ site_settings.pillar_5_desc or 'Dedicated engineering support for all your technical requirements.' }}</p>
-      </div>
-
-      <!-- 6. On Time Delivery -->
-      <div class="pillar-card">
-        <div class="pillar-icon-box">🚚</div>
-        <h3 class="pillar-title">{{ site_settings.pillar_6_title or 'ON TIME DELIVERY' }}</h3>
-        <p class="pillar-desc">{{ site_settings.pillar_6_desc or 'Timely worldwide delivery with safe and secure export packaging.' }}</p>
-      </div>
+      {% endif %}
+      {% endfor %}
     </div>
   </div>
 </section>

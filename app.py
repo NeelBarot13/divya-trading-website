@@ -11,8 +11,9 @@ from werkzeug.utils import secure_filename
 from config import Config
 from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, InquiryMessage, CustomerUser, AdminUser, SiteSetting
 from seed_data import seed_database, slugify
-from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS
+from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS, send_password_reset_email
 from export_service import export_inquiries_csv, export_products_csv
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
@@ -143,6 +144,32 @@ def enforce_session_timeout():
             session.pop('admin_login_time', None)
 
 
+def get_why_choose_pillars(settings):
+    """
+    Parses dynamic why-choose value pillars from JSON or initializes
+    clean defaults allowing any block to be edited, nulled, or removed.
+    """
+    pillars = []
+    pillars_json = settings.get('why_choose_pillars_json')
+    if pillars_json:
+        try:
+            pillars = json.loads(pillars_json)
+        except Exception:
+            pillars = []
+            
+    if not pillars and 'why_choose_pillars_json' not in settings:
+        default_pillars = [
+            {"title": settings.get("pillar_1_title", "27+ YEARS OF EXPERIENCE"), "desc": settings.get("pillar_1_desc", "Serving the textile industry since 1997 with excellence and reliability."), "icon": "⭐"},
+            {"title": settings.get("pillar_2_title", "PREMIUM QUALITY"), "desc": settings.get("pillar_2_desc", "High precision CNC machined parts for reliable machine performance."), "icon": "🛡️"},
+            {"title": settings.get("pillar_3_title", "WIDE RANGE OF PRODUCTS"), "desc": settings.get("pillar_3_desc", "Complete range of textile spare parts and consumables under one roof."), "icon": "🏭"},
+            {"title": settings.get("pillar_4_title", "GLOBAL REACH"), "desc": settings.get("pillar_4_desc", "Exporting to clients across 30+ countries with global trust."), "icon": "🌐"},
+            {"title": settings.get("pillar_5_title", "EXPERT SUPPORT"), "desc": settings.get("pillar_5_desc", "Dedicated engineering support for all your technical requirements."), "icon": "🎧"},
+            {"title": settings.get("pillar_6_title", "ON TIME DELIVERY"), "desc": settings.get("pillar_6_desc", "Timely worldwide delivery with safe and secure export packaging."), "icon": "🚚"}
+        ]
+        pillars = default_pillars
+    return pillars
+
+
 # Context Processor for Global Template Variables
 @app.context_processor
 def inject_global_data():
@@ -150,6 +177,7 @@ def inject_global_data():
     machines = MachineMake.query.order_by(MachineMake.name).all()
     settings_records = SiteSetting.query.all()
     settings = {s.key: s.value for s in settings_records}
+    why_choose_pillars = get_why_choose_pillars(settings)
     current_year = datetime.utcnow().year
     
     current_customer = None
@@ -175,6 +203,7 @@ def inject_global_data():
         'nav_categories': categories,
         'nav_machines': machines,
         'site_settings': settings,
+        'why_choose_pillars': why_choose_pillars,
         'current_year': current_year,
         'current_customer': current_customer
     }
@@ -458,6 +487,94 @@ def customer_logout():
     session.pop('customer_login_time', None)
     flash('You have been logged out of your customer portal.', 'info')
     return redirect(url_for('home'))
+
+
+# ==========================================
+# CUSTOMER PASSWORD RESET FLOW
+# ==========================================
+
+def get_reset_token_serializer():
+    return URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+
+def generate_customer_reset_token(email):
+    s = get_reset_token_serializer()
+    return s.dumps(email, salt='customer-password-reset-salt')
+
+
+def verify_customer_reset_token(token, expiration=86400):
+    s = get_reset_token_serializer()
+    try:
+        email = s.loads(token, salt='customer-password-reset-salt', max_age=expiration)
+        return email
+    except (SignatureExpired, BadTimeSignature, Exception):
+        return None
+
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+@app.route('/customer/forgot-password', methods=['GET', 'POST'])
+def customer_forgot_password():
+    if 'customer_id' in session:
+        return redirect(url_for('customer_dashboard'))
+        
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        if not email:
+            flash('Please enter your registered email address.', 'danger')
+            return render_template('customer/forgot_password.html')
+            
+        user = CustomerUser.query.filter_by(email=email).first()
+        if user:
+            token = generate_customer_reset_token(user.email)
+            reset_url = url_for('customer_reset_password', token=token, _external=True)
+            smtp_cfg = get_smtp_config()
+            success, msg = send_password_reset_email(user.email, user.name, reset_url, smtp_cfg)
+            if not smtp_cfg.get('MAIL_USERNAME') or not smtp_cfg.get('MAIL_PASSWORD'):
+                flash(f"Password reset link generated (Simulated Mode): <a href='{reset_url}' style='font-weight:700; text-decoration:underline;'>Click Here to Reset Password</a>", "info")
+            else:
+                flash('Password reset instructions have been sent to your email address.', 'success')
+            return redirect(url_for('customer_login'))
+        else:
+            flash('If an account exists for that email, password reset instructions have been sent.', 'success')
+            return redirect(url_for('customer_login'))
+            
+    return render_template('customer/forgot_password.html')
+
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+@app.route('/customer/reset-password/<token>', methods=['GET', 'POST'])
+def customer_reset_password(token):
+    if 'customer_id' in session:
+        return redirect(url_for('customer_dashboard'))
+        
+    email = verify_customer_reset_token(token)
+    if not email:
+        flash('The password reset link is invalid, malformed, or has expired. Please request a new one.', 'danger')
+        return redirect(url_for('customer_forgot_password'))
+        
+    user = CustomerUser.query.filter_by(email=email).first()
+    if not user:
+        flash('No customer account found associated with this reset link.', 'danger')
+        return redirect(url_for('customer_register'))
+        
+    if request.method == 'POST':
+        password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+        
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long.', 'danger')
+            return render_template('customer/reset_password.html', token=token, email=email)
+            
+        if password != confirm_password:
+            flash('Passwords do not match. Please verify and re-enter.', 'danger')
+            return render_template('customer/reset_password.html', token=token, email=email)
+            
+        user.set_password(password)
+        db.session.commit()
+        flash('Your password has been reset successfully! Please sign in with your new credentials.', 'success')
+        return redirect(url_for('customer_login'))
+        
+    return render_template('customer/reset_password.html', token=token, email=email)
 
 
 @app.route('/my-quotes')
@@ -1814,18 +1931,51 @@ def admin_settings():
                 else:
                     db.session.add(SiteSetting(key='hero_brands', value=plain_val))
 
-            # 2. Update standard text inputs
+            # 2. Process dynamic Why Choose / Value Pillar Blocks
+            if 'why_choose_builder_active' in request.form or 'pillar_title[]' in request.form:
+                pillar_titles = request.form.getlist('pillar_title[]')
+                pillar_descs = request.form.getlist('pillar_desc[]')
+                pillar_icons = request.form.getlist('pillar_icon[]')
+                
+                pillars_list = []
+                max_len = max(len(pillar_titles), len(pillar_descs), len(pillar_icons))
+                for i in range(max_len):
+                    t = pillar_titles[i].strip() if i < len(pillar_titles) else ""
+                    d = pillar_descs[i].strip() if i < len(pillar_descs) else ""
+                    ic = pillar_icons[i].strip() if i < len(pillar_icons) else "⭐"
+                    pillars_list.append({
+                        'title': t,
+                        'desc': d,
+                        'icon': ic or '⭐'
+                    })
+                setting_pillars = SiteSetting.query.filter_by(key='why_choose_pillars_json').first()
+                if setting_pillars:
+                    setting_pillars.value = json.dumps(pillars_list)
+                else:
+                    db.session.add(SiteSetting(key='why_choose_pillars_json', value=json.dumps(pillars_list)))
+
+            # 3. Update standard text inputs (allow empty string / null values)
+            excluded_keys = (
+                'action', 'hero_brand_name[]', 'hero_brand_url[]', 
+                'pillar_title[]', 'pillar_desc[]', 'pillar_icon[]', 'why_choose_builder_active',
+                'show_hero_brands', 'show_product_range', 'show_quality_banner', 
+                'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 
+                'show_whatsapp_button', 'show_mobile_sticky_bar',
+                'phone_secondary', 'email_secondary'
+            )
             for key, value in request.form.items():
-                if key not in ('action', 'hero_brand_name[]', 'hero_brand_url[]', 'show_hero_brands', 'show_product_range', 
-                               'show_quality_banner', 'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 
-                               'show_whatsapp_button', 'show_mobile_sticky_bar'):
+                if key not in excluded_keys and not key.endswith('[]'):
+                    val = value.strip()
                     setting = SiteSetting.query.filter_by(key=key).first()
                     if setting:
-                        setting.value = value
+                        setting.value = val
                     else:
-                        db.session.add(SiteSetting(key=key, value=value))
+                        db.session.add(SiteSetting(key=key, value=val))
+
+            # Ensure secondary phone and secondary email are permanently purged if submitted
+            SiteSetting.query.filter(SiteSetting.key.in_(['phone_secondary', 'email_secondary'])).delete(synchronize_session=False)
                         
-            # 3. Update Checkbox Toggles
+            # 4. Update Checkbox Toggles
             toggle_keys = [
                 'show_hero_brands', 'show_product_range', 'show_quality_banner',
                 'show_why_choose', 'show_featured_products', 'show_stats_ribbon', 
@@ -1839,7 +1989,7 @@ def admin_settings():
                 else:
                     db.session.add(SiteSetting(key=t_key, value=val))
                     
-            # 4. Handle File Uploads for Banners and Logo
+            # 5. Handle File Uploads for Banners and Logo
             upload_files = {
                 'site_logo_file': 'site_logo',
                 'hero_image_file': 'hero_image',
@@ -1883,6 +2033,12 @@ def admin_settings():
     settings_records = SiteSetting.query.all()
     settings = {s.key: s.value for s in settings_records}
     email_logs = list(reversed(EMAIL_ACTIVITY_LOGS[-30:]))
+    why_choose_pillars = get_why_choose_pillars(settings)
+
+    def get_val(key, default=''):
+        if key in settings and settings[key] is not None:
+            return settings[key]
+        return default
     
     # Parse hero badges for admin builder
     import json
@@ -1905,6 +2061,8 @@ def admin_settings():
     return render_template(
         'admin/settings.html',
         settings=settings,
+        get_val=get_val,
+        why_choose_pillars=why_choose_pillars,
         email_logs=email_logs,
         hero_badges_list=hero_badges_list
     )

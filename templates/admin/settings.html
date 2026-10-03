@@ -212,12 +212,12 @@
 
           <div class="form-group" style="margin-bottom: 18px;">
             <label class="form-label">Hero Main Title (HTML supported, e.g. &lt;br&gt; for line break)</label>
-            <input type="text" name="hero_title" class="form-control" value="{{ settings.hero_title or 'PRECISION PARTS.<br>PERFORMANCE ASSURED.' }}" required>
+            <input type="text" name="hero_title" class="form-control" value="{{ get_val('hero_title', 'PRECISION PARTS.<br>PERFORMANCE ASSURED.') }}">
           </div>
 
           <div class="form-group" style="margin-bottom: 18px;">
             <label class="form-label">Hero Subtitle / Description</label>
-            <textarea name="hero_subtitle" class="form-control" style="min-height: 70px;">{{ settings.hero_subtitle or 'Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines' }}</textarea>
+            <textarea name="hero_subtitle" class="form-control" style="min-height: 70px;">{{ get_val('hero_subtitle', 'Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines') }}</textarea>
           </div>
 
           <!-- Brand Badges with Custom URLs Builder -->
@@ -263,11 +263,11 @@
               <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Trust Badge 1 (Experience)</h4>
               <div class="form-group">
                 <label class="form-label">Badge 1 Heading</label>
-                <input type="text" name="trust_badge_1_title" class="form-control" value="{{ settings.trust_badge_1_title or 'SINCE 1997' }}">
+                <input type="text" name="trust_badge_1_title" class="form-control" value="{{ get_val('trust_badge_1_title', 'SINCE 1997') }}">
               </div>
               <div class="form-group">
                 <label class="form-label">Badge 1 Subtext</label>
-                <input type="text" name="trust_badge_1_desc" class="form-control" value="{{ settings.trust_badge_1_desc or 'Over Two Decades of Excellence' }}">
+                <input type="text" name="trust_badge_1_desc" class="form-control" value="{{ get_val('trust_badge_1_desc', 'Over Two Decades of Excellence') }}">
               </div>
             </div>
 
@@ -276,11 +276,11 @@
               <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Trust Badge 2 (Global Quality)</h4>
               <div class="form-group">
                 <label class="form-label">Badge 2 Heading</label>
-                <input type="text" name="trust_badge_2_title" class="form-control" value="{{ settings.trust_badge_2_title or 'GLOBAL QUALITY' }}">
+                <input type="text" name="trust_badge_2_title" class="form-control" value="{{ get_val('trust_badge_2_title', 'GLOBAL QUALITY') }}">
               </div>
               <div class="form-group">
                 <label class="form-label">Badge 2 Subtext</label>
-                <input type="text" name="trust_badge_2_desc" class="form-control" value="{{ settings.trust_badge_2_desc or 'Trusted by Clients Worldwide' }}">
+                <input type="text" name="trust_badge_2_desc" class="form-control" value="{{ get_val('trust_badge_2_desc', 'Trusted by Clients Worldwide') }}">
               </div>
             </div>
           </div>
@@ -379,18 +379,18 @@
 
             <div class="form-group">
               <label class="form-label">Featured Section Title</label>
-              <input type="text" name="featured_section_title" class="form-control" value="{{ settings.featured_section_title or 'Featured Spare Parts' }}">
+              <input type="text" name="featured_section_title" class="form-control" value="{{ get_val('featured_section_title', 'Featured Spare Parts') }}">
             </div>
 
             <div class="form-group">
               <label class="form-label">Featured Section Subtitle</label>
-              <input type="text" name="featured_section_subtitle" class="form-control" value="{{ settings.featured_section_subtitle or 'Precision Catalog' }}">
+              <input type="text" name="featured_section_subtitle" class="form-control" value="{{ get_val('featured_section_subtitle', 'Precision Catalog') }}">
             </div>
           </div>
 
           <div class="form-group" style="margin-bottom: 24px;">
             <label class="form-label">Product Range Section Title</label>
-            <input type="text" name="product_range_title" class="form-control" value="{{ settings.product_range_title or 'OUR PRODUCT RANGE' }}">
+            <input type="text" name="product_range_title" class="form-control" value="{{ get_val('product_range_title', 'OUR PRODUCT RANGE') }}">
           </div>
 
           <!-- Section Visibility Toggles -->
@@ -462,7 +462,7 @@
       <div id="tab-quality" class="cms-tab-content">
         <div class="admin-card" style="padding: 28px;">
           <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 20px;">
-            Quality Banner & 6 Value Pillars
+            Quality Banner & Why Choose Value Pillars
           </h3>
 
           <!-- Quality Banner -->
@@ -470,11 +470,11 @@
             <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 14px;">Quality Banner Content</h4>
             <div class="form-group" style="margin-bottom: 14px;">
               <label class="form-label">Banner Heading</label>
-              <input type="text" name="quality_banner_title" class="form-control" value="{{ settings.quality_banner_title or 'QUALITY YOU CAN TRUST' }}">
+              <input type="text" name="quality_banner_title" class="form-control" value="{{ get_val('quality_banner_title', 'QUALITY YOU CAN TRUST') }}">
             </div>
             <div class="form-group" style="margin-bottom: 14px;">
               <label class="form-label">Banner Description</label>
-              <textarea name="quality_banner_text" class="form-control">{{ settings.quality_banner_text or 'With over two decades of experience, we are a leader in quality products. Our reputation is based on performance, reliability and customer satisfaction across textile printing mills worldwide.' }}</textarea>
+              <textarea name="quality_banner_text" class="form-control">{{ get_val('quality_banner_text', 'With over two decades of experience, we are a leader in quality products. Our reputation is based on performance, reliability and customer satisfaction across textile printing mills worldwide.') }}</textarea>
             </div>
             <div class="form-group">
               <label class="form-label">Banner Image</label>
@@ -485,53 +485,55 @@
             </div>
           </div>
 
-          <!-- 6 Pillars -->
+          <!-- Why Choose Section Heading & Dynamic Blocks -->
           <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label">Why Choose Section Heading</label>
-            <input type="text" name="why_choose_title" class="form-control" value="{{ settings.why_choose_title or 'WHY CHOOSE DIVYA TRADING CO.' }}">
+            <input type="text" name="why_choose_title" class="form-control" value="{{ get_val('why_choose_title', 'WHY CHOOSE DIVYA TRADING CO.') }}" placeholder="Leave blank to hide heading">
+            <span style="font-size: 0.75rem; color: #64748b;">Heading displayed above the feature pillars. Can be edited, customized, or left empty (null).</span>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <!-- Pillar 1 -->
-            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
-              <strong style="color: #0052cc;">Pillar 1: Experience</strong>
-              <input type="text" name="pillar_1_title" class="form-control" value="{{ settings.pillar_1_title or '27+ YEARS OF EXPERIENCE' }}" style="margin: 8px 0 6px;">
-              <textarea name="pillar_1_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_1_desc or 'Serving the textile industry since 1997 with excellence and reliability.' }}</textarea>
+          <input type="hidden" name="why_choose_builder_active" value="1">
+
+          <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin: 0 0 4px;">
+                  Value Pillars & Why Choose Feature Blocks
+                </h4>
+                <p style="font-size: 0.78rem; color: #64748b; margin: 0;">
+                  Add, edit, remove, or leave text empty. All fields allow null/blank values. Click "✕ Remove" to delete any block, or "+ Add New Feature Block" to add more.
+                </p>
+              </div>
+              <button type="button" onclick="addPillarBlock()" class="btn-admin-primary" style="font-size: 0.82rem; padding: 8px 16px; background: #0052cc;">
+                + Add New Feature Block
+              </button>
             </div>
 
-            <!-- Pillar 2 -->
-            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
-              <strong style="color: #0052cc;">Pillar 2: Quality</strong>
-              <input type="text" name="pillar_2_title" class="form-control" value="{{ settings.pillar_2_title or 'PREMIUM QUALITY' }}" style="margin: 8px 0 6px;">
-              <textarea name="pillar_2_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_2_desc or 'High precision CNC machined parts for reliable machine performance.' }}</textarea>
-            </div>
-
-            <!-- Pillar 3 -->
-            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
-              <strong style="color: #0052cc;">Pillar 3: Wide Range</strong>
-              <input type="text" name="pillar_3_title" class="form-control" value="{{ settings.pillar_3_title or 'WIDE RANGE OF PRODUCTS' }}" style="margin: 8px 0 6px;">
-              <textarea name="pillar_3_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_3_desc or 'Complete range of textile spare parts and consumables under one roof.' }}</textarea>
-            </div>
-
-            <!-- Pillar 4 -->
-            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
-              <strong style="color: #0052cc;">Pillar 4: Global Reach</strong>
-              <input type="text" name="pillar_4_title" class="form-control" value="{{ settings.pillar_4_title or 'GLOBAL REACH' }}" style="margin: 8px 0 6px;">
-              <textarea name="pillar_4_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_4_desc or 'Exporting to clients across 30+ countries with global trust.' }}</textarea>
-            </div>
-
-            <!-- Pillar 5 -->
-            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
-              <strong style="color: #0052cc;">Pillar 5: Expert Support</strong>
-              <input type="text" name="pillar_5_title" class="form-control" value="{{ settings.pillar_5_title or 'EXPERT SUPPORT' }}" style="margin: 8px 0 6px;">
-              <textarea name="pillar_5_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_5_desc or 'Dedicated engineering support for all your technical requirements.' }}</textarea>
-            </div>
-
-            <!-- Pillar 6 -->
-            <div style="background: white; border: 1px solid var(--admin-border); border-radius: 6px; padding: 14px;">
-              <strong style="color: #0052cc;">Pillar 6: Delivery</strong>
-              <input type="text" name="pillar_6_title" class="form-control" value="{{ settings.pillar_6_title or 'ON TIME DELIVERY' }}" style="margin: 8px 0 6px;">
-              <textarea name="pillar_6_desc" class="form-control" style="font-size: 0.8rem; min-height: 50px;">{{ settings.pillar_6_desc or 'Timely worldwide delivery with safe and secure export packaging.' }}</textarea>
+            <div id="pillarsContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              {% for p in why_choose_pillars %}
+              <div class="pillar-builder-card" style="background: white; border: 1px solid var(--admin-border); border-radius: 8px; padding: 16px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="pillar-num-badge" style="background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;">Block #{{ loop.index }}</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <label style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin: 0;">Icon:</label>
+                      <input type="text" name="pillar_icon[]" class="form-control" value="{{ p.icon or '⭐' }}" style="width: 44px; text-align: center; font-size: 1rem; padding: 4px;" title="Emoji icon (e.g. ⭐, 🛡️, 🏭, 🌐, 🎧, 🚚)">
+                    </div>
+                  </div>
+                  <button type="button" onclick="removePillarBlock(this)" style="background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.75rem; font-weight: 700; transition: all 0.2s;" title="Remove this block">
+                    ✕ Remove
+                  </button>
+                </div>
+                <div class="form-group" style="margin-bottom: 8px;">
+                  <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Block Heading (Can be empty / null)</label>
+                  <input type="text" name="pillar_title[]" class="form-control" value="{{ p.title or '' }}" placeholder="e.g. 27+ YEARS OF EXPERIENCE" style="font-size: 0.88rem; font-weight: 700;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Block Description (Can be empty / null)</label>
+                  <textarea name="pillar_desc[]" class="form-control" placeholder="Detailed description or leave empty..." style="font-size: 0.82rem; min-height: 52px;">{{ p.desc or '' }}</textarea>
+                </div>
+              </div>
+              {% endfor %}
             </div>
           </div>
         </div>
@@ -550,11 +552,11 @@
             <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 14px;">CTA Ribbon Text</h4>
             <div class="form-group" style="margin-bottom: 14px;">
               <label class="form-label">CTA Heading</label>
-              <input type="text" name="cta_bar_title" class="form-control" value="{{ settings.cta_bar_title or 'LOOKING FOR THE RIGHT PART?' }}">
+              <input type="text" name="cta_bar_title" class="form-control" value="{{ get_val('cta_bar_title', 'LOOKING FOR THE RIGHT PART?') }}">
             </div>
             <div class="form-group">
               <label class="form-label">CTA Subtitle</label>
-              <input type="text" name="cta_bar_desc" class="form-control" value="{{ settings.cta_bar_desc or 'Send us your requirement and we will get back to you with the best solution.' }}">
+              <input type="text" name="cta_bar_desc" class="form-control" value="{{ get_val('cta_bar_desc', 'Send us your requirement and we will get back to you with the best solution.') }}">
             </div>
           </div>
 
@@ -562,19 +564,19 @@
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
             <div class="form-group">
               <label class="form-label">Stat 1 (Products)</label>
-              <input type="text" name="stats_products" class="form-control" value="{{ settings.stats_products or '1000+' }}">
+              <input type="text" name="stats_products" class="form-control" value="{{ get_val('stats_products', '1000+') }}">
             </div>
             <div class="form-group">
               <label class="form-label">Stat 2 (Satisfied Clients)</label>
-              <input type="text" name="stats_clients" class="form-control" value="{{ settings.stats_clients or '500+' }}">
+              <input type="text" name="stats_clients" class="form-control" value="{{ get_val('stats_clients', '500+') }}">
             </div>
             <div class="form-group">
               <label class="form-label">Stat 3 (Countries)</label>
-              <input type="text" name="stats_countries" class="form-control" value="{{ settings.stats_countries or '30+' }}">
+              <input type="text" name="stats_countries" class="form-control" value="{{ get_val('stats_countries', '30+') }}">
             </div>
             <div class="form-group">
               <label class="form-label">Stat 4 (Quality Assurance)</label>
-              <input type="text" name="stats_quality" class="form-control" value="{{ settings.stats_quality or '100%' }}">
+              <input type="text" name="stats_quality" class="form-control" value="{{ get_val('stats_quality', '100%') }}">
             </div>
           </div>
         </div>
@@ -592,11 +594,11 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
             <div class="form-group">
               <label class="form-label">Company Brand Name</label>
-              <input type="text" name="company_name" class="form-control" value="{{ settings.company_name or 'DIVYA TRADING CO.' }}">
+              <input type="text" name="company_name" class="form-control" value="{{ get_val('company_name', 'DIVYA TRADING CO.') }}">
             </div>
             <div class="form-group">
               <label class="form-label">Company Tagline</label>
-              <input type="text" name="company_tagline" class="form-control" value="{{ settings.company_tagline or 'all type rotary printing machine spares' }}">
+              <input type="text" name="company_tagline" class="form-control" value="{{ get_val('company_tagline', 'all type rotary printing machine spares') }}">
             </div>
           </div>
 
@@ -611,38 +613,27 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
             <div class="form-group">
               <label class="form-label">Primary Phone / WhatsApp</label>
-              <input type="text" name="phone_primary" class="form-control" value="{{ settings.phone_primary or '+91 83208 21579' }}">
+              <input type="text" name="phone_primary" class="form-control" value="{{ get_val('phone_primary', '+91 83208 21579') }}">
             </div>
-            <div class="form-group">
-              <label class="form-label">Secondary Phone</label>
-              <input type="text" name="phone_secondary" class="form-control" value="{{ settings.phone_secondary or '+91 94260 64807' }}">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
             <div class="form-group">
               <label class="form-label">Primary Email</label>
-              <input type="email" name="email_primary" class="form-control" value="{{ settings.email_primary or 'divya.trading06@gmail.com' }}">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Secondary Email</label>
-              <input type="email" name="email_secondary" class="form-control" value="{{ settings.email_secondary or 'neelbarot585@gmail.com' }}">
+              <input type="email" name="email_primary" class="form-control" value="{{ get_val('email_primary', 'divya.trading06@gmail.com') }}">
             </div>
           </div>
 
           <div class="form-group" style="margin-bottom: 18px;">
             <label class="form-label">Factory & Office Address</label>
-            <textarea name="address" class="form-control">{{ settings.address or '15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India' }}</textarea>
+            <textarea name="address" class="form-control">{{ get_val('address', '15, Nageshwar Estate, Opp. Jawaharnagar - Gulabnagar Road, Nr. Amraiwadi A.E.C., Ahmedabad, Gujarat, India') }}</textarea>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
               <label class="form-label">WhatsApp Number (with country code)</label>
-              <input type="text" name="whatsapp_number" class="form-control" value="{{ settings.whatsapp_number or '+918320821579' }}">
+              <input type="text" name="whatsapp_number" class="form-control" value="{{ get_val('whatsapp_number', '+918320821579') }}">
             </div>
             <div class="form-group">
               <label class="form-label">WhatsApp Default Pre-filled Message</label>
-              <input type="text" name="whatsapp_default_message" class="form-control" value="{{ settings.whatsapp_default_message or 'Hello Divya Trading Co., I would like to inquire about rotary printing machine spare parts.' }}">
+              <input type="text" name="whatsapp_default_message" class="form-control" value="{{ get_val('whatsapp_default_message', 'Hello Divya Trading Co., I would like to inquire about rotary printing machine spare parts.') }}">
             </div>
           </div>
         </div>
@@ -840,6 +831,54 @@
         return;
       }
       row.remove();
+    }
+
+    function addPillarBlock() {
+      const container = document.getElementById('pillarsContainer');
+      const count = container.querySelectorAll('.pillar-builder-card').length + 1;
+      const card = document.createElement('div');
+      card.className = 'pillar-builder-card';
+      card.style = 'background: white; border: 1px solid #0284c7; border-radius: 8px; padding: 16px; position: relative; box-shadow: 0 2px 6px rgba(2,132,199,0.15); animation: fadeIn 0.3s ease;';
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="pillar-num-badge" style="background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;">Block #${count}</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <label style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin: 0;">Icon:</label>
+              <input type="text" name="pillar_icon[]" class="form-control" value="⭐" style="width: 44px; text-align: center; font-size: 1rem; padding: 4px;">
+            </div>
+          </div>
+          <button type="button" onclick="removePillarBlock(this)" style="background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.75rem; font-weight: 700;">
+            ✕ Remove
+          </button>
+        </div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Block Heading (Can be empty / null)</label>
+          <input type="text" name="pillar_title[]" class="form-control" value="" placeholder="e.g. CUSTOM PRECISION PARTS" style="font-size: 0.88rem; font-weight: 700;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Block Description (Can be empty / null)</label>
+          <textarea name="pillar_desc[]" class="form-control" placeholder="Detailed description or leave empty..." style="font-size: 0.82rem; min-height: 52px;"></textarea>
+        </div>
+      `;
+      container.appendChild(card);
+      updatePillarBadges();
+    }
+
+    function removePillarBlock(btn) {
+      const card = btn.closest('.pillar-builder-card');
+      if (card) {
+        card.remove();
+        updatePillarBadges();
+      }
+    }
+
+    function updatePillarBadges() {
+      const cards = document.querySelectorAll('.pillar-builder-card');
+      cards.forEach((c, idx) => {
+        const badge = c.querySelector('.pillar-num-badge');
+        if (badge) badge.textContent = 'Block #' + (idx + 1);
+      });
     }
 
     async function triggerEmailBackupAjax() {
