@@ -29,8 +29,54 @@
     rotary printing spare parts, stormac rotary printing spare parts, laxmi rotary printing spare parts, stork rotary printing spare parts, repeat gears, screen head rings, colour pumps
   {% endif %}
 {% endblock %}
+{% block canonical %}https://divyatradingco.com/products{% endblock %}
+{% block og_url %}https://divyatradingco.com/products{% endblock %}
+
+{% block extra_head %}
+<!-- BreadcrumbList Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://divyatradingco.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products Catalog",
+      "item": "https://divyatradingco.com/products"
+    }
+  ]
+}
+</script>
+
+<!-- CollectionPage Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Rotary Printing Spare Parts Catalog",
+  "description": "Complete catalog of precision replacement spare parts for Stormac, Laxmi, Stork, Zimmer, and Reggiani rotary printing machines.",
+  "url": "https://divyatradingco.com/products"
+}
+</script>
+{% endblock %}
 
 {% block content %}
+
+<!-- Breadcrumbs Bar -->
+<div style="background: var(--bg-light); padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+  <div class="container">
+    <a href="{{ url_for('home') }}" style="color: var(--text-light); text-decoration: none;">Home</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <span style="color: var(--primary-navy); font-weight: 700;">Products Catalog</span>
+  </div>
+</div>
 
 <!-- Catalog Header Bar -->
 <section class="catalog-header-bar">
@@ -38,15 +84,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
       <div>
         <h1 class="catalog-page-title">
-          {% if selected_category %}
-            {{ selected_category.name }} - Rotary Printing Spare Parts
-          {% elif selected_machine %}
-            {{ selected_machine.name }} Rotary Printing Spare Parts
-          {% elif search_query %}
-            Search Results for "{{ search_query }}" - Rotary Printing Spares
-          {% else %}
-            Rotary Printing Spare Parts Catalog
-          {% endif %}
+          Rotary Printing Spare Parts Catalog
         </h1>
         <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 4px;">
           Explore our precision engineered textile machinery components. No prices shown — request an instant quote.

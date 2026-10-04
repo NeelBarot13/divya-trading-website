@@ -63,8 +63,8 @@ def seed_database():
         {"key": "whatsapp_number", "val": "+918320821579", "desc": "WhatsApp Chat Number"},
         
         # Hero Banner Settings
-        {"key": "hero_title", "val": "PRECISION PARTS.<br>PERFORMANCE ASSURED.", "desc": "Hero Main Heading"},
-        {"key": "hero_subtitle", "val": "Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines", "desc": "Hero Subtitle"},
+        {"key": "hero_title", "val": "Rotary Printing Spare Parts<br><span style=\"font-size:0.62em; color:#38BDF8; font-weight:700; display:block; margin-top:8px;\">Stormac, Laxmi, Stork Spares Manufacturer</span>", "desc": "Hero Main Heading"},
+        {"key": "hero_subtitle", "val": "Manufacturer & Exporter of High Precision Spare Parts for Stormac, Laxmi, Stork, Zimmer, and Reggiani Rotary Screen Printing Machinery Since 1997", "desc": "Hero Subtitle"},
         {"key": "hero_brands", "val": "STORMAC, LAXMI, STORK, ICHINOSE, REGGIANI, HARISH, ZIMMER, STOVEC", "desc": "Brand Compatibility Pills (comma separated)"},
         {"key": "hero_image", "val": "/static/images/hero_parts.jpg", "desc": "Hero Showcase Image URL"},
         {"key": "trust_badge_1_title", "val": "SINCE 1997", "desc": "Trust Badge 1 Title"},

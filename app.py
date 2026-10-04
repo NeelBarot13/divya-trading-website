@@ -199,13 +199,37 @@ def inject_global_data():
                 session.pop('customer_company', None)
                 session.pop('customer_login_time', None)
         
+    # Compute pristine production HTTPS canonical URL for SEO
+    base_domain = "https://divyatradingco.com"
+    req_path = request.path
+    if req_path == '/products':
+        m_slug = request.args.get('machine')
+        c_slug = request.args.get('category')
+        if m_slug:
+            canonical_url = f"{base_domain}/machines/{m_slug}"
+        elif c_slug:
+            canonical_url = f"{base_domain}/category/{c_slug}"
+        else:
+            canonical_url = f"{base_domain}/products"
+    elif req_path.startswith('/machines/'):
+        canonical_url = f"{base_domain}{req_path}"
+    elif req_path.startswith('/category/'):
+        canonical_url = f"{base_domain}{req_path}"
+    elif req_path.startswith('/product/'):
+        canonical_url = f"{base_domain}{req_path}"
+    elif req_path == '/':
+        canonical_url = f"{base_domain}/"
+    else:
+        canonical_url = f"{base_domain}{req_path}"
+
     return {
         'nav_categories': categories,
         'nav_machines': machines,
         'site_settings': settings,
         'why_choose_pillars': why_choose_pillars,
         'current_year': current_year,
-        'current_customer': current_customer
+        'current_customer': current_customer,
+        'canonical_url': canonical_url
     }
 
 
@@ -275,7 +299,7 @@ def home():
         for b in brand_names:
             matched_make = MachineMake.query.filter(MachineMake.name.ilike(f"%{b}%")).first()
             if matched_make:
-                brand_url = url_for('products', machine=matched_make.slug)
+                brand_url = url_for('machine_detail', slug=matched_make.slug)
             else:
                 brand_url = url_for('products', q=b)
             brand_pills.append({
@@ -298,6 +322,12 @@ def products():
     category_slug = request.args.get('category')
     machine_slug = request.args.get('machine')
     search_query = request.args.get('q', '').strip()
+    
+    # 301 Permanent Redirect to clean SEO dedicated landing pages
+    if machine_slug and not search_query and not category_slug:
+        return redirect(url_for('machine_detail', slug=machine_slug), code=301)
+    if category_slug and not search_query and not machine_slug:
+        return redirect(url_for('category_detail', slug=category_slug), code=301)
     
     query = Product.query.filter_by(is_active=True)
     
@@ -344,6 +374,44 @@ def products():
     )
 
 
+@app.route('/machines/<slug>')
+def machine_detail(slug):
+    """
+    Dedicated SEO Landing Page for Rotary Printing Spare Parts by Machine Make
+    (e.g., Stormac, Laxmi, Stork RD-3 & RD-4, Pegasus, Zimmer, Reggiani).
+    """
+    machine = MachineMake.query.filter_by(slug=slug).first_or_404()
+    products = Product.query.filter_by(machine_make_id=machine.id, is_active=True).order_by(Product.id.desc()).all()
+    all_machines = MachineMake.query.order_by(MachineMake.name).all()
+    categories = Category.query.order_by(Category.order_index).all()
+    return render_template(
+        'machine_detail.html',
+        machine=machine,
+        products=products,
+        machines=all_machines,
+        categories=categories
+    )
+
+
+@app.route('/category/<slug>')
+def category_detail(slug):
+    """
+    Dedicated SEO Landing Page for Rotary Printing Spare Parts Categories
+    (e.g., Screen Heads & End Rings, Gears & Transmission, Colour Pumps).
+    """
+    category = Category.query.filter_by(slug=slug).first_or_404()
+    products = Product.query.filter_by(category_id=category.id, is_active=True).order_by(Product.id.desc()).all()
+    all_machines = MachineMake.query.order_by(MachineMake.name).all()
+    categories = Category.query.order_by(Category.order_index).all()
+    return render_template(
+        'category_detail.html',
+        category=category,
+        products=products,
+        machines=all_machines,
+        categories=categories
+    )
+
+
 @app.route('/product/<slug>')
 def product_detail(slug):
     product = Product.query.filter_by(slug=slug, is_active=True).first_or_404()
@@ -384,51 +452,56 @@ def contact():
 def sitemap():
     """
     Dynamic XML Sitemap for search engines (Google, Bing, Yahoo).
-    Indexes all machine makes, categories, products, and core pages.
+    Indexes all machine makes, categories, products, and core pages with image sitemaps.
     """
-    base_url = request.url_root.rstrip('/')
-    if 'divyatradingco.com' in base_url and not base_url.startswith('https://'):
-        base_url = base_url.replace('http://', 'https://')
+    base_url = "https://divyatradingco.com"
         
     pages = [
         {'loc': f"{base_url}/", 'changefreq': 'daily', 'priority': '1.0'},
         {'loc': f"{base_url}/products", 'changefreq': 'daily', 'priority': '0.95'},
-        {'loc': f"{base_url}/machines", 'changefreq': 'weekly', 'priority': '0.9'},
+        {'loc': f"{base_url}/machines", 'changefreq': 'daily', 'priority': '0.95'},
         {'loc': f"{base_url}/download-catalog", 'changefreq': 'monthly', 'priority': '0.7'},
         {'loc': f"{base_url}/about", 'changefreq': 'monthly', 'priority': '0.7'},
         {'loc': f"{base_url}/contact", 'changefreq': 'monthly', 'priority': '0.7'},
     ]
     
-    # Machine makes (Stormac, Laxmi, Stork, etc.)
+    # Machine makes (Stormac, Laxmi, Stork, etc.) - Dedicated Clean URLs
     for m in MachineMake.query.all():
         pages.append({
-            'loc': f"{base_url}/products?machine={m.slug}",
+            'loc': f"{base_url}/machines/{m.slug}",
             'changefreq': 'weekly',
-            'priority': '0.85'
+            'priority': '0.90'
         })
         
-    # Categories
+    # Categories - Dedicated Clean URLs
     for c in Category.query.all():
         pages.append({
-            'loc': f"{base_url}/products?category={c.slug}",
+            'loc': f"{base_url}/category/{c.slug}",
             'changefreq': 'weekly',
-            'priority': '0.85'
+            'priority': '0.90'
         })
         
-    # Active Products
+    # Active Products with Image tags for Google Images
     for p in Product.query.filter_by(is_active=True).all():
         lastmod = p.updated_at.strftime('%Y-%m-%d') if p.updated_at else (p.created_at.strftime('%Y-%m-%d') if p.created_at else None)
         item = {
             'loc': f"{base_url}/product/{p.slug}",
             'changefreq': 'weekly',
-            'priority': '0.8'
+            'priority': '0.85'
         }
         if lastmod:
             item['lastmod'] = lastmod
+        if p.image_url:
+            img_url = p.image_url if p.image_url.startswith('http') else f"{base_url}{p.image_url}"
+            item['image'] = {
+                'loc': img_url,
+                'title': f"{p.name} - Rotary Printing Spare Parts",
+                'caption': f"{p.name} (Part #{p.part_number}) by Divya Trading Co."
+            }
         pages.append(item)
         
     xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml_lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    xml_lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">')
     for page in pages:
         xml_lines.append('  <url>')
         xml_lines.append(f"    <loc>{page['loc']}</loc>")
@@ -436,6 +509,12 @@ def sitemap():
             xml_lines.append(f"    <lastmod>{page['lastmod']}</lastmod>")
         xml_lines.append(f"    <changefreq>{page['changefreq']}</changefreq>")
         xml_lines.append(f"    <priority>{page['priority']}</priority>")
+        if 'image' in page:
+            xml_lines.append('    <image:image>')
+            xml_lines.append(f"      <image:loc>{page['image']['loc']}</image:loc>")
+            xml_lines.append(f"      <image:title>{page['image']['title']}</image:title>")
+            xml_lines.append(f"      <image:caption>{page['image']['caption']}</image:caption>")
+            xml_lines.append('    </image:image>')
         xml_lines.append('  </url>')
     xml_lines.append('</urlset>')
     
@@ -447,16 +526,16 @@ def robots():
     """
     Search Engine Crawling Directives.
     """
-    base_url = request.url_root.rstrip('/')
-    if 'divyatradingco.com' in base_url and not base_url.startswith('https://'):
-        base_url = base_url.replace('http://', 'https://')
+    base_url = "https://divyatradingco.com"
         
     content = f"""User-agent: *
 Allow: /
+Allow: /static/
 Disallow: /admin/
 Disallow: /customer/
 Disallow: /forgot-password
 Disallow: /reset-password/
+Disallow: /api/
 
 Sitemap: {base_url}/sitemap.xml
 """

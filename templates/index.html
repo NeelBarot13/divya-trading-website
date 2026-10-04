@@ -72,10 +72,15 @@
       <!-- Left Hero Text -->
       <div class="hero-content">
         <h1 class="hero-title">
-          {{ site_settings.hero_title|safe if site_settings.hero_title else 'PRECISION PARTS.<br>PERFORMANCE ASSURED.' }}
+          {% if site_settings.hero_title and 'Rotary Printing' in site_settings.hero_title %}
+            {{ site_settings.hero_title|safe }}
+          {% else %}
+            Rotary Printing Spare Parts<br>
+            <span style="font-size: 0.65em; display: block; margin-top: 8px; color: #60A5FA; font-weight: 700;">Stormac, Laxmi, Stork Spares Manufacturer</span>
+          {% endif %}
         </h1>
         <p class="hero-subtitle">
-          {{ site_settings.hero_subtitle or 'Manufacturer & Exporter of High Precision Spare Parts for Textile Printing & Processing Machines' }}
+          {{ site_settings.hero_subtitle or 'India\'s leading manufacturer & worldwide exporter of precision spare parts for Stormac, Laxmi, Stork (RD-3/RD-4), Zimmer, and Reggiani rotary screen printing machinery since 1997.' }}
         </p>
 
         <!-- Brand Compatibility Pills (Clickable & Configurable from Admin) -->
@@ -312,7 +317,7 @@
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
           Complete spare parts range for <strong>Stormac rotary printing machines</strong>: 64R & 81.9R screen head drive ring assemblies, repeat spur gears, magnetic rods, doctor squeegee blade coils, and heavy-duty colour pumps.
         </p>
-        <a href="{{ url_for('products', machine='stormac') }}" class="btn-action-sm" style="font-weight: 700; color: var(--dtc-blue); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <a href="{{ url_for('machine_detail', slug='stormac') }}" class="btn-action-sm" style="font-weight: 700; color: var(--dtc-blue); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
           Explore Stormac Spares ➔
         </a>
       </div>
@@ -331,7 +336,7 @@
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
           Precision engineered replacement components for <strong>Laxmi rotary printing machines</strong>: screen head assemblies, pneumatic dye feed pumps, squeegee holders, repeat drive gears, and bearing housings built for non-stop shift runs.
         </p>
-        <a href="{{ url_for('products', machine='laxmi') }}" class="btn-action-sm" style="font-weight: 700; color: #166534; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <a href="{{ url_for('machine_detail', slug='laxmi') }}" class="btn-action-sm" style="font-weight: 700; color: #166534; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
           Explore Laxmi Spares ➔
         </a>
       </div>
@@ -350,8 +355,65 @@
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
           High tolerance replacement spares for <strong>Stork rotary screen printing machines</strong>: precision 640mm (64R), 819mm (81.9R), and 914mm (91.4R) screen head rings, ground repeat gears, colour pump diaphragms, and seal rings.
         </p>
-        <a href="{{ url_for('products', machine='stork-rd-3-rd-4') }}" class="btn-action-sm" style="font-weight: 700; color: #92400E; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <a href="{{ url_for('machine_detail', slug='stork-rd-3-rd-4') }}" class="btn-action-sm" style="font-weight: 700; color: #92400E; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
           Explore Stork Spares ➔
+        </a>
+      </div>
+
+      <!-- Zimmer Rotary Spares -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #EDE9FE; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🧲</span>
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+              Zimmer Rotary Printing Spares
+            </h3>
+            <span style="font-size: 0.75rem; color: #6D28D9; font-weight: 600;">Magnet System & Squeegee Specialists</span>
+          </div>
+        </div>
+        <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
+          Replacement components for <strong>Zimmer rotary printing machines</strong>: magnetic squeegee roll rods, Swedish blue spring steel doctor blade coils (0.15mm / 0.20mm), screen head adaptors, and drive transmission parts.
+        </p>
+        <a href="{{ url_for('machine_detail', slug='zimmer') }}" class="btn-action-sm" style="font-weight: 700; color: #6D28D9; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          Explore Zimmer Spares ➔
+        </a>
+      </div>
+
+      <!-- Reggiani Spares -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #FFE4E6; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">📐</span>
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+              Reggiani Rotary Printing Spares
+            </h3>
+            <span style="font-size: 0.75rem; color: #BE123C; font-weight: 600;">High Precision Transmission Spares</span>
+          </div>
+        </div>
+        <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
+          Precision parts for <strong>Reggiani textile rotary machines</strong>: repeat gears, screen clamps, ink pump assemblies, and high-tolerance bearings engineered to prevent backlash and color misregistration.
+        </p>
+        <a href="{{ url_for('machine_detail', slug='reggiani') }}" class="btn-action-sm" style="font-weight: 700; color: #BE123C; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          Explore Reggiani Spares ➔
+        </a>
+      </div>
+
+      <!-- Ichinose Spares -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #CFFAFE; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">⚡</span>
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+              Ichinose Screen Printing Spares
+            </h3>
+            <span style="font-size: 0.75rem; color: #0E7490; font-weight: 600;">Japanese Standard Precision Fits</span>
+          </div>
+        </div>
+        <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
+          Custom CNC machined spares for <strong>Ichinose rotary printing machines</strong>: repeat gears, squeegee angle holders, wash-off rings, and color pump accessories manufactured to micron-level accuracy.
+        </p>
+        <a href="{{ url_for('machine_detail', slug='ichinose') }}" class="btn-action-sm" style="font-weight: 700; color: #0E7490; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          Explore Ichinose Spares ➔
         </a>
       </div>
     </div>

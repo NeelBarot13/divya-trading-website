@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ machine.name }} Rotary Printing Spare Parts Manufacturer & Exporter | Divya Trading Co.{% endblock %}
+
+{% block meta_description %}Buy precision {{ machine.name }} rotary printing spare parts from Divya Trading Co. Screen head rings (64R, 81.9R, 91.4R), repeat gears, colour pumps, squeegee blades. In-house CNC manufactured in Gujarat, India with worldwide dispatch.{% endblock %}
+
+{% block meta_keywords %}{{ machine.name.lower() }} rotary printing spare parts, {{ machine.name.lower() }} rotary printing spares manufacturer, {{ machine.name.lower() }} machine parts, rotary printing spare parts, screen head rings 64r 81.9r, repeat spur gears, textile machinery spares india{% endblock %}
+
+{% block canonical %}https://divyatradingco.com/machines/{{ machine.slug }}{% endblock %}
+{% block og_url %}https://divyatradingco.com/machines/{{ machine.slug }}{% endblock %}
+{% block og_title %}{{ machine.name }} Rotary Printing Spare Parts | Divya Trading Co.{% endblock %}
+{% block og_description %}High precision OEM replacement spares for {{ machine.name }} rotary screen printing machines. 100% in-house CNC manufacturing in Gujarat, India.{% endblock %}
+
+{% block extra_head %}
+<!-- BreadcrumbList Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://divyatradingco.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Machines",
+      "item": "https://divyatradingco.com/machines"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{{ machine.name }} Rotary Printing Spare Parts",
+      "item": "https://divyatradingco.com/machines/{{ machine.slug }}"
+    }
+  ]
+}
+</script>
+
+<!-- Machine Make CollectionPage & ItemList Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{{ machine.name }} Rotary Printing Spare Parts",
+  "description": "Precision OEM-compatible replacement spare parts manufactured for {{ machine.name }} rotary screen printing machinery by Divya Trading Co.",
+  "url": "https://divyatradingco.com/machines/{{ machine.slug }}",
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "{{ machine.name }} Spare Parts Catalog",
+    "itemListElement": [
+      {% for prod in products %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": "{{ prod.name }}",
+        "url": "https://divyatradingco.com/product/{{ prod.slug }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
+
+<!-- FAQPage Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are your spare parts 100% compatible with {{ machine.name }} rotary printing machines?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, Divya Trading Co. manufactures precision replacement spare parts engineered to meet or exceed original equipment specifications for {{ machine.name }} rotary screen printing machines. Our parts guarantee exact fitment and seamless pattern registration."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What repeat sizes are available for {{ machine.name }} screen head rings and repeat gears?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We manufacture screen head rings and repeat gears for {{ machine.name }} machines in all standard repeats: 640mm (64R), 819mm (81.9R), 914mm (91.4R), and 1018mm (101.8R), with custom repeat dimensions manufactured upon request."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How quickly can you dispatch {{ machine.name }} rotary printing spare parts internationally?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In-stock {{ machine.name }} spare parts are dispatched within 24 to 48 hours via express air cargo or sea freight to international textile hubs including Bangladesh, Turkey, Egypt, Indonesia, Pakistan, and Vietnam."
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumbs Bar -->
+<div style="background: var(--bg-light); padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+  <div class="container">
+    <a href="{{ url_for('home') }}" style="color: var(--text-light); text-decoration: none;">Home</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <a href="{{ url_for('machines') }}" style="color: var(--text-light); text-decoration: none;">Machines</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <span style="color: var(--primary-navy); font-weight: 700;">{{ machine.name }} Spares</span>
+  </div>
+</div>
+
+<!-- Machine Hero Section -->
+<section style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 60px 0; position: relative;">
+  <div class="container">
+    <div style="max-width: 850px;">
+      <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 14px;">
+        100% OEM COMPATIBLE PRECISION ENGINEERING
+      </span>
+      <h1 style="font-family: var(--font-heading); font-size: 2.6rem; font-weight: 900; line-height: 1.15; margin-bottom: 16px; color: white;">
+        {{ machine.name }} Rotary Printing Spare Parts
+      </h1>
+      <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
+        High precision replacement spare parts and components manufactured for <strong>{{ machine.name }}</strong> rotary screen printing machines. Engineered by <strong>Divya Trading Co.</strong> with in-house CNC machining and zero-vibration dynamic balancing for non-stop textile mill operations.
+      </p>
+
+      <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+        <a href="#machine-catalog" class="btn-enquire-primary" style="padding: 12px 22px;">
+          View {{ machine.name }} Catalog ({{ products|length }}) ➔
+        </a>
+        <a href="{{ url_for('contact') }}" class="btn-card-add-cart" style="padding: 12px 20px; background: rgba(255,255,255,0.08); color: white; border-color: rgba(255,255,255,0.2);">
+          Request Custom RFQ
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Machine Technical Authority & Specifications Block -->
+<section style="padding: 60px 0; background: var(--bg-white); border-bottom: 1px solid var(--border-color);">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: start;">
+      
+      <!-- Left Column: Technical Overview -->
+      <div style="grid-column: span 2;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">
+          ENGINEERING & SPECIFICATIONS
+        </span>
+        <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy); margin: 6px 0 16px;">
+          Precision Engineered Components for {{ machine.name }} Printing Machinery
+        </h2>
+        
+        <p style="font-size: 0.95rem; color: #475569; line-height: 1.7; margin-bottom: 14px;">
+          {{ machine.description or 'Divya Trading Co. manufactures complete replacement components designed to match OEM tolerances for continuous shift operations across leading textile printing and process houses in India and globally.' }}
+        </p>
+
+        {% if 'Stormac' in machine.name %}
+        <p style="font-size: 0.95rem; color: #475569; line-height: 1.7; margin-bottom: 14px;">
+          Our <strong>Stormac rotary printing spare parts</strong> cover the entire RD-IV and Pegasus machine series. We produce screen head drive ring assemblies, Module 2.5 and Module 3 repeat spur gears, magnetic squeegee rods, heavy-duty SS316 pneumatic colour feed pumps, and high-tensile doctor blade coils (0.15mm and 0.20mm Swedish blue spring steel).
+        </p>
+        {% elif 'Laxmi' in machine.name %}
+        <p style="font-size: 0.95rem; color: #475569; line-height: 1.7; margin-bottom: 14px;">
+          Our <strong>Laxmi rotary printing spare parts</strong> are heavy-duty, reinforced components built specifically for the demanding 24/7 printing environments of Surat, Ahmedabad, Panipat, and Bhilwara textile clusters. We manufacture precision screen drive units, dye feed pumps, squeegee beam assemblies, and hardened repeat spur gear sets engineered to eliminate pattern registration drift.
+        </p>
+        {% elif 'Stork' in machine.name %}
+        <p style="font-size: 0.95rem; color: #475569; line-height: 1.7; margin-bottom: 14px;">
+          Our <strong>Stork rotary printing spare parts</strong> are manufactured for Stork RD-3, RD-4, Pegasus, and RD-DD printing units. Every screen head ring (64R, 81.9R, 91.4R) is dynamically balanced to zero vibration, ensuring crisp print clarity and prolonged bearing life.
+        </p>
+        {% else %}
+        <p style="font-size: 0.95rem; color: #475569; line-height: 1.7; margin-bottom: 14px;">
+          Our precision parts for <strong>{{ machine.name }}</strong> rotary printing machines are machined in-house using CNC turning and milling centers to ensure exact mechanical interchangeability, zero play, and extended operating life.
+        </p>
+        {% endif %}
+
+        <!-- Technical Capabilities 4-Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px;">
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
+            <div style="font-size: 1.3rem; margin-bottom: 6px;">⚙️</div>
+            <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Repeat Circumferences</strong>
+            <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
+              640mm (64R), 819mm (81.9R), 914mm (91.4R), 1018mm (101.8R), and custom repeats.
+            </span>
+          </div>
+
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
+            <div style="font-size: 1.3rem; margin-bottom: 6px;">🛡️</div>
+            <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Material Metallurgy</strong>
+            <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
+              SS316 Stainless Steel, Phosphor Bronze, Swedish Spring Steel, High-Tensile Forged Alloys.
+            </span>
+          </div>
+
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
+            <div style="font-size: 1.3rem; margin-bottom: 6px;">🔬</div>
+            <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Precision Inspection</strong>
+            <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
+              100% Dimensional verification and dynamic balancing for zero pattern registration marks.
+            </span>
+          </div>
+
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
+            <div style="font-size: 1.3rem; margin-bottom: 6px;">📦</div>
+            <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Global Export Crating</strong>
+            <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
+              Reinforced wooden export packaging with anti-corrosion protective wrap. Air & sea dispatch.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Quick Contact & RFQ Card -->
+      <div>
+        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">
+            Need {{ machine.name }} Spare Parts?
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px;">
+            Our engineering team assists with part identification, CAD drawings, repeat gear ratios, and instant quotation pricing.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <a href="tel:{{ site_settings.phone_primary or '+918320821579' }}" style="display: flex; align-items: center; gap: 8px; color: var(--primary-navy); text-decoration: none; font-size: 0.88rem; font-weight: 700;">
+              <span>📞</span> <span>{{ site_settings.phone_primary or '+91 83208 21579' }}</span>
+            </a>
+            <a href="mailto:{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}" style="display: flex; align-items: center; gap: 8px; color: var(--dtc-blue); text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+              <span>✉️</span> <span>{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}</span>
+            </a>
+            <a href="https://wa.me/{{ (site_settings.whatsapp_number or '918320821579')|replace('+', '')|replace(' ', '') }}?text={{ ('Hello Divya Trading Co., I would like to inquire about ' + machine.name + ' rotary printing spare parts.')|urlencode }}" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #16a34a; text-decoration: none; font-size: 0.88rem; font-weight: 700;">
+              <span>💬</span> <span>WhatsApp Direct Chat</span>
+            </a>
+          </div>
+
+          <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="width: 100%; justify-content: center; font-size: 0.88rem;">
+            Submit Quotation Request ➔
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Machine Products Catalog Grid Section -->
+<section id="machine-catalog" style="padding: 70px 0; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">
+          IN-STOCK & MADE-TO-ORDER SPARES
+        </span>
+        <h2 style="font-family: var(--font-heading); font-size: 1.9rem; font-weight: 800; color: var(--primary-navy); margin-top: 4px;">
+          {{ machine.name }} Spare Parts Catalog
+        </h2>
+      </div>
+      <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">
+        Showing {{ products|length }} Precision Components
+      </span>
+    </div>
+
+    {% if products %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+      {% for prod in products %}
+      <div class="product-card">
+        {% if prod.is_featured %}
+        <span class="product-badge-featured">Featured</span>
+        {% endif %}
+
+        {% if prod.stock_status == 'out_of_stock' %}
+        <span class="product-badge-stock out_of_stock">Out of Stock</span>
+        {% elif prod.stock_status == 'made_to_order' %}
+        <span class="product-badge-stock made_to_order">Made to Order</span>
+        {% endif %}
+        
+        <a href="{{ url_for('product_detail', slug=prod.slug) }}" class="product-card-img-wrap">
+          <img src="{{ prod.image_url }}" alt="{{ prod.name }} - {{ machine.name }} Rotary Printing Spare Part" loading="lazy">
+        </a>
+        
+        <div class="product-card-body">
+          <div class="product-meta-row">
+            <span class="product-part-no">{{ prod.part_number }}</span>
+            <span class="product-make-badge">{{ machine.name }}</span>
+          </div>
+          
+          <h3 class="product-title">
+            <a href="{{ url_for('product_detail', slug=prod.slug) }}">{{ prod.name }}</a>
+          </h3>
+          
+          <p class="product-specs-summary">
+            {% if prod.repeat_sizes %}<strong>Repeat:</strong> {{ prod.repeat_sizes }}<br>{% endif %}
+            {{ prod.short_description or (prod.description[:90] + '...') }}
+          </p>
+
+          <div class="product-card-actions">
+            <button class="btn-card-inquire btn-quick-inquire" 
+                    data-product-id="{{ prod.id }}" 
+                    data-product-name="{{ prod.name }}" 
+                    data-part-number="{{ prod.part_number }}"
+                    data-repeat-sizes="{{ prod.repeat_sizes }}">
+              Inquire Now
+            </button>
+            <button class="btn-card-add-cart btn-add-quote-cart" 
+                    data-product-id="{{ prod.id }}" 
+                    data-product-name="{{ prod.name }}" 
+                    data-part-number="{{ prod.part_number }}"
+                    data-product-image="{{ prod.image_url }}">
+              + Quote List
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Custom Machine Requirement Box if no specific products yet -->
+    <div style="background: #F8FAFC; border: 2px dashed #CBD5E1; border-radius: var(--radius-lg); padding: 50px 30px; text-align: center; max-width: 750px; margin: 0 auto;">
+      <div style="font-size: 2.6rem; margin-bottom: 12px;">⚙️</div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
+        Complete {{ machine.name }} Spares Manufactured to Order
+      </h3>
+      <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 22px;">
+        We manufacture all replacement components for <strong>{{ machine.name }}</strong> rotary screen printing machines according to original part numbers, physical samples, or customer CAD drawings with zero-play tolerances.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('contact') }}" class="btn-enquire-primary">Send {{ machine.name }} Part Specs ➔</a>
+        <a href="{{ url_for('products') }}" class="btn-card-add-cart" style="padding: 10px 18px;">View Universal Catalog</a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- Other Supported Machine Makes Switcher (SEO Link Mesh) -->
+<section style="padding: 50px 0; background: var(--bg-light); border-top: 1px solid var(--border-color);">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="font-size: 0.78rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">
+        EXPLORE COMPATIBILITY
+      </span>
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--primary-navy); margin-top: 4px;">
+        Rotary Printing Spare Parts for Other Machine Makes
+      </h3>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+      {% for m in machines %}
+      {% if m.slug != machine.slug %}
+      <a href="{{ url_for('machine_detail', slug=m.slug) }}" 
+         style="background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; color: var(--primary-navy); text-decoration: none; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;"
+         title="{{ m.name }} Rotary Printing Spare Parts">
+        <span>⚙️</span>
+        <span>{{ m.name }}</span>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Machine-Specific FAQ Section (Rich Snippets) -->
+<section style="padding: 60px 0; background: var(--bg-white); border-top: 1px solid var(--border-color);">
+  <div class="container" style="max-width: 850px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">
+        FREQUENTLY ASKED QUESTIONS
+      </span>
+      <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy); margin-top: 4px;">
+        {{ machine.name }} Rotary Printing Spare Parts FAQ
+      </h2>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px 24px;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          Are your spare parts 100% compatible with {{ machine.name }} rotary printing machines?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          Yes, Divya Trading Co. manufactures precision replacement spare parts engineered to meet or exceed original equipment specifications for {{ machine.name }} rotary screen printing machines. Our parts guarantee exact fitment and seamless pattern registration.
+        </p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px 24px;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          What repeat sizes are available for {{ machine.name }} screen head rings and repeat gears?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          We manufacture screen head rings and repeat gears for {{ machine.name }} machines in all standard repeats: <strong>640mm (64R), 819mm (81.9R), 914mm (91.4R), and 1018mm (101.8R)</strong>, with custom repeat dimensions manufactured upon request.
+        </p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px 24px;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+          How quickly can you dispatch {{ machine.name }} rotary printing spare parts internationally?
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          In-stock {{ machine.name }} spare parts are dispatched within 24 to 48 hours via express air cargo or sea freight to international textile hubs including Bangladesh, Turkey, Egypt, Indonesia, Pakistan, and Vietnam.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

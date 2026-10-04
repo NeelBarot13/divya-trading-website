@@ -1,22 +1,85 @@
 {% extends 'base.html' %}
 
-{% block title %}Rotary Printing Spare Parts for Stormac, Laxmi, Stork & Global Machines | Divya Trading Co.{% endblock %}
+{% block title %}Rotary Printing Spare Parts by Machine Make — Stormac, Laxmi, Stork Spares | Divya Trading Co.{% endblock %}
 
-{% block meta_description %}Manufacturer of Rotary Printing Spare Parts compatible with Stormac, Laxmi, Stork (RD-3/RD-4/Pegasus), Zimmer, Reggiani, Harish, and Ichinose machines. High precision screen head rings, repeat gears, and colour pumps.{% endblock %}
+{% block meta_description %}Manufacturer & Exporter of precision Rotary Printing Spare Parts compatible with Stormac, Laxmi, Stork (RD-3/RD-4), Zimmer, Reggiani, and Ichinose machines. Screen head rings 64R/81.9R, repeat gears, colour pumps. In-house CNC manufacturing in Gujarat, India.{% endblock %}
 
-{% block meta_keywords %}stormac rotary printing spare parts, laxmi rotary printing spare parts, stork rotary printing spare parts, rotary printing spare parts, zimmer printing spares, reggiani spares, textile rotary machine parts{% endblock %}
+{% block meta_keywords %}rotary printing spare parts, stormac rotary printing spare parts, laxmi rotary printing spare parts, stork rotary printing spare parts, zimmer printing spares, reggiani spares, ichinose spares, textile rotary machine parts manufacturer{% endblock %}
+
+{% block canonical %}https://divyatradingco.com/machines{% endblock %}
+{% block og_url %}https://divyatradingco.com/machines{% endblock %}
+{% block og_title %}Rotary Printing Spare Parts by Machine Make | Divya Trading Co.{% endblock %}
+{% block og_description %}100% OEM-compatible spare parts for Stormac, Laxmi, Stork, Zimmer, Reggiani, and Ichinose rotary screen printing machinery.{% endblock %}
+
+{% block extra_head %}
+<!-- BreadcrumbList Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://divyatradingco.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Supported Machine Makes",
+      "item": "https://divyatradingco.com/machines"
+    }
+  ]
+}
+</script>
+
+<!-- CollectionPage Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Rotary Printing Spare Parts by Machine Make",
+  "description": "Directory of precision replacement spare parts manufactured for leading textile rotary screen printing machine makes: Stormac, Laxmi, Stork, Zimmer, Reggiani, and Ichinose.",
+  "url": "https://divyatradingco.com/machines",
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Textile Printing Machine Makes",
+    "itemListElement": [
+      {% for m in machines %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": "{{ m.name }} Rotary Printing Spare Parts",
+        "url": "https://divyatradingco.com/machines/{{ m.slug }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
+{% endblock %}
 
 {% block content %}
 
+<!-- Breadcrumbs Bar -->
+<div style="background: var(--bg-light); padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+  <div class="container">
+    <a href="{{ url_for('home') }}" style="color: var(--text-light); text-decoration: none;">Home</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <span style="color: var(--primary-navy); font-weight: 700;">Supported Machines</span>
+  </div>
+</div>
+
 <!-- Header Banner -->
-<section style="background: var(--primary-navy); color: white; padding: 50px 0; text-align: center;">
+<section style="background: var(--primary-navy); color: white; padding: 55px 0; text-align: center;">
   <div class="container">
     <span style="font-size: 0.82rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">MACHINE COMPATIBILITY & PRECISION ENGINEERING</span>
-    <h1 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; margin-top: 6px;">
+    <h1 style="font-family: var(--font-heading); font-size: 2.3rem; font-weight: 800; margin-top: 6px;">
       Rotary Printing Spare Parts by Machine Make
     </h1>
-    <p style="font-size: 1rem; color: #CBD5E1; max-width: 720px; margin: 10px auto 0; line-height: 1.5;">
-      Precision engineered replacement spares for <strong>Stormac, Laxmi, Stork, Zimmer, Reggiani, Ichinose</strong>, and all leading textile rotary printing & processing machines.
+    <p style="font-size: 1.05rem; color: #CBD5E1; max-width: 780px; margin: 12px auto 0; line-height: 1.6;">
+      Divya Trading Co. manufactures 100% OEM-matched replacement spare parts for <strong>Stormac, Laxmi, Stork (RD-3/RD-4), Zimmer, Reggiani, Ichinose</strong>, and all leading global rotary screen printing & processing machines.
     </p>
   </div>
 </section>
@@ -28,34 +91,34 @@
       {% for m in machines %}
       <div style="background: var(--bg-white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; display: flex; flex-direction: column; transition: var(--transition); box-shadow: var(--shadow-sm);">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-navy);">
-            {{ m.name }}
-          </h3>
+          <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+            <a href="{{ url_for('machine_detail', slug=m.slug) }}" style="color: inherit; text-decoration: none;">{{ m.name }}</a>
+          </h2>
           <span style="background: var(--dtc-blue-light); color: var(--dtc-blue); font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">
             {{ m.products|length }} Spares
           </span>
         </div>
         
-        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; flex-grow: 1;">
-          {{ m.description }}
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 20px; flex-grow: 1;">
+          {{ m.description or ('Precision replacement spare parts manufactured for ' + m.name + ' rotary screen printing machines. Guaranteed zero-vibration dynamic balancing.') }}
         </p>
 
-        <a href="{{ url_for('products', machine=m.slug) }}" class="btn-view-products" style="padding: 10px 14px; font-size: 0.82rem;">
-          View {{ m.name }} Spares ➔
+        <a href="{{ url_for('machine_detail', slug=m.slug) }}" class="btn-view-products" style="padding: 10px 14px; font-size: 0.85rem; font-weight: 700;">
+          Explore {{ m.name }} Spares ➔
         </a>
       </div>
       {% endfor %}
     </div>
 
     <!-- Custom Machine Requirement Box -->
-    <div style="margin-top: 50px; background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius-lg); padding: 32px; text-align: center;">
-      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
-        Have a Different Machine Make or Custom Drawing?
+    <div style="margin-top: 50px; background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: var(--radius-lg); padding: 36px 30px; text-align: center;">
+      <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
+        Have a Different Machine Make or Custom Engineering Drawing?
       </h3>
-      <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 20px;">
-        We manufacture custom repeat gear sets, screen head rings, squeegee assemblies, and precision shafts as per physical sample or CAD drawing.
+      <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 650px; margin: 0 auto 20px; line-height: 1.6;">
+        We manufacture custom repeat gear sets, screen head rings, squeegee assemblies, and precision shafts as per physical sample or CAD drawing with full quality certification and worldwide export packaging.
       </p>
-      <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="display: inline-flex;">Send Machine Specifications</a>
+      <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="display: inline-flex; padding: 12px 24px;">Send Machine Specifications ➔</a>
     </div>
   </div>
 </section>

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} | Rotary Printing Spare Parts Manufacturer | Divya Trading Co.{% endblock %}
+
+{% block meta_description %}Buy precision {{ category.name }} for rotary screen printing machinery (Stormac, Laxmi, Stork, Zimmer). High precision CNC manufactured by Divya Trading Co. in Gujarat, India. Request quote.{% endblock %}
+
+{% block meta_keywords %}{{ category.name.lower() }}, rotary printing spare parts, textile machinery spares, stormac rotary spares, laxmi rotary spares, stork spares, repeat gears, colour pumps, screen head rings{% endblock %}
+
+{% block canonical %}https://divyatradingco.com/category/{{ category.slug }}{% endblock %}
+{% block og_url %}https://divyatradingco.com/category/{{ category.slug }}{% endblock %}
+{% block og_title %}{{ category.name }} - Rotary Printing Spare Parts | Divya Trading Co.{% endblock %}
+{% block og_description %}Precision {{ category.name }} for rotary screen printing machines. 100% in-house manufactured with global export quality.{% endblock %}
+
+{% block extra_head %}
+<!-- BreadcrumbList Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://divyatradingco.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products",
+      "item": "https://divyatradingco.com/products"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{{ category.name }}",
+      "item": "https://divyatradingco.com/category/{{ category.slug }}"
+    }
+  ]
+}
+</script>
+
+<!-- CollectionPage & ItemList Schema JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{{ category.name }} - Rotary Printing Spare Parts",
+  "description": "High precision {{ category.name }} for Stormac, Laxmi, and Stork rotary screen printing machinery.",
+  "url": "https://divyatradingco.com/category/{{ category.slug }}",
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "{{ category.name }} Catalog",
+    "itemListElement": [
+      {% for prod in products %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": "{{ prod.name }}",
+        "url": "https://divyatradingco.com/product/{{ prod.slug }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumbs Bar -->
+<div style="background: var(--bg-light); padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+  <div class="container">
+    <a href="{{ url_for('home') }}" style="color: var(--text-light); text-decoration: none;">Home</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <a href="{{ url_for('products') }}" style="color: var(--text-light); text-decoration: none;">Products</a>
+    <span style="color: #cbd5e1; margin: 0 8px;">/</span>
+    <span style="color: var(--primary-navy); font-weight: 700;">{{ category.name }}</span>
+  </div>
+</div>
+
+<!-- Category Hero Section -->
+<section style="background: var(--primary-navy); color: white; padding: 50px 0;">
+  <div class="container">
+    <div style="max-width: 800px;">
+      <span style="font-size: 0.8rem; font-weight: 700; color: #93C5FD; text-transform: uppercase; letter-spacing: 1px;">
+        ROTARY PRINTING SPARE PARTS CATEGORY
+      </span>
+      <h1 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; margin-top: 6px; color: white;">
+        {{ category.name }}
+      </h1>
+      <p style="font-size: 1rem; color: #CBD5E1; line-height: 1.6; margin-top: 10px;">
+        {{ category.description or 'High precision rotary screen printing machine components engineered for Stormac, Laxmi, Stork, Zimmer, and Reggiani printing machines. In-house CNC manufacturing by Divya Trading Co.' }}
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Category Products Grid -->
+<section style="padding: 60px 0 80px; background: var(--bg-white);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+      <h2 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
+        Available {{ category.name }} ({{ products|length }})
+      </h2>
+      <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.85rem; padding: 8px 16px;">
+        View Complete Catalog ➔
+      </a>
+    </div>
+
+    {% if products %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+      {% for prod in products %}
+      <div class="product-card">
+        {% if prod.is_featured %}
+        <span class="product-badge-featured">Featured</span>
+        {% endif %}
+
+        {% if prod.stock_status == 'out_of_stock' %}
+        <span class="product-badge-stock out_of_stock">Out of Stock</span>
+        {% elif prod.stock_status == 'made_to_order' %}
+        <span class="product-badge-stock made_to_order">Made to Order</span>
+        {% endif %}
+        
+        <a href="{{ url_for('product_detail', slug=prod.slug) }}" class="product-card-img-wrap">
+          <img src="{{ prod.image_url }}" alt="{{ prod.name }} - Rotary Printing Spare Parts" loading="lazy">
+        </a>
+        
+        <div class="product-card-body">
+          <div class="product-meta-row">
+            <span class="product-part-no">{{ prod.part_number }}</span>
+            <span class="product-make-badge">{{ prod.machine_make.name if prod.machine_make else 'Universal' }}</span>
+          </div>
+          
+          <h3 class="product-title">
+            <a href="{{ url_for('product_detail', slug=prod.slug) }}">{{ prod.name }}</a>
+          </h3>
+          
+          <p class="product-specs-summary">
+            {% if prod.repeat_sizes %}<strong>Repeat:</strong> {{ prod.repeat_sizes }}<br>{% endif %}
+            {{ prod.short_description or (prod.description[:90] + '...') }}
+          </p>
+
+          <div class="product-card-actions">
+            <button class="btn-card-inquire btn-quick-inquire" 
+                    data-product-id="{{ prod.id }}" 
+                    data-product-name="{{ prod.name }}" 
+                    data-part-number="{{ prod.part_number }}"
+                    data-repeat-sizes="{{ prod.repeat_sizes }}">
+              Inquire Now
+            </button>
+            <button class="btn-card-add-cart btn-add-quote-cart" 
+                    data-product-id="{{ prod.id }}" 
+                    data-product-name="{{ prod.name }}" 
+                    data-part-number="{{ prod.part_number }}"
+                    data-product-image="{{ prod.image_url }}">
+              + Quote List
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 40px; text-align: center;">
+      <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
+        Custom Inquiries for {{ category.name }}
+      </h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+        We manufacture custom items for this category as per client sample or CAD drawing.
+      </p>
+      <a href="{{ url_for('contact') }}" class="btn-enquire-primary">Submit Custom Inquiry ➔</a>
+    </div>
+    {% endif %}
+
+    <!-- Cross Category Switcher -->
+    <div style="margin-top: 50px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 14px;">
+        Other Spare Part Categories:
+      </h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        {% for cat in categories %}
+        {% if cat.slug != category.slug %}
+        <a href="{{ url_for('category_detail', slug=cat.slug) }}" 
+           style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 6px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600; color: var(--primary-navy); text-decoration: none;">
+          {{ cat.name }}
+        </a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
