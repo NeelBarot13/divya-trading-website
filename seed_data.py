@@ -114,7 +114,16 @@ def seed_database():
         {"key": "show_featured_products", "val": "true", "desc": "Show Featured Products on Home"},
         {"key": "show_stats_ribbon", "val": "true", "desc": "Show Stats & CTA Ribbon"},
         {"key": "show_whatsapp_button", "val": "true", "desc": "Show Floating WhatsApp Button"},
-        {"key": "show_mobile_sticky_bar", "val": "true", "desc": "Show Mobile Sticky Bottom Bar"}
+        {"key": "show_mobile_sticky_bar", "val": "true", "desc": "Show Mobile Sticky Bottom Bar"},
+
+        # Download Catalog CMS Settings
+        {"key": "catalog_file_url", "val": "/static/docs/Divya_Trading_Co_Catalog.pdf", "desc": "Active Catalog File URL/Path"},
+        {"key": "catalog_download_name", "val": "Divya_Trading_Co_Catalog.pdf", "desc": "Downloaded Catalog Filename"},
+        {"key": "catalog_badge", "val": "Full PDF Catalog (8 Pages)", "desc": "Catalog Badge Text"},
+        {"key": "catalog_title", "val": "Rotary Printing Machine Spares Technical Brochure", "desc": "Catalog Main Title"},
+        {"key": "catalog_description", "val": "Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.", "desc": "Catalog Description"},
+        {"key": "catalog_file_size", "val": "8.2 MB", "desc": "Catalog File Size Note"},
+        {"key": "catalog_preview_image", "val": "/static/images/hero_parts.jpg", "desc": "Catalog Preview Image URL"}
     ]
     
     for s in settings_data:

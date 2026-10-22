@@ -5,7 +5,7 @@ import random
 import string
 from functools import wraps
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, Response, send_file
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, Response, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 
 from config import Config
@@ -440,6 +440,40 @@ def machines():
 @app.route('/download-catalog')
 def download_catalog():
     return render_template('download_catalog.html')
+
+
+@app.route('/download-catalog/pdf')
+@app.route('/catalog.pdf')
+def download_catalog_pdf():
+    """
+    Dynamically delivers the active catalog file configured via the Admin CMS.
+    Supports uploaded files, custom static paths, and external download URLs.
+    """
+    setting_url = SiteSetting.query.filter_by(key='catalog_file_url').first()
+    setting_name = SiteSetting.query.filter_by(key='catalog_download_name').first()
+    
+    download_filename = setting_name.value.strip() if (setting_name and setting_name.value and setting_name.value.strip()) else 'Divya_Trading_Co_Catalog.pdf'
+    file_rel_path = setting_url.value.strip() if (setting_url and setting_url.value and setting_url.value.strip()) else '/static/docs/Divya_Trading_Co_Catalog.pdf'
+    
+    # If external URL (e.g. Google Drive, Dropbox), redirect directly
+    if file_rel_path.startswith(('http://', 'https://')):
+        return redirect(file_rel_path)
+        
+    # If local static path (e.g. /static/uploads/... or /static/docs/...)
+    if file_rel_path.startswith('/static/'):
+        clean_rel = file_rel_path[len('/static/'):]
+        local_path = os.path.join(app.root_path, 'static', clean_rel.replace('/', os.sep))
+        if os.path.exists(local_path):
+            dir_name = os.path.dirname(local_path)
+            base_name = os.path.basename(local_path)
+            return send_from_directory(dir_name, base_name, as_attachment=True, download_name=download_filename)
+            
+    # Fallback to default static/docs/Divya_Trading_Co_Catalog.pdf
+    default_dir = os.path.join(app.root_path, 'static', 'docs')
+    if os.path.exists(os.path.join(default_dir, 'Divya_Trading_Co_Catalog.pdf')):
+        return send_from_directory(default_dir, 'Divya_Trading_Co_Catalog.pdf', as_attachment=True, download_name=download_filename)
+        
+    return redirect(url_for('download_catalog'))
 
 
 @app.route('/contact')
@@ -2222,9 +2256,48 @@ def admin_settings():
                             setting.value = img_val
                         else:
                             db.session.add(SiteSetting(key=setting_key, value=img_val))
+
+            # 6. Handle Catalog File & Cover Image Upload
+            if 'catalog_file' in request.files:
+                cat_file = request.files['catalog_file']
+                if cat_file and cat_file.filename and allowed_file(cat_file.filename):
+                    cat_orig_name = cat_file.filename
+                    safe_cat_name = secure_filename(f"catalog_{int(time.time())}_{cat_orig_name}")
+                    cat_save_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_cat_name)
+                    cat_file.save(cat_save_path)
+                    cat_url = f"/static/uploads/{safe_cat_name}"
+                    
+                    setting_cat_url = SiteSetting.query.filter_by(key='catalog_file_url').first()
+                    if setting_cat_url:
+                        setting_cat_url.value = cat_url
+                    else:
+                        db.session.add(SiteSetting(key='catalog_file_url', value=cat_url))
+                        
+                    # Auto set download filename if not explicitly customized
+                    custom_name = request.form.get('catalog_download_name', '').strip()
+                    if not custom_name or custom_name == 'Divya_Trading_Co_Catalog.pdf':
+                        setting_cat_name = SiteSetting.query.filter_by(key='catalog_download_name').first()
+                        if setting_cat_name:
+                            setting_cat_name.value = cat_orig_name
+                        else:
+                            db.session.add(SiteSetting(key='catalog_download_name', value=cat_orig_name))
+
+            if 'catalog_cover_image_file' in request.files:
+                cov_file = request.files['catalog_cover_image_file']
+                if cov_file and cov_file.filename and allowed_file(cov_file.filename):
+                    safe_cov_name = secure_filename(f"catalog_cover_{int(time.time())}_{cov_file.filename}")
+                    cov_save_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_cov_name)
+                    cov_file.save(cov_save_path)
+                    cov_url = f"/static/uploads/{safe_cov_name}"
+                    
+                    setting_cov = SiteSetting.query.filter_by(key='catalog_preview_image').first()
+                    if setting_cov:
+                        setting_cov.value = cov_url
+                    else:
+                        db.session.add(SiteSetting(key='catalog_preview_image', value=cov_url))
                             
             db.session.commit()
-            flash('Website CMS, homepage hero badges, and appearance settings saved successfully!', 'success')
+            flash('Website CMS, catalog settings, and appearance settings saved successfully!', 'success')
             
         elif action == 'test_email':
             test_target = request.form.get('test_email_recipient', 'divya.trading06@gmail.com').strip()

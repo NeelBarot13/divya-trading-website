@@ -177,6 +177,9 @@
       <button type="button" class="cms-tab-btn active" onclick="switchCmsTab('tab-hero', this)">
         <span>🖼️</span> Hero Banner & Badges
       </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-catalog', this)">
+        <span>📥</span> Download Catalog
+      </button>
       <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-mobile', this)">
         <span>📱</span> Mobile View & Actions
       </button>
@@ -293,6 +296,132 @@
               <div style="flex: 1;">
                 <input type="file" name="hero_image_file" class="form-control" accept="image/*">
                 <span style="font-size: 0.75rem; color: #64748b;">Upload a new image or leave empty to keep current.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB: DOWNLOAD CATALOG CMS MANAGER
+           =================================================================== -->
+      <div id="tab-catalog" class="cms-tab-content">
+        <div class="admin-card" style="padding: 28px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 6px;">
+                Download Catalog File & Page Manager
+              </h3>
+              <p style="color: var(--admin-muted); font-size: 0.9rem; margin: 0;">
+                Change which file is downloaded when visitors click "Download Catalog" anywhere across the website.
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="{{ get_val('catalog_file_url', url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf')) }}" target="_blank" class="btn-admin-export" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-weight: 700;">
+                <span>Test Current File ↗</span>
+              </a>
+              <a href="{{ url_for('download_catalog') }}" target="_blank" class="btn-admin-export" style="background: #f8fafc; color: #334155; border-color: #cbd5e1;">
+                <span>View Public Page ↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Current Active File Status Banner -->
+          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 18px 22px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="width: 48px; height: 48px; border-radius: 8px; background: #16a34a; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 900; box-shadow: 0 4px 10px rgba(22,163,74,0.25);">
+                📄
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.8px;">Current Active Catalog File</span>
+                <div style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 800; color: #14532d; word-break: break-all;">
+                  {{ get_val('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf') }}
+                </div>
+                <div style="font-size: 0.82rem; color: #166534; margin-top: 2px;">
+                  Serving Path: <code style="background: #dcfce7; padding: 2px 6px; border-radius: 4px;">{{ get_val('catalog_file_url', '/static/docs/Divya_Trading_Co_Catalog.pdf') }}</code>
+                </div>
+              </div>
+            </div>
+            <a href="{{ get_val('catalog_file_url', url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf')) }}" download="{{ get_val('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf') }}" class="btn-admin-primary" style="padding: 8px 18px; font-size: 0.85rem; background: #16a34a; border-color: #16a34a;">
+              <span>⬇ Download Active File</span>
+            </a>
+          </div>
+
+          <!-- Section 1: Upload New Catalog File -->
+          <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 10px; padding: 22px; margin-bottom: 24px;">
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 8px;">
+              1. Upload New Catalog File (PDF / Document)
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--admin-muted); margin-bottom: 14px;">
+              Select a new PDF, brochure, or document from your computer. Once uploaded and saved, all website download buttons will immediately serve this new file to visitors.
+            </p>
+            <div class="form-group" style="margin-bottom: 6px;">
+              <input type="file" name="catalog_file" class="form-control" accept=".pdf,.doc,.docx,.zip,.jpg,.png" style="padding: 10px; background: white;">
+              <small style="display: block; color: #64748b; margin-top: 6px; font-size: 0.78rem;">
+                Supported file types: <strong>.pdf</strong>, <strong>.doc</strong>, <strong>.docx</strong>, <strong>.zip</strong>, <strong>.png</strong>, <strong>.jpg</strong> (Max upload size: 32MB).
+              </small>
+            </div>
+          </div>
+
+          <!-- Section 2: Catalog File URL or Path Override -->
+          <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 10px; padding: 22px; margin-bottom: 24px;">
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 8px;">
+              2. Catalog File URL or Path
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--admin-muted); margin-bottom: 14px;">
+              You can specify an internal static path or an external cloud URL (e.g. Google Drive / Dropbox direct link).
+            </p>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Active File Path or External URL</label>
+              <input type="text" name="catalog_file_url" class="form-control" value="{{ get_val('catalog_file_url', '/static/docs/Divya_Trading_Co_Catalog.pdf') }}" placeholder="/static/docs/Divya_Trading_Co_Catalog.pdf or https://drive.google.com/...">
+              <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.78rem;">
+                Default internal brochure: <code>/static/docs/Divya_Trading_Co_Catalog.pdf</code>
+              </small>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Downloaded File Name (Name suggested to customer's device)</label>
+              <input type="text" name="catalog_download_name" class="form-control" value="{{ get_val('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf') }}" placeholder="Divya_Trading_Co_Catalog.pdf">
+              <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.78rem;">
+                This exact filename is suggested to the customer when their browser downloads the file (e.g., <code>Divya_Trading_Co_Catalog.pdf</code>).
+              </small>
+            </div>
+          </div>
+
+          <!-- Section 3: Download Page Content Customization -->
+          <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 10px; padding: 22px; margin-bottom: 0;">
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 14px;">
+              3. Download Page Content & Visuals
+            </h4>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Brochure Main Title</label>
+                <input type="text" name="catalog_title" class="form-control" value="{{ get_val('catalog_title', 'Rotary Printing Machine Spares Technical Brochure') }}">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Catalog Badge Text</label>
+                <input type="text" name="catalog_badge" class="form-control" value="{{ get_val('catalog_badge', 'Full PDF Catalog (8 Pages)') }}">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Brochure Description Summary</label>
+              <textarea name="catalog_description" class="form-control" style="min-height: 80px;">{{ get_val('catalog_description', 'Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.') }}</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">File Size Note (Shown on Download button)</label>
+                <input type="text" name="catalog_file_size" class="form-control" value="{{ get_val('catalog_file_size', '8.2 MB') }}" placeholder="8.2 MB">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Cover Showcase Image</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <img src="{{ get_val('catalog_preview_image', url_for('static', filename='images/hero_parts.jpg')) }}" alt="Cover" style="width: 55px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1;">
+                  <input type="file" name="catalog_cover_image_file" class="form-control" accept="image/*" style="font-size: 0.8rem; padding: 6px;">
+                </div>
+                <input type="hidden" name="catalog_preview_image" value="{{ get_val('catalog_preview_image', '/static/images/hero_parts.jpg') }}">
               </div>
             </div>
           </div>

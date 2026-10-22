@@ -56,17 +56,17 @@
     <div class="download-hero-grid">
       <div>
         <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-lg);">
-          <img src="{{ url_for('static', filename='images/hero_parts.jpg') }}" alt="DTC Catalog Preview" style="border-radius: var(--radius-md); width: 100%; height: auto;">
+          <img src="{{ site_settings.catalog_preview_image or url_for('static', filename='images/hero_parts.jpg') }}" alt="DTC Catalog Preview" style="border-radius: var(--radius-md); width: 100%; height: auto;">
         </div>
       </div>
 
       <div>
-        <span class="product-part-no" style="font-size: 0.85rem; padding: 4px 10px;">Full PDF Catalog (8 Pages)</span>
+        <span class="product-part-no" style="font-size: 0.85rem; padding: 4px 10px;">{{ site_settings.catalog_badge or 'Full PDF Catalog (8 Pages)' }}</span>
         <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy); margin: 10px 0 16px;">
-          Rotary Printing Machine Spares Technical Brochure
+          {{ site_settings.catalog_title or 'Rotary Printing Machine Spares Technical Brochure' }}
         </h2>
         <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
-          Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.
+          {{ site_settings.catalog_description or 'Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.' }}
         </p>
 
         <div style="background: var(--bg-light); border-left: 4px solid var(--dtc-blue); padding: 14px 18px; border-radius: 4px; margin-bottom: 24px;">
@@ -74,12 +74,15 @@
           <span style="font-size: 0.82rem; color: var(--text-muted);">Get a high-resolution PDF sent directly to your email or WhatsApp number.</span>
         </div>
 
-        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-          <a href="{{ url_for('static', filename='images/hero_parts.jpg') }}" download="Divya_Trading_Co_Catalog.jpg" class="btn-enquire-primary" style="padding: 12px 24px;">
-            <span>Download Catalog PDF / Image</span>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+          <a href="{{ site_settings.catalog_file_url or url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf') }}" download="{{ site_settings.catalog_download_name or 'Divya_Trading_Co_Catalog.pdf' }}" class="btn-enquire-primary" style="padding: 12px 24px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+            <span>Download Catalog {% if site_settings.catalog_file_size %}({{ site_settings.catalog_file_size }}){% else %}PDF{% endif %}</span>
             <span>⬇</span>
           </a>
-          <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20please%20send%20me%20your%20complete%20PDF%20catalog." target="_blank" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #25D366; color: white; border-color: #25D366;">
+          <a href="{{ site_settings.catalog_file_url or url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf') }}" target="_blank" rel="noopener noreferrer" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #F8FAFC; color: var(--primary-navy); border-color: #CBD5E1; display: inline-flex; align-items: center; gap: 8px;">
+            <span>Preview in Browser ↗</span>
+          </a>
+          <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20please%20send%20me%20your%20complete%20PDF%20catalog." target="_blank" rel="noopener noreferrer" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #25D366; color: white; border-color: #25D366; display: inline-flex; align-items: center; gap: 8px;">
             <span>Request on WhatsApp 💬</span>
           </a>
         </div>
