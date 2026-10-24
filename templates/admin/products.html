@@ -95,6 +95,12 @@
         </span>
         <span>Manage Products</span>
       </a>
+      <a href="{{ url_for('admin_compose_email') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </span>
+        <span>Compose & Send Email</span>
+      </a>
       <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -112,6 +118,12 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
         </span>
         <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_catalog') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </span>
+        <span>Manage Catalog PDF</span>
       </a>
       <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item">
         <span class="nav-icon">
@@ -368,6 +380,18 @@
             </div>
           </div>
 
+          <!-- Accompanying Images / Zip (Optional) -->
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label" style="font-weight: 700; margin-bottom: 6px; color: #0F172A; display: flex; justify-content: space-between; align-items: center;">
+              <span>Attach Product Images or ZIP Archive <span style="font-weight: 400; color: #64748B;">(Optional)</span></span>
+              <span style="font-size: 0.74rem; background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Multiple Files or .ZIP</span>
+            </label>
+            <input type="file" name="product_images" multiple accept="image/*,.zip" class="form-control" style="padding: 8px 12px; font-size: 0.84rem;">
+            <div style="font-size: 0.77rem; color: #64748B; margin-top: 5px; line-height: 1.4;">
+              💡 <strong>Flexible Images:</strong> Select multiple image files or upload a <code>.zip</code> file here. You can also directly place image files into <code>static/images/products/</code> or write their filenames, computer file paths, or image URLs into your spreadsheet!
+            </div>
+          </div>
+
           <!-- Update Existing Option -->
           <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
             <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.86rem; color: #1E293B; cursor: pointer;">
@@ -375,7 +399,7 @@
               <div>
                 <strong>Update existing products if Part Number already exists</strong>
                 <div style="font-size: 0.78rem; color: #64748B; margin-top: 2px;">
-                  If checked, matching products will have their names, categories, descriptions, and stock statuses refreshed. If unchecked, duplicates are skipped.
+                  If checked, matching products will have their names, categories, descriptions, images, and stock statuses refreshed. If unchecked, duplicates are skipped.
                 </div>
               </div>
             </label>
@@ -385,6 +409,7 @@
           <div style="font-size: 0.8rem; color: #475569; margin-bottom: 22px; line-height: 1.5; padding-left: 6px;">
             <div style="font-weight: 700; color: #0F172A; margin-bottom: 4px;">⚡ Smart Import Highlights:</div>
             <ul style="margin: 0; padding-left: 18px;">
+              <li><strong>Image Path Flexibility:</strong> Write simple filenames (e.g. <code>pinsensor.jpg</code>), folder paths (e.g. <code>/static/images/products/pinsensor.jpg</code>), local PC paths (e.g. <code>D:\Photos\part.jpg</code>), or web URLs. All formats work seamlessly!</li>
               <li><strong>Automatic Categories:</strong> New categories typed in the sheet are automatically created.</li>
               <li><strong>Machine Makes:</strong> Supports Stork, Stormac, Pegasus, Zimmer, etc. or Universal.</li>
               <li><strong>Stock Status:</strong> Accepts <code>in_stock</code>, <code>out_of_stock</code>, or <code>made_to_order</code>.</li>
@@ -481,18 +506,22 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Product Image Preset or Upload</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center;">
+            <label class="form-label">Product Image (Preset, File Upload, or Custom Path)</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center; margin-bottom: 8px;">
               <select name="image_preset" class="form-control">
-                <option value="/static/images/cat_screen_heads.jpg">Screen Heads Standard</option>
-                <option value="/static/images/cat_gears.jpg">Gears & Drive Box</option>
-                <option value="/static/images/cat_pumps.jpg">Colour Pumps</option>
-                <option value="/static/images/cat_rollers.jpg">Rollers & Shafts</option>
-                <option value="/static/images/cat_squeegee.jpg">Squeegee Blade Coils</option>
-                <option value="/static/images/cat_components.jpg">Machine Components</option>
-                <option value="/static/images/hero_parts.jpg">Assorted Spares</option>
+                <option value="/static/images/cat_screen_heads.jpg">Preset: Screen Heads</option>
+                <option value="/static/images/cat_gears.jpg">Preset: Gears & Drive Box</option>
+                <option value="/static/images/cat_pumps.jpg">Preset: Colour Pumps</option>
+                <option value="/static/images/cat_rollers.jpg">Preset: Rollers & Shafts</option>
+                <option value="/static/images/cat_squeegee.jpg">Preset: Squeegee Blade Coils</option>
+                <option value="/static/images/cat_components.jpg">Preset: Machine Components</option>
+                <option value="/static/images/hero_parts.jpg">Preset: Assorted Spares</option>
               </select>
               <input type="file" name="image_file" class="form-control" accept="image/*">
+            </div>
+            <div>
+              <input type="text" name="custom_image_url" class="form-control" placeholder="OR paste image path / filename (e.g. pinsensor.jpg, /static/images/products/...)" style="font-size: 0.83rem;">
+              <div style="font-size: 0.74rem; color: #64748B; margin-top: 3px;">Accepts filenames in static/images/products/, full paths, or web URLs.</div>
             </div>
           </div>
 
@@ -591,9 +620,13 @@
 
           <div class="form-group">
             <label class="form-label">Update Image</label>
-            <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
               <img id="editImagePreview" src="" alt="Preview" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1;">
               <input type="file" name="image_file" class="form-control" accept="image/*" style="flex: 1;">
+            </div>
+            <div>
+              <input type="text" id="editCustomImageUrl" name="custom_image_url" class="form-control" placeholder="OR enter custom image path / filename (e.g. pinsensor.jpg, /static/images/...)" style="font-size: 0.83rem;">
+              <div style="font-size: 0.74rem; color: #64748B; margin-top: 3px;">Accepts filenames in static/images/products/, full paths, or web URLs.</div>
             </div>
           </div>
 
@@ -678,6 +711,8 @@
         document.getElementById('editIsFeatured').checked = Boolean(p.is_featured);
         document.getElementById('editIsActive').checked = Boolean(p.is_active);
         document.getElementById('editImagePreview').src = p.image_url || '/static/images/hero_parts.jpg';
+        const editCustomImg = document.getElementById('editCustomImageUrl');
+        if (editCustomImg) editCustomImg.value = p.image_url || '';
         
         document.getElementById('editProductModal').classList.add('active');
       });

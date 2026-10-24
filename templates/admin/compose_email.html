@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compose & Send Customer Email | Divya Trading Co. Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .composer-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 1024px) {
+      .composer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .template-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .template-pill-btn:hover {
+      background: #E2E8F0;
+      border-color: #94A3B8;
+      color: #0F172A;
+    }
+    .email-preview-box {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+    .email-preview-header {
+      background: #0A2540;
+      padding: 20px 24px;
+      text-align: center;
+      border-bottom: 4px solid #0052CC;
+      color: white;
+    }
+    .email-preview-body {
+      padding: 24px;
+      color: #334155;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .email-preview-footer {
+      background: #F8FAFC;
+      border-top: 1px solid #E2E8F0;
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #64748B;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+      <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
+      <div class="sidebar-title">
+        <h2>DIVYA TRADING</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </span>
+        <span>Inquiries & Quotes</span>
+      </a>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        </span>
+        <span>Manage Products</span>
+      </a>
+      <a href="{{ url_for('admin_compose_email') }}" class="sidebar-nav-item active">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </span>
+        <span>Compose & Send Email</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </span>
+        <span>Customer Accounts</span>
+      </a>
+      <a href="{{ url_for('admin_users') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </span>
+        <span>Team Roles & Passwords</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+        </span>
+        <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_catalog') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </span>
+        <span>Manage Catalog PDF</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </span>
+        <span>Website CMS & Settings</span>
+      </a>
+      <a href="{{ url_for('home') }}" target="_blank" class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        </span>
+        <span>View Live Website ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Logged in: <strong>{{ session.admin_username }}</strong></span>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Mobile Top Header Bar -->
+  <div class="admin-mobile-header">
+    <div class="admin-mobile-brand">
+      <img src="{{ url_for('static', filename='images/dtc_emblem.png') }}" alt="DTC" style="height: 34px; width: 34px; border-radius: 50%; background: white; padding: 2px;">
+      <span style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 800; color: white;">DIVYA TRADING</span>
+    </div>
+    <button type="button" class="admin-sidebar-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Navigation Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+  <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div class="admin-page-title">
+        <h1>Compose & Send Customer Email</h1>
+        <p>Draft quotations, spare parts availability, technical updates, and send branded emails directly to any client address.</p>
+      </div>
+
+      <div class="admin-top-actions">
+        <a href="{{ url_for('admin_settings') }}#tab-email" class="btn-admin-export" style="background: #F8FAFC; border-color: #CBD5E1; color: #334155;">
+          <span>⚙️ SMTP Server Settings</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message|safe }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- SMTP Connection Status Banner -->
+    <div style="background: {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}#ECFDF5; border-color: #A7F3D0; color: #065F46;{% else %}#FFFBEB; border-color: #FDE68A; color: #92400E;{% endif %} border-width: 1px; border-style: solid; border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.2rem;">{% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}🟢{% else %}⚠️{% endif %}</span>
+        <div>
+          <strong style="font-size: 0.88rem;">
+            {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}
+              SMTP Active: Connected via {{ smtp_cfg.MAIL_SERVER }}:{{ smtp_cfg.MAIL_PORT }} (Sender: {{ smtp_cfg.MAIL_DEFAULT_SENDER }})
+            {% else %}
+              SMTP Not Configured: Emails will be simulated and logged until you enter your SMTP App Password.
+            {% endif %}
+          </strong>
+          <div style="font-size: 0.78rem; opacity: 0.9; margin-top: 2px;">
+            {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}
+              Ready to send live emails directly to customer inboxes.
+            {% else %}
+              Click <a href="{{ url_for('admin_settings') }}#tab-email" style="font-weight: 700; text-decoration: underline; color: inherit;">Website Settings > SMTP</a> to save your Gmail App Password.
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Composer Grid -->
+    <div class="composer-grid">
+      <!-- Left Column: Compose Form -->
+      <div class="admin-card" style="padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A;">✉️ Email Composer</h3>
+          <span style="font-size: 0.75rem; background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-weight: 700;">HTML Delivery</span>
+        </div>
+
+        <form action="{{ url_for('admin_compose_email') }}" method="POST" id="emailComposeForm">
+          
+          <!-- Quick Customer / Inquiry Selector Dropdown -->
+          <div class="form-group" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 4px;">
+              ⚡ Quick-Select from Inquiries or Registered Customers:
+            </label>
+            <select class="form-control" style="font-size: 0.84rem;" onchange="loadSelectedContact(this)">
+              <option value="">-- Choose a customer or inquiry to auto-fill --</option>
+              <optgroup label="Recent Inquiries & Quotes">
+                {% for inq in inquiries %}
+                <option value="{{ inq.email }}" 
+                        data-name="{{ inq.customer_name }}" 
+                        data-inquiry="{{ inq.inquiry_number }}"
+                        data-machine="{{ inq.machine_model }}"
+                        data-items="{% for it in inq.items %}{{ it.product_name }} (Qty: {{ it.quantity }}){% if not loop.last %}, {% endif %}{% endfor %}">
+                  Inquiry #{{ inq.inquiry_number }} — {{ inq.customer_name }} ({{ inq.email }})
+                </option>
+                {% endfor %}
+              </optgroup>
+              <optgroup label="Registered Customer Accounts">
+                {% for c in customers %}
+                <option value="{{ c.email }}" data-name="{{ c.name }}" data-company="{{ c.company_name }}">
+                  {{ c.name }} {% if c.company_name %}({{ c.company_name }}){% endif %} — {{ c.email }}
+                </option>
+                {% endfor %}
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Recipient Email -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 700;">Customer Email Address *</label>
+            <input type="email" id="toEmailInput" name="to_email" class="form-control" required placeholder="e.g. buyer@textilemill.com" value="{{ to_email or '' }}" oninput="updateLivePreview()">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Customer Name</label>
+              <input type="text" id="custNameInput" name="customer_name" class="form-control" placeholder="e.g. Mahesh Patel" value="{{ customer_name or '' }}" oninput="updateLivePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CC Copy (Optional)</label>
+              <input type="email" name="cc_email" class="form-control" placeholder="e.g. sales@divyatrading.com" value="{{ cc_email or '' }}">
+            </div>
+          </div>
+
+          <!-- Inquiry Reference (if any) -->
+          <div class="form-group">
+            <label class="form-label">Inquiry Reference # (Optional)</label>
+            <input type="text" id="inqRefInput" name="inquiry_number" class="form-control" placeholder="e.g. DTC-20261024-ABCD" value="{% if inquiry %}{{ inquiry.inquiry_number }}{% endif %}" oninput="updateLivePreview()">
+          </div>
+
+          <!-- Subject Line -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 700;">Email Subject *</label>
+            <input type="text" id="subjectInput" name="subject" class="form-control" required placeholder="e.g. Quotation for Rotary Printing Spare Parts - Divya Trading Co." value="{{ subject or '' }}" oninput="updateLivePreview()">
+          </div>
+
+          <!-- Template Pills Toolbar -->
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px;">
+              📄 Quick Templates:
+            </label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="template-pill-btn" onclick="applyTemplate('quotation')">
+                📋 Formal Quotation
+              </button>
+              <button type="button" class="template-pill-btn" onclick="applyTemplate('stock')">
+                📦 Stock & Dispatch
+              </button>
+              <button type="button" class="template-pill-btn" onclick="applyTemplate('catalog')">
+                📖 Catalog Brochure Link
+              </button>
+              <button type="button" class="template-pill-btn" onclick="applyTemplate('specs')">
+                ⚙️ Specifications Request
+              </button>
+              <button type="button" class="template-pill-btn" onclick="applyTemplate('clear')" style="color: #991b1b; background: #FEF2F2; border-color: #FECACA;">
+                ✕ Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Message Body Textarea -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 700; display: flex; justify-content: space-between;">
+              <span>Message Body *</span>
+              <span style="font-size: 0.75rem; color: #64748B; font-weight: 400;">Paragraphs and line breaks are formatted automatically</span>
+            </label>
+            <textarea id="messageBodyInput" name="message_body" class="form-control" rows="12" required placeholder="Type your email message to the customer here..." oninput="updateLivePreview()">{{ message_body or '' }}</textarea>
+          </div>
+
+          <!-- Send Actions -->
+          <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 20px;">
+            <button type="submit" class="btn-admin-primary" style="padding: 12px 28px; font-size: 0.92rem; font-weight: 700; background: #0052CC; border-color: #0052CC; display: inline-flex; align-items: center; gap: 8px;">
+              <span>Send Email to Customer</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Interactive Live Email Preview -->
+      <div>
+        <div class="admin-card" style="padding: 24px; position: sticky; top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A;">👁️ Live Email Preview</h3>
+            <span style="font-size: 0.74rem; background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 4px; font-weight: 700;">Customer's Inbox View</span>
+          </div>
+
+          <div class="email-preview-box">
+            <div class="email-preview-header">
+              <h2 style="margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; font-family: 'Outfit', sans-serif;">DIVYA TRADING CO.</h2>
+              <p style="margin: 4px 0 0; font-size: 0.8rem; color: #93C5FD;">Precision Rotary Printing Machine Spares • Ahmedabad, India</p>
+            </div>
+
+            <div class="email-preview-body">
+              <div id="previewInquiryBadge" style="display: none; background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; margin-bottom: 14px;">
+                Reference Inquiry #<span id="previewInquiryRef"></span>
+              </div>
+
+              <p style="font-size: 0.95rem; color: #1E293B; margin-top: 0;">
+                Dear <strong id="previewCustName">Valued Customer</strong>,
+              </p>
+
+              <div id="previewMessageContent" style="font-size: 0.88rem; color: #334155; line-height: 1.6; margin: 16px 0; min-height: 80px;">
+                <p style="color: #94A3B8; font-style: italic;">(Your drafted message will appear here in real time...)</p>
+              </div>
+
+              <!-- Official DTC Contact Details Card in Preview -->
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; margin-top: 20px; font-size: 0.82rem; color: #475569;">
+                <strong style="color: #0A2540; font-size: 0.84rem; display: block; margin-bottom: 6px;">Direct Sales & Engineering Support:</strong>
+                <div>📞 WhatsApp / Call: <strong>+91 83208 21579</strong></div>
+                <div>✉️ Direct Email: <strong>divya.trading06@gmail.com</strong></div>
+                <div>🏭 Works: 15, Nageshwar Estate, Amraiwadi, Ahmedabad, India</div>
+              </div>
+            </div>
+
+            <div class="email-preview-footer">
+              Divya Trading Co. • Quality Industrial Printing Machine Spare Parts Since 1997
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+      sidebar?.classList.toggle('open');
+      overlay?.classList.toggle('active');
+    }
+
+    function loadSelectedContact(selectEl) {
+      const opt = selectEl.options[selectEl.selectedIndex];
+      if (!opt || !opt.value) return;
+
+      document.getElementById('toEmailInput').value = opt.value;
+      
+      const name = opt.dataset.name || '';
+      if (name) document.getElementById('custNameInput').value = name;
+      
+      const inq = opt.dataset.inquiry || '';
+      if (inq) {
+        document.getElementById('inqRefInput').value = inq;
+        document.getElementById('subjectInput').value = `Regarding Quotation & Inquiry #${inq} - Divya Trading Co.`;
+      }
+
+      const items = opt.dataset.items || '';
+      if (items && !document.getElementById('messageBodyInput').value) {
+        applyTemplate('quotation', items, inq);
+      }
+
+      updateLivePreview();
+    }
+
+    function applyTemplate(type, customItems = '', customInq = '') {
+      const name = document.getElementById('custNameInput').value || 'Customer';
+      const inq = customInq || document.getElementById('inqRefInput').value || 'DTC-QUOTE';
+      const subjectInput = document.getElementById('subjectInput');
+      const bodyInput = document.getElementById('messageBodyInput');
+
+      if (type === 'quotation') {
+        subjectInput.value = `Quotation for Textile Machine Spare Parts - Divya Trading Co. [Ref: #${inq}]`;
+        bodyInput.value = 
+`Thank you for inquiring with Divya Trading Co.
+
+We are pleased to submit our formal quotation for your precision rotary printing machine spare parts requirement:
+
+• Inquired Items: ${customItems || 'Precision Screen Head Assembly / Rotary Spares'}
+• Repeat Size / Specification: 64R Standard / Alloy Steel
+• Stock Status: Ready in Stock
+• Delivery Timeline: Dispatched within 24-48 hours via express cargo from Ahmedabad works.
+• Quality Guarantee: 100% precision engineered & quality inspected prior to dispatch.
+• Commercial Terms: 100% advance against Proforma Invoice / RTGS.
+• Validity: Quotation valid for 15 days.
+
+Please let us know if you require a formal PDF Proforma Invoice or additional technical specifications.`;
+      } 
+      else if (type === 'stock') {
+        subjectInput.value = `Stock Availability & Dispatch Confirmation - Divya Trading Co.`;
+        bodyInput.value = 
+`Thank you for contacting Divya Trading Co.
+
+We are pleased to confirm that the requested rotary screen printing machine spare parts are in ready stock at our Ahmedabad facility:
+
+• Stock Status: Ready in Stock
+• Dispatch: Same day / Next working day from Ahmedabad, Gujarat
+• Packaging: Heavy-duty export seaworthy / transport corrugated packaging
+• Transit Time: 2-3 days across India / 5-7 days worldwide
+
+Kindly confirm your billing & shipping address to initiate the dispatch process.`;
+      }
+      else if (type === 'catalog') {
+        subjectInput.value = `Technical Catalog & Spare Parts Guide - Divya Trading Co.`;
+        bodyInput.value = 
+`Dear ${name},
+
+Thank you for your interest in Divya Trading Co. textile machinery precision spares.
+
+You can download our complete 8-page Technical Brochure & Spare Parts Catalog using this direct link:
+https://divyatradingco.com/catalog.pdf
+
+Our manufacturing program covers spares for:
+• Stormac (RD-3, RD-4, Pegasus, RD-DD)
+• Stork Box, Screen Heads & Repeats (64R, 81.9R, 91.4R, 101.8R)
+• Colour Pumps (SB-4, SB-5, SB-7)
+• Swedish Steel Squeegee Blades
+• Laxmi, Ichinose, Reggiani & Zimmer Rotary Machines
+
+Feel free to reply to this email or reach us on WhatsApp at +91 83208 21579 for any technical assistance.`;
+      }
+      else if (type === 'specs') {
+        subjectInput.value = `Specification Confirmation for Rotary Printing Machine Spares - Divya Trading Co.`;
+        bodyInput.value = 
+`Dear ${name},
+
+We are following up regarding your recent inquiry for rotary printing machine spares.
+
+To ensure a 100% exact engineering match for your machine, could you please confirm:
+1. Machine Make & Model (e.g. Stork RD-4, Stormac, Laxmi, etc.)
+2. Screen Repeat Size (e.g. 640mm / 64R, 819mm / 81.9R, 914mm / 91.4R)
+3. Current part photo or bearing/shaft dimensions if available
+
+Once confirmed, we will promptly issue your quotation and dispatch schedule.`;
+      }
+      else if (type === 'clear') {
+        bodyInput.value = '';
+      }
+
+      updateLivePreview();
+    }
+
+    function updateLivePreview() {
+      const name = document.getElementById('custNameInput').value.trim();
+      const inq = document.getElementById('inqRefInput').value.trim();
+      const rawBody = document.getElementById('messageBodyInput').value.trim();
+
+      document.getElementById('previewCustName').textContent = name || 'Valued Customer';
+
+      const inqBadge = document.getElementById('previewInquiryBadge');
+      if (inq) {
+        inqBadge.style.display = 'inline-block';
+        document.getElementById('previewInquiryRef').textContent = inq;
+      } else {
+        inqBadge.style.display = 'none';
+      }
+
+      const contentBox = document.getElementById('previewMessageContent');
+      if (!rawBody) {
+        contentBox.innerHTML = '<p style="color: #94A3B8; font-style: italic;">(Your drafted message will appear here in real time...)</p>';
+      } else {
+        const paragraphs = rawBody.split('\n\n').filter(p => p.trim());
+        const html = paragraphs.map(p => `<p style="margin: 0 0 12px; line-height: 1.6;">${p.replace(/\n/g, '<br>')}</p>`).join('');
+        contentBox.innerHTML = html;
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateLivePreview();
+    });
+  </script>
+</body>
+</html>

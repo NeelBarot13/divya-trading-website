@@ -75,11 +75,11 @@
         </div>
 
         <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
-          <a href="{{ site_settings.catalog_file_url or url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf') }}" download="{{ site_settings.catalog_download_name or 'Divya_Trading_Co_Catalog.pdf' }}" class="btn-enquire-primary" style="padding: 12px 24px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
-            <span>Download Catalog {% if site_settings.catalog_file_size %}({{ site_settings.catalog_file_size }}){% else %}PDF{% endif %}</span>
+          <a href="{{ url_for('download_catalog_pdf') }}" class="btn-enquire-primary" style="padding: 12px 24px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+            <span>Download Catalog {% if site_settings.catalog_file_size %}({{ site_settings.catalog_file_size }}){% else %}PDF (8.2 MB){% endif %}</span>
             <span>⬇</span>
           </a>
-          <a href="{{ site_settings.catalog_file_url or url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf') }}" target="_blank" rel="noopener noreferrer" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #F8FAFC; color: var(--primary-navy); border-color: #CBD5E1; display: inline-flex; align-items: center; gap: 8px;">
+          <a href="{{ url_for('view_catalog_pdf') }}" target="_blank" rel="noopener noreferrer" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #F8FAFC; color: var(--primary-navy); border-color: #CBD5E1; display: inline-flex; align-items: center; gap: 8px;">
             <span>Preview in Browser ↗</span>
           </a>
           <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20please%20send%20me%20your%20complete%20PDF%20catalog." target="_blank" rel="noopener noreferrer" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700; background: #25D366; color: white; border-color: #25D366; display: inline-flex; align-items: center; gap: 8px;">

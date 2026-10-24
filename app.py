@@ -1,4 +1,6 @@
 import os
+import shutil
+import zipfile
 import json
 import time
 import random
@@ -11,8 +13,8 @@ from werkzeug.utils import secure_filename
 from config import Config
 from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, InquiryMessage, CustomerUser, AdminUser, SiteSetting
 from seed_data import seed_database, slugify
-from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS, send_password_reset_email
-from export_service import export_inquiries_csv, export_products_csv, generate_product_template_excel, import_products_from_file
+from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS, send_password_reset_email, send_custom_customer_email
+from export_service import export_inquiries_csv, export_products_csv, generate_product_template_excel, import_products_from_file, resolve_product_image_path
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -447,14 +449,22 @@ def download_catalog():
 def download_catalog_pdf():
     """
     Dynamically delivers the active catalog file configured via the Admin CMS.
-    Supports uploaded files, custom static paths, and external download URLs.
+    Guarantees Content-Type: application/pdf and Content-Disposition: attachment
+    so the browser always downloads the PDF file (never an image).
     """
     setting_url = SiteSetting.query.filter_by(key='catalog_file_url').first()
     setting_name = SiteSetting.query.filter_by(key='catalog_download_name').first()
     
     download_filename = setting_name.value.strip() if (setting_name and setting_name.value and setting_name.value.strip()) else 'Divya_Trading_Co_Catalog.pdf'
+    if not download_filename.lower().endswith('.pdf'):
+        download_filename = f"{download_filename}.pdf"
+
     file_rel_path = setting_url.value.strip() if (setting_url and setting_url.value and setting_url.value.strip()) else '/static/docs/Divya_Trading_Co_Catalog.pdf'
     
+    # Safety Check: If the configured URL was mistakenly set to an image, protect users by falling back to official PDF
+    if any(file_rel_path.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.webp', '.gif']):
+        file_rel_path = '/static/docs/Divya_Trading_Co_Catalog.pdf'
+
     # If external URL (e.g. Google Drive, Dropbox), redirect directly
     if file_rel_path.startswith(('http://', 'https://')):
         return redirect(file_rel_path)
@@ -463,15 +473,45 @@ def download_catalog_pdf():
     if file_rel_path.startswith('/static/'):
         clean_rel = file_rel_path[len('/static/'):]
         local_path = os.path.join(app.root_path, 'static', clean_rel.replace('/', os.sep))
-        if os.path.exists(local_path):
+        if os.path.isfile(local_path):
             dir_name = os.path.dirname(local_path)
             base_name = os.path.basename(local_path)
-            return send_from_directory(dir_name, base_name, as_attachment=True, download_name=download_filename)
+            return send_from_directory(dir_name, base_name, as_attachment=True, download_name=download_filename, mimetype='application/pdf')
             
     # Fallback to default static/docs/Divya_Trading_Co_Catalog.pdf
     default_dir = os.path.join(app.root_path, 'static', 'docs')
-    if os.path.exists(os.path.join(default_dir, 'Divya_Trading_Co_Catalog.pdf')):
-        return send_from_directory(default_dir, 'Divya_Trading_Co_Catalog.pdf', as_attachment=True, download_name=download_filename)
+    if os.path.isfile(os.path.join(default_dir, 'Divya_Trading_Co_Catalog.pdf')):
+        return send_from_directory(default_dir, 'Divya_Trading_Co_Catalog.pdf', as_attachment=True, download_name=download_filename, mimetype='application/pdf')
+        
+    return redirect(url_for('download_catalog'))
+
+
+@app.route('/download-catalog/view')
+@app.route('/catalog-view.pdf')
+def view_catalog_pdf():
+    """
+    Inline preview of the catalog PDF inside the browser (as_attachment=False).
+    """
+    setting_url = SiteSetting.query.filter_by(key='catalog_file_url').first()
+    file_rel_path = setting_url.value.strip() if (setting_url and setting_url.value and setting_url.value.strip()) else '/static/docs/Divya_Trading_Co_Catalog.pdf'
+    
+    if any(file_rel_path.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.webp', '.gif']):
+        file_rel_path = '/static/docs/Divya_Trading_Co_Catalog.pdf'
+
+    if file_rel_path.startswith(('http://', 'https://')):
+        return redirect(file_rel_path)
+        
+    if file_rel_path.startswith('/static/'):
+        clean_rel = file_rel_path[len('/static/'):]
+        local_path = os.path.join(app.root_path, 'static', clean_rel.replace('/', os.sep))
+        if os.path.isfile(local_path):
+            dir_name = os.path.dirname(local_path)
+            base_name = os.path.basename(local_path)
+            return send_from_directory(dir_name, base_name, as_attachment=False, mimetype='application/pdf')
+            
+    default_dir = os.path.join(app.root_path, 'static', 'docs')
+    if os.path.isfile(os.path.join(default_dir, 'Divya_Trading_Co_Catalog.pdf')):
+        return send_from_directory(default_dir, 'Divya_Trading_Co_Catalog.pdf', as_attachment=False, mimetype='application/pdf')
         
     return redirect(url_for('download_catalog'))
 
@@ -726,10 +766,18 @@ def customer_forgot_password():
             reset_url = url_for('customer_reset_password', token=token, _external=True)
             smtp_cfg = get_smtp_config()
             success, msg = send_password_reset_email(user.email, user.name, reset_url, smtp_cfg)
-            if not smtp_cfg.get('MAIL_USERNAME') or not smtp_cfg.get('MAIL_PASSWORD'):
-                flash(f"Password reset link generated (Simulated Mode): <a href='{reset_url}' style='font-weight:700; text-decoration:underline;'>Click Here to Reset Password</a>", "info")
+            if success:
+                flash(f"Password reset instructions have been sent to <strong>{user.email}</strong>. Please check your inbox and spam folder.", "success")
             else:
-                flash('Password reset instructions have been sent to your email address.', 'success')
+                flash(
+                    f"<div style='line-height:1.5;'>"
+                    f"<strong>Password Reset Request Created:</strong><br>"
+                    f"<span style='font-size:0.83rem; color:#475569;'>Note: Email delivery status: {msg}</span><br>"
+                    f"<div style='margin-top:10px;'>"
+                    f"<a href='{reset_url}' style='display:inline-block; background:#0052cc; color:#ffffff; padding:9px 18px; border-radius:6px; font-weight:700; text-decoration:none; font-size:0.88rem;'>Click Here to Set New Password ➔</a>"
+                    f"</div></div>",
+                    "info"
+                )
             return redirect(url_for('customer_login'))
         else:
             flash('If an account exists for that email, password reset instructions have been sent.', 'success')
@@ -850,7 +898,8 @@ def customer_add_comment(inquiry_number):
         <blockquote style="background:#f1f5f9; padding:12px; border-left:4px solid #0052cc;">{message_text}</blockquote>
         <p><a href="{request.host_url}admin/dashboard">Open Admin Dashboard to Reply ➔</a></p>
         """
-        send_email(admin_subject, app.config['ADMIN_NOTIFICATION_EMAIL'], admin_body, app.config)
+        smtp_cfg = get_smtp_config()
+        send_email(admin_subject, smtp_cfg['ADMIN_NOTIFICATION_EMAIL'], admin_body, smtp_cfg)
         
         flash('Your message has been sent to Divya Trading Co. engineering team.', 'success')
     else:
@@ -1204,7 +1253,8 @@ def admin_update_quote_details(inquiry_id):
         <p>You can view full quotation details, item breakdown, and chat directly with our team under your customer portal:</p>
         <p><a href="{request.host_url}my-quotes/{inquiry.inquiry_number}" style="display:inline-block; background:#0A2540; color:white; padding:10px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">View My Quotation ➔</a></p>
         """
-        send_email(cust_subject, inquiry.email, cust_body, app.config)
+        smtp_cfg = get_smtp_config()
+        send_email(cust_subject, inquiry.email, cust_body, smtp_cfg)
         
     flash(f'Quotation details for #{inquiry.inquiry_number} updated successfully.', 'success')
     return redirect(url_for('admin_dashboard'))
@@ -1238,7 +1288,8 @@ def admin_add_comment(inquiry_id):
             <blockquote style="background:#f1f5f9; padding:12px; border-left:4px solid #0A2540;">{message_text}</blockquote>
             <p><a href="{request.host_url}my-quotes/{inquiry.inquiry_number}">View & Reply in Your Portal ➔</a></p>
             """
-            send_email(cust_subject, inquiry.email, cust_body, app.config)
+            smtp_cfg = get_smtp_config()
+            send_email(cust_subject, inquiry.email, cust_body, smtp_cfg)
             
         flash('Message dispatched to customer thread successfully.', 'success')
     return redirect(url_for('admin_dashboard'))
@@ -1347,8 +1398,11 @@ def admin_add_product():
         
     slug = slugify(f"{name}-{part_number}")
     
-    # Image handling
-    image_url = request.form.get('image_preset', '/static/images/hero_parts.jpg')
+    # Image handling: file upload -> custom path/url -> preset dropdown
+    custom_img_url = request.form.get('custom_image_url', '').strip()
+    preset_img_url = request.form.get('image_preset', '/static/images/hero_parts.jpg').strip()
+    image_url = '/static/images/hero_parts.jpg'
+    
     if 'image_file' in request.files:
         file = request.files['image_file']
         if file and file.filename and allowed_file(file.filename):
@@ -1356,6 +1410,10 @@ def admin_add_product():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             image_url = f"/static/uploads/{filename}"
+    elif custom_img_url:
+        image_url = resolve_product_image_path(custom_img_url, app_root=app.root_path)
+    elif preset_img_url:
+        image_url = preset_img_url
             
     product = Product(
         name=name,
@@ -1398,7 +1456,10 @@ def admin_edit_product(product_id):
     product.is_featured = 'is_featured' in request.form
     product.is_active = 'is_active' in request.form
     
-    # Image upload
+    # Image upload or path update
+    custom_img_url = request.form.get('custom_image_url', '').strip()
+    preset_img_url = request.form.get('image_preset', '').strip()
+    
     if 'image_file' in request.files:
         file = request.files['image_file']
         if file and file.filename and allowed_file(file.filename):
@@ -1406,8 +1467,10 @@ def admin_edit_product(product_id):
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             product.image_url = f"/static/uploads/{filename}"
-    elif request.form.get('image_preset'):
-        product.image_url = request.form.get('image_preset')
+    elif custom_img_url:
+        product.image_url = resolve_product_image_path(custom_img_url, app_root=app.root_path)
+    elif preset_img_url:
+        product.image_url = preset_img_url
         
     db.session.commit()
     flash(f'Product "{product.name}" updated successfully.', 'success')
@@ -1562,6 +1625,7 @@ def admin_download_product_template():
 def admin_import_products():
     """
     Handles bulk product import from uploaded Excel (.xlsx, .xls) or CSV file.
+    Supports simultaneous upload of matching product image files or .zip archive.
     """
     if 'excel_file' not in request.files:
         flash('Please select an Excel or CSV file to upload.', 'danger')
@@ -1576,12 +1640,42 @@ def admin_import_products():
     if not any(file.filename.lower().endswith(ext) for ext in allowed_exts):
         flash('Unsupported file format. Please upload an Excel (.xlsx, .xls) or CSV file.', 'danger')
         return redirect(url_for('admin_products'))
+
+    # 1. Handle any accompanying image files or .zip archive
+    target_img_dir = os.path.join(app.root_path, 'static', 'images', 'products')
+    os.makedirs(target_img_dir, exist_ok=True)
+    
+    uploaded_images_count = 0
+    if 'product_images' in request.files:
+        img_files = request.files.getlist('product_images')
+        for img_f in img_files:
+            if img_f and img_f.filename:
+                orig_fname = img_f.filename
+                if orig_fname.lower().endswith('.zip'):
+                    try:
+                        with zipfile.ZipFile(img_f) as zf:
+                            for member in zf.namelist():
+                                base_m = os.path.basename(member)
+                                if base_m and base_m.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg')):
+                                    dest = os.path.join(target_img_dir, base_m)
+                                    with zf.open(member) as src_f, open(dest, 'wb') as dst_f:
+                                        shutil.copyfileobj(src_f, dst_f)
+                                    uploaded_images_count += 1
+                    except Exception as zip_e:
+                        flash(f"Notice while extracting images ZIP: {zip_e}", 'warning')
+                elif allowed_file(orig_fname):
+                    dest = os.path.join(target_img_dir, os.path.basename(orig_fname))
+                    img_f.save(dest)
+                    uploaded_images_count += 1
         
     update_existing = 'update_existing' in request.form
-    result = import_products_from_file(file, update_existing=update_existing)
+    result = import_products_from_file(file, update_existing=update_existing, app_root=app.root_path)
     
     if result.get('success'):
-        flash(result.get('message'), 'success')
+        msg = result.get('message')
+        if uploaded_images_count > 0:
+            msg += f" (Stored {uploaded_images_count} accompanying image(s) in static/images/products/)."
+        flash(msg, 'success')
         if result.get('errors'):
             for err in result['errors'][:5]:
                 flash(f"Notice: {err}", 'warning')
@@ -2213,6 +2307,12 @@ def admin_settings():
             for key, value in request.form.items():
                 if key not in excluded_keys and not key.endswith('[]'):
                     val = value.strip()
+                    # Do not overwrite mail_password with empty string if not changed
+                    if key == 'mail_password' and not val:
+                        continue
+                    # Protect catalog_file_url from being mistakenly pointed to an image
+                    if key == 'catalog_file_url' and any(val.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.webp', '.gif']):
+                        continue
                     setting = SiteSetting.query.filter_by(key=key).first()
                     if setting:
                         setting.value = val
@@ -2260,27 +2360,41 @@ def admin_settings():
             # 6. Handle Catalog File & Cover Image Upload
             if 'catalog_file' in request.files:
                 cat_file = request.files['catalog_file']
-                if cat_file and cat_file.filename and allowed_file(cat_file.filename):
-                    cat_orig_name = cat_file.filename
-                    safe_cat_name = secure_filename(f"catalog_{int(time.time())}_{cat_orig_name}")
-                    cat_save_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_cat_name)
-                    cat_file.save(cat_save_path)
-                    cat_url = f"/static/uploads/{safe_cat_name}"
-                    
-                    setting_cat_url = SiteSetting.query.filter_by(key='catalog_file_url').first()
-                    if setting_cat_url:
-                        setting_cat_url.value = cat_url
+                if cat_file and cat_file.filename:
+                    if not cat_file.filename.lower().endswith('.pdf'):
+                        flash('Note: Catalog document must be in .pdf format. Image files should be uploaded under Cover Image.', 'warning')
                     else:
-                        db.session.add(SiteSetting(key='catalog_file_url', value=cat_url))
+                        cat_orig_name = cat_file.filename
+                        safe_cat_name = secure_filename(f"catalog_{int(time.time())}_{cat_orig_name}")
+                        docs_folder = os.path.join(app.root_path, 'static', 'docs')
+                        os.makedirs(docs_folder, exist_ok=True)
+                        cat_save_path = os.path.join(docs_folder, safe_cat_name)
+                        cat_file.save(cat_save_path)
+                        cat_url = f"/static/docs/{safe_cat_name}"
                         
-                    # Auto set download filename if not explicitly customized
-                    custom_name = request.form.get('catalog_download_name', '').strip()
-                    if not custom_name or custom_name == 'Divya_Trading_Co_Catalog.pdf':
-                        setting_cat_name = SiteSetting.query.filter_by(key='catalog_download_name').first()
-                        if setting_cat_name:
-                            setting_cat_name.value = cat_orig_name
+                        setting_cat_url = SiteSetting.query.filter_by(key='catalog_file_url').first()
+                        if setting_cat_url:
+                            setting_cat_url.value = cat_url
                         else:
-                            db.session.add(SiteSetting(key='catalog_download_name', value=cat_orig_name))
+                            db.session.add(SiteSetting(key='catalog_file_url', value=cat_url))
+                            
+                        # Auto-detect file size
+                        b_size = os.path.getsize(cat_save_path)
+                        cat_size_str = f"{b_size / (1024 * 1024):.1f} MB" if b_size >= 1024 * 1024 else f"{b_size / 1024:.0f} KB"
+                        setting_size = SiteSetting.query.filter_by(key='catalog_file_size').first()
+                        if setting_size:
+                            setting_size.value = cat_size_str
+                        else:
+                            db.session.add(SiteSetting(key='catalog_file_size', value=cat_size_str))
+                            
+                        # Auto set download filename if not explicitly customized
+                        custom_name = request.form.get('catalog_download_name', '').strip()
+                        if not custom_name or custom_name == 'Divya_Trading_Co_Catalog.pdf':
+                            setting_cat_name = SiteSetting.query.filter_by(key='catalog_download_name').first()
+                            if setting_cat_name:
+                                setting_cat_name.value = cat_orig_name
+                            else:
+                                db.session.add(SiteSetting(key='catalog_download_name', value=cat_orig_name))
 
             if 'catalog_cover_image_file' in request.files:
                 cov_file = request.files['catalog_cover_image_file']
@@ -2309,6 +2423,8 @@ def admin_settings():
             """
             smtp_cfg = get_smtp_config()
             success, msg = send_email(test_subject, test_target, test_body, smtp_cfg)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+                return jsonify({'success': success, 'message': msg})
             if success:
                 flash(f'Test email dispatched to {test_target}. Status: {msg}', 'success')
             else:
@@ -2351,6 +2467,275 @@ def admin_settings():
         why_choose_pillars=why_choose_pillars,
         email_logs=email_logs,
         hero_badges_list=hero_badges_list
+    )
+
+
+def _save_site_setting(key, value):
+    setting = SiteSetting.query.filter_by(key=key).first()
+    if setting:
+        setting.value = value
+    else:
+        db.session.add(SiteSetting(key=key, value=value))
+    db.session.commit()
+
+
+@app.route('/admin/catalog', methods=['GET', 'POST'])
+@admin_required
+def admin_catalog():
+    """
+    Dedicated Admin Portal for Managing the Official Technical Catalog PDF:
+    - View active PDF details, file size, last modified, download & browser preview
+    - Upload & replace the active PDF (strictly validates .pdf format)
+    - Auto-detect and store file size (e.g. 8.2 MB)
+    - Set download filename (e.g. Divya_Trading_Co_Catalog.pdf)
+    - Upload cover preview image
+    - Reset to default factory DTC catalog PDF
+    """
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'upload_pdf':
+            if 'catalog_pdf_file' not in request.files:
+                flash('Please select a PDF file to upload.', 'danger')
+                return redirect(url_for('admin_catalog'))
+            
+            f = request.files['catalog_pdf_file']
+            if not f or not f.filename:
+                flash('No PDF file selected.', 'danger')
+                return redirect(url_for('admin_catalog'))
+                
+            orig_filename = f.filename
+            if not orig_filename.lower().endswith('.pdf'):
+                flash('Invalid file format! The catalog file must be a .pdf document. (Images should be uploaded under Cover Image).', 'danger')
+                return redirect(url_for('admin_catalog'))
+                
+            docs_folder = os.path.join(app.root_path, 'static', 'docs')
+            os.makedirs(docs_folder, exist_ok=True)
+            
+            safe_fname = secure_filename(f"dtc_catalog_{int(time.time())}_{orig_filename}")
+            save_path = os.path.join(docs_folder, safe_fname)
+            f.save(save_path)
+            
+            # Compute actual file size
+            bytes_size = os.path.getsize(save_path)
+            if bytes_size >= 1024 * 1024:
+                file_size_str = f"{bytes_size / (1024 * 1024):.1f} MB"
+            else:
+                file_size_str = f"{bytes_size / 1024:.0f} KB"
+                
+            web_url = f"/static/docs/{safe_fname}"
+            
+            _save_site_setting('catalog_file_url', web_url)
+            _save_site_setting('catalog_file_size', file_size_str)
+            
+            dl_name = request.form.get('catalog_download_name', '').strip()
+            if not dl_name:
+                dl_name = orig_filename
+            if not dl_name.lower().endswith('.pdf'):
+                dl_name += '.pdf'
+            _save_site_setting('catalog_download_name', dl_name)
+            
+            flash(f'New Catalog PDF "{dl_name}" ({file_size_str}) uploaded successfully! Front-end download will now serve this file.', 'success')
+            return redirect(url_for('admin_catalog'))
+            
+        elif action == 'save_details':
+            title = request.form.get('catalog_title', '').strip()
+            desc = request.form.get('catalog_description', '').strip()
+            badge = request.form.get('catalog_badge', '').strip()
+            dl_name = request.form.get('catalog_download_name', '').strip()
+            url_override = request.form.get('catalog_file_url', '').strip()
+            size_override = request.form.get('catalog_file_size', '').strip()
+            
+            if title: _save_site_setting('catalog_title', title)
+            if desc: _save_site_setting('catalog_description', desc)
+            if badge: _save_site_setting('catalog_badge', badge)
+            if dl_name:
+                if not dl_name.lower().endswith('.pdf'):
+                    dl_name += '.pdf'
+                _save_site_setting('catalog_download_name', dl_name)
+            if url_override:
+                if any(url_override.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.webp', '.gif']):
+                    flash('Warning: The Catalog File URL cannot be an image! The catalog file must be a PDF document or cloud document link.', 'warning')
+                else:
+                    _save_site_setting('catalog_file_url', url_override)
+            if size_override:
+                _save_site_setting('catalog_file_size', size_override)
+                
+            flash('Catalog text, details, and download settings saved successfully.', 'success')
+            return redirect(url_for('admin_catalog'))
+            
+        elif action == 'upload_cover':
+            if 'catalog_cover_image' not in request.files:
+                flash('Please select an image file for the catalog cover preview.', 'danger')
+                return redirect(url_for('admin_catalog'))
+                
+            f = request.files['catalog_cover_image']
+            if not f or not f.filename or not allowed_file(f.filename):
+                flash('Invalid image file. Please upload a .jpg, .png, or .webp image.', 'danger')
+                return redirect(url_for('admin_catalog'))
+                
+            safe_name = secure_filename(f"catalog_cover_{int(time.time())}_{f.filename}")
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_name)
+            f.save(save_path)
+            
+            cover_url = f"/static/uploads/{safe_name}"
+            _save_site_setting('catalog_preview_image', cover_url)
+            flash('Catalog cover preview image updated successfully.', 'success')
+            return redirect(url_for('admin_catalog'))
+            
+        elif action == 'reset_default':
+            default_pdf = '/static/docs/Divya_Trading_Co_Catalog.pdf'
+            _save_site_setting('catalog_file_url', default_pdf)
+            _save_site_setting('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf')
+            _save_site_setting('catalog_file_size', '8.2 MB')
+            _save_site_setting('catalog_badge', 'Full PDF Catalog (8 Pages)')
+            _save_site_setting('catalog_title', 'Rotary Printing Machine Spares Technical Brochure')
+            _save_site_setting('catalog_description', 'Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.')
+            flash('Catalog reset back to official default DTC 8-Page Technical PDF.', 'success')
+            return redirect(url_for('admin_catalog'))
+
+    settings = {s.key: s.value for s in SiteSetting.query.all()}
+    cat_url = settings.get('catalog_file_url', '/static/docs/Divya_Trading_Co_Catalog.pdf')
+    cat_name = settings.get('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf')
+    cat_size = settings.get('catalog_file_size', '8.2 MB')
+    cat_badge = settings.get('catalog_badge', 'Full PDF Catalog (8 Pages)')
+    cat_title = settings.get('catalog_title', 'Rotary Printing Machine Spares Technical Brochure')
+    cat_desc = settings.get('catalog_description', 'Includes complete part listings, repeat size availability (64R, 81.9R, 91.4R, 101.8R), technical drawings, colour pump specs (SB-4, SB-5, SB-7), and squeegee blade steel dimensions.')
+    cat_cover = settings.get('catalog_preview_image', '/static/images/hero_parts.jpg')
+    
+    file_exists = False
+    physical_size_str = cat_size
+    last_modified_str = None
+    
+    if cat_url.startswith('/static/'):
+        clean_rel = cat_url[len('/static/'):]
+        local_path = os.path.join(app.root_path, 'static', clean_rel.replace('/', os.sep))
+        if os.path.isfile(local_path):
+            file_exists = True
+            bytes_size = os.path.getsize(local_path)
+            if bytes_size >= 1024 * 1024:
+                physical_size_str = f"{bytes_size / (1024 * 1024):.1f} MB"
+            else:
+                physical_size_str = f"{bytes_size / 1024:.0f} KB"
+            mtime = os.path.getmtime(local_path)
+            last_modified_str = datetime.fromtimestamp(mtime).strftime('%d %b %Y, %I:%M %p')
+    elif cat_url.startswith(('http://', 'https://')):
+        file_exists = True
+        
+    return render_template('admin/catalog.html',
+                           cat_url=cat_url,
+                           cat_name=cat_name,
+                           cat_size=physical_size_str,
+                           cat_badge=cat_badge,
+                           cat_title=cat_title,
+                           cat_desc=cat_desc,
+                           cat_cover=cat_cover,
+                           file_exists=file_exists,
+                           last_modified=last_modified_str)
+
+
+@app.route('/admin/email/compose', methods=['GET', 'POST'])
+@admin_required
+def admin_compose_email():
+    """
+    Dedicated Admin Composer: Allows admins to draft and send customized,
+    professionally branded emails directly to any customer email address,
+    with pre-filled templates, dynamic placeholders, live preview, and tracking.
+    """
+    prefill_to = request.args.get('to', '').strip()
+    prefill_name = request.args.get('name', '').strip()
+    prefill_subject = request.args.get('subject', '').strip()
+    inquiry_id = request.args.get('inquiry_id')
+    
+    inquiry = None
+    if inquiry_id:
+        try:
+            inquiry = Inquiry.query.get(int(inquiry_id))
+            if inquiry:
+                if not prefill_to:
+                    prefill_to = inquiry.email or ''
+                if not prefill_name:
+                    prefill_name = inquiry.customer_name or ''
+                if not prefill_subject:
+                    prefill_subject = f"Regarding Quotation & Inquiry #{inquiry.inquiry_number} - Divya Trading Co."
+        except Exception:
+            pass
+
+    if request.method == 'POST':
+        to_email = request.form.get('to_email', '').strip()
+        cc_email = request.form.get('cc_email', '').strip()
+        customer_name = request.form.get('customer_name', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message_body = request.form.get('message_body', '').strip()
+        inquiry_number = request.form.get('inquiry_number', '').strip()
+        
+        if not to_email or not subject or not message_body:
+            flash('Recipient Email, Subject, and Message Body are all required.', 'danger')
+            return redirect(url_for('admin_compose_email', to=to_email, name=customer_name, subject=subject))
+            
+        smtp_cfg = get_smtp_config()
+        success, msg = send_custom_customer_email(
+            recipient_email=to_email,
+            subject=subject,
+            message_body=message_body,
+            config=smtp_cfg,
+            customer_name=customer_name,
+            inquiry_number=inquiry_number,
+            cc=cc_email
+        )
+        
+        # If this email was sent in reference to an inquiry, record it in the inquiry chat history
+        if inquiry_number:
+            inq = Inquiry.query.filter_by(inquiry_number=inquiry_number).first()
+            if inq:
+                db_msg = InquiryMessage(
+                    inquiry_id=inq.id,
+                    sender_type='admin',
+                    sender_name=f"Admin Email ({session.get('admin_username', 'DTC')})",
+                    message=f"<strong>[Emailed to {to_email}]</strong><br><strong>Subject:</strong> {subject}<br><br>{message_body}"
+                )
+                db.session.add(db_msg)
+                inq.updated_at = datetime.utcnow()
+                db.session.commit()
+                
+        if success:
+            flash(f"Email successfully delivered to <strong>{to_email}</strong>! (Subject: {subject})", 'success')
+            if inquiry:
+                return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('admin_compose_email'))
+        else:
+            flash(f"Email delivery issue: {msg}", 'danger')
+            inquiries = Inquiry.query.order_by(Inquiry.created_at.desc()).limit(40).all()
+            customers = CustomerUser.query.order_by(CustomerUser.name).all()
+            return render_template(
+                'admin/compose_email.html',
+                to_email=to_email,
+                cc_email=cc_email,
+                customer_name=customer_name,
+                subject=subject,
+                message_body=message_body,
+                inquiry=inquiry,
+                inquiries=inquiries,
+                customers=customers,
+                smtp_cfg=smtp_cfg
+            )
+
+    # GET request
+    smtp_cfg = get_smtp_config()
+    inquiries = Inquiry.query.order_by(Inquiry.created_at.desc()).limit(40).all()
+    customers = CustomerUser.query.order_by(CustomerUser.name).all()
+    
+    return render_template(
+        'admin/compose_email.html',
+        to_email=prefill_to,
+        cc_email='',
+        customer_name=prefill_name,
+        subject=prefill_subject,
+        message_body='',
+        inquiry=inquiry,
+        inquiries=inquiries,
+        customers=customers,
+        smtp_cfg=smtp_cfg
     )
 
 

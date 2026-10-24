@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Catalog PDF Manager | Divya Trading Co. Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .catalog-admin-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 992px) {
+      .catalog-admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .status-badge-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #dcfce7;
+      color: #15803d;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid #86efac;
+    }
+    .status-badge-missing {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid #fca5a5;
+    }
+    .file-dropzone-box {
+      border: 2px dashed #93c5fd;
+      background: #f0f7ff;
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .file-dropzone-box:hover {
+      border-color: #3b82f6;
+      background: #e0f2fe;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+      <img src="{{ site_settings.site_logo or url_for('static', filename='images/logo.png') }}" alt="DTC" class="sidebar-logo">
+      <div class="sidebar-title">
+        <h2>DIVYA TRADING</h2>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </span>
+        <span>Inquiries & Quotes</span>
+      </a>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        </span>
+        <span>Manage Products</span>
+      </a>
+      <a href="{{ url_for('admin_catalog') }}" class="sidebar-nav-item active">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </span>
+        <span>Manage Catalog PDF</span>
+      </a>
+      <a href="{{ url_for('admin_compose_email') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </span>
+        <span>Compose & Send Email</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </span>
+        <span>Customer Accounts</span>
+      </a>
+      <a href="{{ url_for('admin_users') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </span>
+        <span>Team Roles & Passwords</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+        </span>
+        <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </span>
+        <span>Website CMS & Settings</span>
+      </a>
+      <a href="{{ url_for('home') }}" target="_blank" class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        </span>
+        <span>View Live Website ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Logged in: <strong>{{ session.admin_username }}</strong></span>
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Mobile Top Header -->
+  <div class="admin-mobile-header">
+    <div class="admin-mobile-brand">
+      <img src="{{ url_for('static', filename='images/dtc_emblem.png') }}" alt="DTC" style="height: 34px; width: 34px; border-radius: 50%; background: white; padding: 2px;">
+      <span style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 800; color: white;">DIVYA TRADING</span>
+    </div>
+    <button type="button" class="admin-sidebar-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Navigation Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+  <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div class="admin-page-title">
+        <h1>Technical Catalog PDF Manager</h1>
+        <p>Manage the official Rotary Printing Spare Parts Technical Brochure PDF served to website visitors across desktop and mobile.</p>
+      </div>
+
+      <div class="admin-top-actions">
+        <a href="{{ url_for('view_catalog_pdf') }}" target="_blank" class="btn-admin-export" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-weight: 700;">
+          <span>Preview PDF in Tab ↗</span>
+        </a>
+        <a href="{{ url_for('download_catalog') }}" target="_blank" class="btn-admin-export" style="background: #f8fafc; color: #334155; border-color: #cbd5e1;">
+          <span>View Public Page ↗</span>
+        </a>
+        <a href="{{ url_for('download_catalog_pdf') }}" class="btn-admin-primary" style="background: #16a34a; border-color: #16a34a;">
+          <span>⬇ Test Download PDF</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="admin-flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Main Grid -->
+    <div class="catalog-admin-grid">
+
+      <!-- Left Column: Active File Status & Upload Form -->
+      <div>
+
+        <!-- Card 1: Active PDF Status Banner -->
+        <div class="admin-card" style="padding: 24px; margin-bottom: 24px; border-left: 5px solid #16a34a;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 50px; height: 50px; border-radius: 8px; background: #16a34a; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; box-shadow: 0 4px 10px rgba(22,163,74,0.25);">
+                📄
+              </div>
+              <div>
+                <span style="font-size: 0.74rem; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.8px;">Active Catalog PDF</span>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--admin-navy); margin: 2px 0 4px; word-break: break-all;">
+                  {{ cat_name }}
+                </h3>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                  {% if file_exists %}
+                    <span class="status-badge-verified">✓ Verified on Server ({{ cat_size }})</span>
+                    {% if last_modified %}
+                      <span style="font-size: 0.75rem; color: #64748b;">Updated: {{ last_modified }}</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="status-badge-missing">⚠ File missing at configured path! Default backup is served.</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; color: #475569;">
+            <strong>Serving Path:</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{{ cat_url }}</code>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('download_catalog_pdf') }}" class="btn-admin-primary" style="padding: 8px 18px; font-size: 0.84rem; background: #16a34a; border-color: #16a34a;">
+              <span>⬇ Download Active PDF</span>
+            </a>
+            <a href="{{ url_for('view_catalog_pdf') }}" target="_blank" class="btn-admin-export" style="padding: 8px 16px; font-size: 0.84rem;">
+              <span>Preview in Browser ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2: Upload New Catalog PDF -->
+        <div class="admin-card" style="padding: 24px; margin-bottom: 24px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 6px;">
+            Upload & Replace Catalog PDF
+          </h3>
+          <p style="color: var(--admin-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Select a new technical brochure PDF from your computer. Once uploaded, all download links across the website will immediately serve this new PDF file.
+          </p>
+
+          <form action="{{ url_for('admin_catalog') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="upload_pdf">
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Select PDF Document * (Strictly .pdf format)</label>
+              <div class="file-dropzone-box" onclick="document.getElementById('catalogPdfInput').click()">
+                <div style="font-size: 2.2rem; margin-bottom: 6px;">📑</div>
+                <input type="file" name="catalog_pdf_file" id="catalogPdfInput" accept=".pdf,application/pdf" required style="display: none;" onchange="updatePdfSelectionName(this)">
+                <button type="button" class="btn-action-sm" style="padding: 8px 18px; font-weight: 700; background: white; border: 1px solid #93c5fd; cursor: pointer; border-radius: 6px;">
+                  Choose PDF from Computer
+                </button>
+                <div id="pdfSelectedNameDisplay" style="margin-top: 10px; font-size: 0.84rem; color: #1e40af; font-weight: 700;">
+                  Ready to upload: Supports official .pdf documents up to 32MB
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+              <label class="form-label">Downloaded File Name (Saved to customer's computer/phone)</label>
+              <input type="text" name="catalog_download_name" class="form-control" value="{{ cat_name }}" placeholder="Divya_Trading_Co_Catalog.pdf">
+              <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.76rem;">
+                Visitors downloading from the website will receive this exact filename (must end with <code>.pdf</code>).
+              </small>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-admin-primary" style="padding: 10px 22px; font-size: 0.92rem; background: #0284c7; border-color: #0284c7;">
+                <span>🚀 Upload & Activate Catalog PDF</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Card 3: Reset to Factory Default DTC PDF -->
+        <div class="admin-card" style="padding: 20px 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <h4 style="margin: 0 0 2px; font-size: 0.92rem; font-weight: 700; color: var(--admin-navy);">
+                Factory Default Catalog
+              </h4>
+              <p style="margin: 0; font-size: 0.78rem; color: #64748b;">
+                Reset back to the factory 8-page Rotary Printing Technical Catalog PDF (8.2 MB).
+              </p>
+            </div>
+            <form action="{{ url_for('admin_catalog') }}" method="POST" onsubmit="return confirm('Reset catalog to the default 8-page DTC technical brochure PDF?');">
+              <input type="hidden" name="action" value="reset_default">
+              <button type="submit" class="btn-action-sm" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700; padding: 7px 14px; cursor: pointer;">
+                ↺ Reset to Factory Default
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Front-end Details & Cover Image -->
+      <div>
+
+        <!-- Card 4: Catalog Details & Metadata -->
+        <div class="admin-card" style="padding: 24px; margin-bottom: 24px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 6px;">
+            Public Page Presentation & Text
+          </h3>
+          <p style="color: var(--admin-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Customize the title, badge, and description displayed on the public Download Catalog page.
+          </p>
+
+          <form action="{{ url_for('admin_catalog') }}" method="POST">
+            <input type="hidden" name="action" value="save_details">
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">Catalog Main Heading</label>
+              <input type="text" name="catalog_title" class="form-control" value="{{ cat_title }}" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Badge Text</label>
+                <input type="text" name="catalog_badge" class="form-control" value="{{ cat_badge }}" placeholder="Full PDF Catalog (8 Pages)">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">File Size Label</label>
+                <input type="text" name="catalog_file_size" class="form-control" value="{{ cat_size }}" placeholder="8.2 MB">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">Brochure Description Summary</label>
+              <textarea name="catalog_description" class="form-control" style="min-height: 80px;">{{ cat_desc }}</textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label">Download Filename</label>
+              <input type="text" name="catalog_download_name" class="form-control" value="{{ cat_name }}">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-label">Cloud URL Override (Optional)</label>
+              <input type="text" name="catalog_file_url" class="form-control" value="{{ cat_url }}" placeholder="e.g. /static/docs/... or https://drive.google.com/...">
+              <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.75rem;">
+                Internal path: <code>/static/docs/Divya_Trading_Co_Catalog.pdf</code> or external Google Drive link.
+              </small>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-admin-primary" style="padding: 9px 20px; font-size: 0.9rem;">
+                <span>💾 Save Catalog Details</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Card 5: Catalog Cover Preview Image -->
+        <div class="admin-card" style="padding: 24px;">
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 6px;">
+            Catalog Cover Preview Picture
+          </h3>
+          <p style="color: var(--admin-muted); font-size: 0.85rem; margin-bottom: 16px;">
+            The preview picture shown alongside the download button on the public page.
+          </p>
+
+          <form action="{{ url_for('admin_catalog') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="upload_cover">
+
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <img src="{{ cat_cover }}" alt="Catalog Cover" style="width: 100px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <div>
+                <strong style="font-size: 0.85rem; color: var(--admin-navy); display: block;">Current Cover Picture</strong>
+                <span style="font-size: 0.75rem; color: #64748b; word-break: break-all;">{{ cat_cover }}</span>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Upload New Cover Picture (JPG / PNG / WebP)</label>
+              <input type="file" name="catalog_cover_image" class="form-control" accept="image/*" required>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-admin-primary" style="padding: 9px 20px; font-size: 0.9rem; background: #0284c7; border-color: #0284c7;">
+                <span>🖼️ Update Cover Picture</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Live In-Browser PDF Preview Frame -->
+    <div class="admin-card" style="padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--admin-navy); margin: 0 0 4px;">
+            Interactive Live PDF Preview
+          </h3>
+          <p style="color: var(--admin-muted); font-size: 0.84rem; margin: 0;">
+            Inspect your technical brochure pages directly in this frame as your clients will see them.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="{{ url_for('view_catalog_pdf') }}" target="_blank" class="btn-action-sm" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; text-decoration: none; background: white; border: 1px solid #cbd5e1; border-radius: 6px; color: #0f172a;">
+            Open Fullscreen ↗
+          </a>
+        </div>
+      </div>
+
+      <div style="width: 100%; height: 580px; border-radius: 8px; overflow: hidden; border: 1px solid var(--admin-border); background: #f1f5f9;">
+        <iframe src="{{ url_for('view_catalog_pdf') }}" style="width: 100%; height: 100%; border: none;" title="DTC Technical Catalog Preview"></iframe>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function updatePdfSelectionName(input) {
+      const display = document.getElementById('pdfSelectedNameDisplay');
+      if (input.files && input.files.length > 0) {
+        display.innerHTML = '✓ Selected PDF: <strong>' + input.files[0].name + '</strong> (' + (input.files[0].size / (1024*1024)).toFixed(2) + ' MB)';
+        display.style.color = '#15803d';
+      }
+    }
+
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+      }
+    }
+  </script>
+
+</body>
+</html>

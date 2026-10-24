@@ -1,5 +1,7 @@
 import csv
 import io
+import os
+import shutil
 import re
 from datetime import datetime
 import openpyxl
@@ -8,6 +10,90 @@ from openpyxl.utils import get_column_letter
 
 from models import db, Category, MachineMake, Product
 from seed_data import slugify
+
+
+def resolve_product_image_path(raw_path, app_root=None):
+    """
+    Intelligently resolves any image path, filename, or URL provided during bulk upload
+    or manual entry into a valid, web-accessible URL.
+    
+    Supports:
+    1. Bare filenames: 'pinsensor.jpg' -> auto-checks static/images/products/, static/uploads/, static/images/
+    2. Relative subpaths: 'products/pinsensor.jpg', 'images/products/pinsensor.jpg', 'static/images/products/pinsensor.jpg'
+    3. Windows backslashes: 'static\\images\\products\\pinsensor.jpg'
+    4. Full absolute paths on this machine:
+       - 'D:/Imp/Website/static/images/products/pinsensor.jpg' -> extracts relative web path
+       - 'C:/Users/neelb/Downloads/sensor.jpg' -> auto-copies into static/images/products/ and returns web URL
+    5. Web URLs: 'http://...', 'https://...', '//...', 'data:image/...'
+    6. Empty / None -> defaults to '/static/images/hero_parts.jpg'
+    """
+    if not raw_path or not str(raw_path).strip():
+        return '/static/images/hero_parts.jpg'
+
+    cleaned = str(raw_path).strip().strip('\'"').replace('\\', '/')
+
+    # 1. External URLs or Data URIs
+    if cleaned.startswith(('http://', 'https://', '//', 'data:image/')):
+        return cleaned
+
+    # Fallback paths
+    if app_root is None:
+        try:
+            from flask import current_app
+            app_root = current_app.root_path
+        except Exception:
+            app_root = os.path.dirname(os.path.abspath(__file__))
+
+    static_dir = os.path.join(app_root, 'static')
+    products_img_dir = os.path.join(static_dir, 'images', 'products')
+    uploads_dir = os.path.join(static_dir, 'uploads')
+    general_img_dir = os.path.join(static_dir, 'images')
+
+    os.makedirs(products_img_dir, exist_ok=True)
+    os.makedirs(uploads_dir, exist_ok=True)
+
+    # 2. Check if it's an absolute path on filesystem or contains /static/
+    if '/static/' in cleaned.lower():
+        idx = cleaned.lower().rfind('/static/')
+        rel_static = cleaned[idx:]
+        return '/' + rel_static.lstrip('/')
+
+    if os.path.isabs(cleaned) or (len(cleaned) > 2 and cleaned[1] == ':'):
+        local_sys_path = os.path.normpath(cleaned)
+        if os.path.isfile(local_sys_path):
+            base_filename = os.path.basename(local_sys_path)
+            dest_path = os.path.join(products_img_dir, base_filename)
+            try:
+                if not os.path.exists(dest_path) or os.path.getsize(dest_path) != os.path.getsize(local_sys_path):
+                    shutil.copy2(local_sys_path, dest_path)
+                return f"/static/images/products/{base_filename}"
+            except Exception:
+                pass
+
+    # 3. Handle relative path prefixes
+    clean_no_slash = cleaned.lstrip('/')
+    if clean_no_slash.startswith('static/'):
+        return '/' + clean_no_slash
+    if clean_no_slash.startswith('images/products/'):
+        return '/static/' + clean_no_slash
+    if clean_no_slash.startswith('products/'):
+        return '/static/images/' + clean_no_slash
+    if clean_no_slash.startswith('images/'):
+        return '/static/' + clean_no_slash
+    if clean_no_slash.startswith('uploads/'):
+        return '/static/' + clean_no_slash
+
+    # 4. If user provided just a filename, search candidate folders on disk
+    base_file = os.path.basename(clean_no_slash)
+    if os.path.isfile(os.path.join(products_img_dir, base_file)):
+        return f"/static/images/products/{base_file}"
+    if os.path.isfile(os.path.join(general_img_dir, base_file)):
+        return f"/static/images/{base_file}"
+    if os.path.isfile(os.path.join(uploads_dir, base_file)):
+        return f"/static/uploads/{base_file}"
+
+    # 5. Default fallback to products directory if not yet on disk
+    return f"/static/images/products/{base_file}"
 
 
 def export_inquiries_csv(inquiries):
@@ -171,7 +257,7 @@ def generate_product_template_excel(categories=None, machines=None):
         "Material Grade",
         "Featured (Yes/No)",
         "Active (Yes/No)",
-        "Image Preset or URL"
+        "Image Path / File / URL"
     ]
     
     ws.append(headers)
@@ -337,7 +423,7 @@ def generate_product_template_excel(categories=None, machines=None):
         "4. Part Number is used as the unique key. If a product with the same Part Number exists, it will update it.",
         "5. Stock Status accepts: 'in_stock', 'out_of_stock', or 'made_to_order'.",
         "6. Featured and Active accept: 'Yes' or 'No'. Default is Active=Yes, Featured=No.",
-        "7. You can leave Image URL blank to use the default spare part graphic.",
+        "7. Image Path accepts any format: image filename (e.g. 'pinsensor.jpg' in static/images/products/ or static/uploads/), relative path ('images/products/pinsensor.jpg'), local file path on your computer (auto-imported!), or web URL ('https://...'). If left blank, uses default graphic.",
         "8. You can add as many rows as you need, then save and upload this Excel file in the admin panel."
     ]
 
@@ -371,7 +457,7 @@ def generate_product_template_excel(categories=None, machines=None):
     return output.getvalue()
 
 
-def import_products_from_file(file_storage, update_existing=True):
+def import_products_from_file(file_storage, update_existing=True, app_root=None):
     """
     Parses and imports products from an uploaded Excel (.xlsx, .xls) or CSV file.
     
@@ -484,7 +570,13 @@ def import_products_from_file(file_storage, update_existing=True):
         'material': ('materialgrade', 'material', 'composition', 'metal'),
         'is_featured': ('featured', 'isfeatured', 'highlight'),
         'is_active': ('active', 'isactive', 'status', 'livestatus', 'enabled'),
-        'image_url': ('imagepresetorurl', 'imageurl', 'image', 'photo', 'preset', 'photourl')
+        'image_url': (
+            'imagepresetorurl', 'imageurl', 'image', 'photo', 'preset', 'photourl',
+            'imagepath', 'imagespath', 'images', 'imagefile', 'imagefilename',
+            'imgpath', 'imgurl', 'img', 'picture', 'picturepath', 'pic',
+            'filepath', 'path', 'productimage', 'productphoto', 'itemimage',
+            'productimagepath', 'productimg'
+        )
     }
 
     for idx, raw_h in enumerate(header_row):
@@ -625,10 +717,9 @@ def import_products_from_file(file_storage, update_existing=True):
         raw_active = get_val('is_active', 'yes').lower()
         is_active = raw_active not in ('no', 'false', '0', 'n', 'disabled', 'inactive')
 
-        # 6. Image URL
-        image_url = get_val('image_url')
-        if not image_url:
-            image_url = '/static/images/hero_parts.jpg'
+        # 6. Image URL / Path Resolution
+        raw_img_val = get_val('image_url')
+        image_url = resolve_product_image_path(raw_img_val, app_root=app_root)
 
         # 7. Check if Product with this Part Number exists
         existing_prod = Product.query.filter(
@@ -649,7 +740,7 @@ def import_products_from_file(file_storage, update_existing=True):
                     existing_prod.stock_status = stock_status
                     existing_prod.is_featured = is_featured
                     existing_prod.is_active = is_active
-                    if image_url != '/static/images/hero_parts.jpg' or not existing_prod.image_url:
+                    if raw_img_val or not existing_prod.image_url:
                         existing_prod.image_url = image_url
                     updated_count += 1
                 else:

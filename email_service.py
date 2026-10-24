@@ -10,27 +10,41 @@ logger = logging.getLogger('EmailService')
 # In-memory log of sent/attempted emails for admin audit
 EMAIL_ACTIVITY_LOGS = []
 
-def send_email(subject, recipients, html_content, config):
+def send_email(subject, recipients, html_content, config, cc=None):
     """
     Sends an email using the SMTP settings provided in config.
-    Logs success or failure gracefully.
+    Logs success or failure gracefully with detailed error diagnostics.
     """
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     
     if not isinstance(recipients, list):
         recipients = [r.strip() for r in recipients.split(',') if r.strip()]
         
+    cc_list = []
+    if cc:
+        if isinstance(cc, list):
+            cc_list = [c.strip() for c in cc if c.strip()]
+        else:
+            cc_list = [c.strip() for c in cc.split(',') if c.strip()]
+
     sender = config.get('MAIL_DEFAULT_SENDER') or 'divya.trading06@gmail.com'
-    mail_server = config.get('MAIL_SERVER')
-    mail_port = config.get('MAIL_PORT', 587)
-    username = config.get('MAIL_USERNAME')
-    password = config.get('MAIL_PASSWORD')
+    mail_server = config.get('MAIL_SERVER') or 'smtp.gmail.com'
+    try:
+        mail_port = int(config.get('MAIL_PORT') or 587)
+    except (ValueError, TypeError):
+        mail_port = 587
+        
+    username = (config.get('MAIL_USERNAME') or '').strip()
+    password = (config.get('MAIL_PASSWORD') or '').strip().replace(' ', '')
     use_tls = config.get('MAIL_USE_TLS', True)
+    use_ssl = config.get('MAIL_USE_SSL', False) or (mail_port == 465)
     
+    all_recipients = list(dict.fromkeys(recipients + cc_list))
+
     log_entry = {
         'timestamp': timestamp,
         'subject': subject,
-        'recipients': recipients,
+        'recipients': all_recipients,
         'sender': sender,
         'status': 'pending',
         'error': None
@@ -39,21 +53,23 @@ def send_email(subject, recipients, html_content, config):
     # Check if SMTP credentials are provided
     if not username or not password:
         log_entry['status'] = 'simulated'
-        log_entry['note'] = 'SMTP credentials not configured in .env. Logged simulated email.'
+        log_entry['note'] = 'SMTP credentials not configured. Please enter your SMTP username & App Password in Website CMS & Settings.'
         EMAIL_ACTIVITY_LOGS.append(log_entry)
-        logger.info(f"[SIMULATED EMAIL] To: {recipients} | Subject: {subject}")
-        return True, "Email logged (Simulated Mode - configure SMTP in admin/env for live delivery)"
+        logger.info(f"[SIMULATED EMAIL] To: {all_recipients} | Subject: {subject}")
+        return False, "SMTP credentials not configured. Please configure your email username and App Password under Website CMS & Settings > SMTP."
         
     try:
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = f"Divya Trading Co. <{sender}>"
         msg['To'] = ", ".join(recipients)
+        if cc_list:
+            msg['Cc'] = ", ".join(cc_list)
         
         part = MIMEText(html_content, 'html')
         msg.attach(part)
         
-        if config.get('MAIL_USE_SSL'):
+        if use_ssl or mail_port == 465:
             server = smtplib.SMTP_SSL(mail_server, mail_port, timeout=15)
         else:
             server = smtplib.SMTP(mail_server, mail_port, timeout=15)
@@ -61,15 +77,29 @@ def send_email(subject, recipients, html_content, config):
                 server.starttls()
                 
         server.login(username, password)
-        server.sendmail(sender, recipients, msg.as_string())
+        server.sendmail(sender, all_recipients, msg.as_string())
         server.quit()
         
         log_entry['status'] = 'sent'
         EMAIL_ACTIVITY_LOGS.append(log_entry)
-        logger.info(f"[EMAIL SENT] To: {recipients} | Subject: {subject}")
+        logger.info(f"[EMAIL SENT] To: {all_recipients} | Subject: {subject}")
         return True, "Email sent successfully"
+    except smtplib.SMTPAuthenticationError as e:
+        err_msg = f"SMTP Authentication Failed: Mail server rejected username or password. If using Gmail, please use a 16-character App Password (not your normal password)."
+        logger.error(f"[EMAIL AUTH ERROR] {err_msg}")
+        log_entry['status'] = 'failed'
+        log_entry['error'] = err_msg
+        EMAIL_ACTIVITY_LOGS.append(log_entry)
+        return False, err_msg
+    except smtplib.SMTPConnectError as e:
+        err_msg = f"Could not connect to SMTP server ({mail_server}:{mail_port}). Please verify port and server address."
+        logger.error(f"[EMAIL CONNECT ERROR] {err_msg}")
+        log_entry['status'] = 'failed'
+        log_entry['error'] = err_msg
+        EMAIL_ACTIVITY_LOGS.append(log_entry)
+        return False, err_msg
     except Exception as e:
-        logger.error(f"[EMAIL ERROR] Failed sending to {recipients}: {str(e)}")
+        logger.error(f"[EMAIL ERROR] Failed sending to {all_recipients}: {str(e)}")
         log_entry['status'] = 'failed'
         log_entry['error'] = str(e)
         EMAIL_ACTIVITY_LOGS.append(log_entry)
@@ -358,3 +388,76 @@ def send_database_backup_email(backup_json_str, filename, config, recipient_emai
     except Exception as e:
         logger.error(f"[BACKUP EMAIL ERROR] {str(e)}")
         return False, str(e)
+
+
+def send_custom_customer_email(recipient_email, subject, message_body, config, customer_name=None, inquiry_number=None, cc=None):
+    """
+    Sends a beautifully formatted custom email to a customer with official DTC branding.
+    Supports paragraphs, line breaks, optional inquiry tag, and contact details.
+    """
+    greeting_name = customer_name or 'Valued Customer'
+    
+    # Format line breaks and paragraphs in body if plain text passed
+    if '<p>' not in message_body and '<br>' not in message_body and '<div>' not in message_body:
+        formatted_body = ''.join([f"<p style='margin:0 0 14px; line-height:1.6;'>{p.strip()}</p>" for p in message_body.split('\n\n') if p.strip()])
+        formatted_body = formatted_body.replace('\n', '<br>')
+    else:
+        formatted_body = message_body
+
+    inquiry_badge = f"""
+    <div style="display: inline-block; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; margin-bottom: 16px;">
+        Reference Inquiry #{inquiry_number}
+    </div>
+    """ if inquiry_number else ""
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>{subject}</title>
+    </head>
+    <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px;">
+        <div style="max-width: 650px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <div style="background: #0A2540; padding: 26px 28px; text-align: center; border-bottom: 4px solid #0052CC;">
+                <h2 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 0.5px;">DIVYA TRADING CO.</h2>
+                <p style="color: #93c5fd; margin: 4px 0 0; font-size: 13px;">Precision Rotary Printing Machine Spares • Ahmedabad, India</p>
+            </div>
+            
+            <div style="padding: 28px;">
+                {inquiry_badge}
+                
+                <p style="font-size: 15px; color: #1e293b; margin-top: 0;">Dear <strong>{greeting_name}</strong>,</p>
+                
+                <div style="font-size: 14px; color: #334155; line-height: 1.6; margin: 18px 0;">
+                    {formatted_body}
+                </div>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin: 26px 0 10px;">
+                    <h4 style="margin: 0 0 10px; color: #0A2540; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Direct Sales & Engineering Support:</h4>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #475569;">
+                        <tr>
+                            <td style="padding: 4px 0; width: 32%;"><strong>WhatsApp / Phone:</strong></td>
+                            <td style="padding: 4px 0;"><a href="https://wa.me/918320821579" style="color: #16a34a; text-decoration: none; font-weight: 700;">+91 83208 21579 💬</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Direct Email:</strong></td>
+                            <td style="padding: 4px 0;"><a href="mailto:divya.trading06@gmail.com" style="color: #0052CC; text-decoration: none;">divya.trading06@gmail.com</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Works & Office:</strong></td>
+                            <td style="padding: 4px 0;">15, Nageshwar Estate, Amraiwadi, Ahmedabad - 380026, Gujarat, India</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="background: #f1f5f9; padding: 14px 20px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0;">
+                Divya Trading Co. • Quality Industrial Printing Machine Spare Parts Since 1997<br>
+                <a href="https://divyatradingco.com" style="color: #0052CC; text-decoration: none;">divyatradingco.com</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(subject, [recipient_email], html, config, cc=cc)

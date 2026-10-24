@@ -98,6 +98,12 @@
         </span>
         <span>Manage Products</span>
       </a>
+      <a href="{{ url_for('admin_compose_email') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </span>
+        <span>Compose & Send Email</span>
+      </a>
       <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -115,6 +121,12 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
         </span>
         <span>Categories & Makes</span>
+      </a>
+      <a href="{{ url_for('admin_catalog') }}" class="sidebar-nav-item">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </span>
+        <span>Manage Catalog PDF</span>
       </a>
       <a href="{{ url_for('admin_settings') }}" class="sidebar-nav-item active">
         <span class="nav-icon">
@@ -317,8 +329,11 @@
               </p>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <a href="{{ get_val('catalog_file_url', url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf')) }}" target="_blank" class="btn-admin-export" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-weight: 700;">
-                <span>Test Current File ↗</span>
+              <a href="{{ url_for('admin_catalog') }}" class="btn-admin-export" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-weight: 700;">
+                <span>📘 Dedicated Catalog PDF Center ➔</span>
+              </a>
+              <a href="{{ url_for('download_catalog_pdf') }}" target="_blank" class="btn-admin-export" style="background: #f0fdf4; color: #15803d; border-color: #86efac; font-weight: 700;">
+                <span>⬇ Test Download PDF</span>
               </a>
               <a href="{{ url_for('download_catalog') }}" target="_blank" class="btn-admin-export" style="background: #f8fafc; color: #334155; border-color: #cbd5e1;">
                 <span>View Public Page ↗</span>
@@ -333,7 +348,7 @@
                 📄
               </div>
               <div>
-                <span style="font-size: 0.75rem; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.8px;">Current Active Catalog File</span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.8px;">Current Active Catalog PDF</span>
                 <div style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 800; color: #14532d; word-break: break-all;">
                   {{ get_val('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf') }}
                 </div>
@@ -342,8 +357,8 @@
                 </div>
               </div>
             </div>
-            <a href="{{ get_val('catalog_file_url', url_for('static', filename='docs/Divya_Trading_Co_Catalog.pdf')) }}" download="{{ get_val('catalog_download_name', 'Divya_Trading_Co_Catalog.pdf') }}" class="btn-admin-primary" style="padding: 8px 18px; font-size: 0.85rem; background: #16a34a; border-color: #16a34a;">
-              <span>⬇ Download Active File</span>
+            <a href="{{ url_for('download_catalog_pdf') }}" class="btn-admin-primary" style="padding: 8px 18px; font-size: 0.85rem; background: #16a34a; border-color: #16a34a;">
+              <span>⬇ Download Active PDF</span>
             </a>
           </div>
 
@@ -829,9 +844,17 @@
               <div class="form-group" style="margin-bottom: 12px;">
                 <input type="email" id="testEmailTarget" class="form-control" placeholder="your@email.com" value="neelbarot585@gmail.com">
               </div>
-              <button type="button" onclick="sendTestEmailAjax()" class="btn-admin-primary" style="width: 100%; justify-content: center; background: #059669;">
+              <button type="button" id="btnSendTestEmail" onclick="sendTestEmailAjax()" class="btn-admin-primary" style="width: 100%; justify-content: center; background: #059669;">
                 Send Test Email ✉
               </button>
+              <div id="testEmailStatus" style="display: none; margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 0.8rem; line-height: 1.4;"></div>
+              
+              <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--admin-border); text-align: center;">
+                <a href="{{ url_for('admin_compose_email') }}" style="display: inline-flex; align-items: center; gap: 6px; color: #0052cc; font-weight: 700; font-size: 0.82rem; text-decoration: none;">
+                  <span>✉️ Need to draft & share an email to a customer?</span>
+                  <span style="text-decoration: underline;">Open Composer ➔</span>
+                </a>
+              </div>
             </div>
 
             <!-- Complete Database Backup & Restore -->
@@ -912,8 +935,19 @@
     }
 
     async function sendTestEmailAjax() {
-      const email = document.getElementById('testEmailTarget').value;
-      if (!email) return alert('Please enter an email address.');
+      const email = document.getElementById('testEmailTarget').value.trim();
+      const btn = document.getElementById('btnSendTestEmail');
+      const statusBox = document.getElementById('testEmailStatus');
+      
+      if (!email) {
+        alert('Please enter a recipient email address.');
+        return;
+      }
+      
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = 'Connecting to SMTP & Sending... ⏳';
+      statusBox.style.display = 'none';
       
       const formData = new FormData();
       formData.append('action', 'test_email');
@@ -922,12 +956,34 @@
       try {
         const res = await fetch('{{ url_for("admin_settings") }}', {
           method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
           body: formData
         });
-        alert('Test email trigger sent! Check the notification log.');
-        window.location.reload();
+        const data = await res.json();
+        
+        statusBox.style.display = 'block';
+        if (data.success) {
+          statusBox.style.background = '#dcfce7';
+          statusBox.style.color = '#15803d';
+          statusBox.style.border = '1px solid #86efac';
+          statusBox.innerHTML = `<strong>✅ Success!</strong> ${data.message}`;
+        } else {
+          statusBox.style.background = '#fef2f2';
+          statusBox.style.color = '#991b1b';
+          statusBox.style.border = '1px solid #fca5a5';
+          statusBox.innerHTML = `<strong>⚠️ Status:</strong> ${data.message}`;
+        }
       } catch (e) {
-        alert('Error sending test email.');
+        statusBox.style.display = 'block';
+        statusBox.style.background = '#fef2f2';
+        statusBox.style.color = '#991b1b';
+        statusBox.style.border = '1px solid #fca5a5';
+        statusBox.innerHTML = `<strong>Error:</strong> Request failed (${e.message}). Please check server logs.`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
       }
     }
     function addBadgeRow(name = '', url = '') {
