@@ -20,8 +20,16 @@ def deploy():
     print("=" * 60)
     print()
     
-    # Prompt password securely
-    password = getpass.getpass(prompt=f"Enter SSH password for {USER}@{HOST} (or press Enter for email default): ")
+    # Accept password from command line or prompt securely
+    password = None
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--password" and len(sys.argv) > 2:
+            password = sys.argv[2]
+        else:
+            password = sys.argv[1]
+            
+    if not password:
+        password = getpass.getpass(prompt=f"Enter SSH password for {USER}@{HOST} (or press Enter for email default): ")
     if not password:
         password = "K#g9(m@$>r)7lm"
         print("Using default email password: K#g9(m@$>r)7lm")
