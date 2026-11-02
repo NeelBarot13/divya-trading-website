@@ -9,8 +9,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# SQLite Database (optional - keep instance clean)
+# SQLite Database (keep server and local databases independent)
 instance/
+*.db
 *.sqlite3
 *.db-shm
 *.db-wal
