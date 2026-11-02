@@ -75,8 +75,10 @@ def deploy():
     git reset --hard origin/main
     echo "=== CURRENT COMMIT ==="
     git log -1 --oneline
+    echo "=== ENSURING DATABASE TABLES EXIST ==="
+    ./venv/bin/python -c "from app import app, db; app.app_context().push(); db.create_all()" 2>/dev/null || true
     echo "=== RESTARTING GUNICORN & NGINX ==="
-    sudo systemctl restart gunicorn divya divyatrading 2>/dev/null || sudo systemctl restart gunicorn || true
+    sudo supervisorctl restart all
     sudo systemctl restart nginx
     echo "=== DEPLOYMENT COMPLETE ==="
     """
