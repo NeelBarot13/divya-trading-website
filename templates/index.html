@@ -84,12 +84,13 @@
         </p>
 
         <!-- Brand Compatibility Pills (Clickable & Configurable from Admin) -->
+        <!-- Brand Compatibility Pills (Clickable & Configurable from Admin) -->
         {% if site_settings.show_hero_brands != 'false' and brand_pills %}
         <div class="brand-pills-container">
           {% for b in brand_pills %}
           <a href="{{ b.url }}" class="brand-pill" title="View {{ b.name }} Compatible Spare Parts">
             <span>{{ b.name }}</span>
-            <span class="pill-arrow">➔</span>
+            <span class="pill-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
           </a>
           {% endfor %}
         </div>
@@ -98,14 +99,18 @@
         <!-- Trust Badges -->
         <div class="hero-trust-badges">
           <div class="trust-badge-item">
-            <div class="trust-badge-icon">⚙️</div>
+            <div class="trust-badge-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </div>
             <div class="trust-badge-text">
               <h4>{{ site_settings.trust_badge_1_title or 'SINCE 1997' }}</h4>
               <p>{{ site_settings.trust_badge_1_desc or 'Over Two Decades of Excellence' }}</p>
             </div>
           </div>
           <div class="trust-badge-item">
-            <div class="trust-badge-icon">🌐</div>
+            <div class="trust-badge-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </div>
             <div class="trust-badge-text">
               <h4>{{ site_settings.trust_badge_2_title or 'GLOBAL QUALITY' }}</h4>
               <p>{{ site_settings.trust_badge_2_desc or 'Trusted by Clients Worldwide' }}</p>
@@ -160,14 +165,17 @@
   <div class="container">
     <div class="quality-banner-wrapper">
       <div class="quality-banner-content">
-        <div class="quality-banner-icon">⚙️</div>
+        <div class="quality-banner-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
         <h2 class="quality-banner-title">{{ site_settings.quality_banner_title or 'QUALITY YOU CAN TRUST' }}</h2>
         <p class="quality-banner-text">
           {{ site_settings.quality_banner_text or 'With over two decades of experience, we are a leader in quality products. Our reputation is based on performance, reliability and customer satisfaction across textile printing mills worldwide.' }}
         </p>
         <div style="margin-top: 24px;">
-          <a href="{{ url_for('products') }}" class="btn-enquire-white" style="font-size: 0.82rem; padding: 9px 20px;">
-            Explore Complete Range ➔
+          <a href="{{ url_for('products') }}" class="btn-enquire-white" style="font-size: 0.82rem; padding: 9px 20px; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Explore Complete Range</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </a>
         </div>
       </div>
@@ -196,7 +204,23 @@
       {% for pillar in why_choose_pillars %}
       {% if pillar.title or pillar.desc %}
       <div class="pillar-card">
-        <div class="pillar-icon-box">{{ pillar.icon or '⭐' }}</div>
+        <div class="pillar-icon-box">
+          {% if pillar.icon == 'experience' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+          {% elif pillar.icon == 'quality' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+          {% elif pillar.icon == 'range' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          {% elif pillar.icon == 'global' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          {% elif pillar.icon == 'support' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+          {% elif pillar.icon == 'delivery' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+          {% else %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+          {% endif %}
+        </div>
         {% if pillar.title %}<h3 class="pillar-title">{{ pillar.title }}</h3>{% endif %}
         {% if pillar.desc %}<p class="pillar-desc">{{ pillar.desc }}</p>{% endif %}
       </div>
@@ -223,8 +247,9 @@
           {{ site_settings.featured_section_title or 'Featured Spare Parts' }}
         </h2>
       </div>
-      <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.85rem; padding: 9px 18px;">
-        View Complete Catalog ➔
+      <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.85rem; padding: 9px 18px; display: inline-flex; align-items: center; gap: 6px;">
+        <span>View Complete Catalog</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </a>
     </div>
 
@@ -306,83 +331,97 @@
       <!-- Stormac Rotary Spares -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-          <span style="width: 44px; height: 44px; border-radius: 8px; background: #DBEAFE; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">⚙️</span>
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #DBEAFE; display: flex; align-items: center; justify-content: center; color: #0052CC;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </span>
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
               Stormac Rotary Printing Spare Parts
             </h3>
-            <span style="font-size: 0.75rem; color: var(--dtc-blue); font-weight: 600;">RD-IV & Pegasus Series Compatible</span>
+            <span style="font-size: 0.75rem; color: var(--dtc-blue); font-weight: 600;">RD-IV &amp; Pegasus Series Compatible</span>
           </div>
         </div>
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
-          Complete spare parts range for <strong>Stormac rotary printing machines</strong>: 64R & 81.9R screen head drive ring assemblies, repeat spur gears, magnetic rods, doctor squeegee blade coils, and heavy-duty colour pumps.
+          Complete spare parts range for <strong>Stormac rotary printing machines</strong>: 64R &amp; 81.9R screen head drive ring assemblies, repeat spur gears, magnetic rods, doctor squeegee blade coils, and heavy-duty colour pumps.
         </p>
         <a href="{{ url_for('machine_detail', slug='stormac') }}" class="btn-action-sm" style="font-weight: 700; color: var(--dtc-blue); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Explore Stormac Spares ➔
+          <span>Explore Stormac Spares</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
 
       <!-- Laxmi Rotary Spares -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-          <span style="width: 44px; height: 44px; border-radius: 8px; background: #DCFCE7; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🛠️</span>
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #DCFCE7; display: flex; align-items: center; justify-content: center; color: #166534;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+          </span>
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
               Laxmi Rotary Printing Spare Parts
             </h3>
-            <span style="font-size: 0.75rem; color: #166534; font-weight: 600;">Heavy Duty Surat & Ahmedabad Process Spares</span>
+            <span style="font-size: 0.75rem; color: #166534; font-weight: 600;">Heavy Duty Surat &amp; Ahmedabad Process Spares</span>
           </div>
         </div>
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
           Precision engineered replacement components for <strong>Laxmi rotary printing machines</strong>: screen head assemblies, pneumatic dye feed pumps, squeegee holders, repeat drive gears, and bearing housings built for non-stop shift runs.
         </p>
         <a href="{{ url_for('machine_detail', slug='laxmi') }}" class="btn-action-sm" style="font-weight: 700; color: #166534; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Explore Laxmi Spares ➔
+          <span>Explore Laxmi Spares</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
 
       <!-- Stork Rotary Spares -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-          <span style="width: 44px; height: 44px; border-radius: 8px; background: #FEF3C7; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🔄</span>
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #FEF3C7; display: flex; align-items: center; justify-content: center; color: #92400E;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          </span>
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
               Stork Rotary Printing Spare Parts
             </h3>
-            <span style="font-size: 0.75rem; color: #92400E; font-weight: 600;">RD-3, RD-4 & RD-DD Systems</span>
+            <span style="font-size: 0.75rem; color: #92400E; font-weight: 600;">RD-3, RD-4 &amp; RD-DD Systems</span>
           </div>
         </div>
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
           High tolerance replacement spares for <strong>Stork rotary screen printing machines</strong>: precision 640mm (64R), 819mm (81.9R), and 914mm (91.4R) screen head rings, ground repeat gears, colour pump diaphragms, and seal rings.
         </p>
         <a href="{{ url_for('machine_detail', slug='stork-rd-3-rd-4') }}" class="btn-action-sm" style="font-weight: 700; color: #92400E; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Explore Stork Spares ➔
+          <span>Explore Stork Spares</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
 
       <!-- Zimmer Rotary Spares -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-          <span style="width: 44px; height: 44px; border-radius: 8px; background: #EDE9FE; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">🧲</span>
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #EDE9FE; display: flex; align-items: center; justify-content: center; color: #6D28D9;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M4 14h16"></path><path d="M6 18h12"></path></svg>
+          </span>
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
               Zimmer Rotary Printing Spares
             </h3>
-            <span style="font-size: 0.75rem; color: #6D28D9; font-weight: 600;">Magnet System & Squeegee Specialists</span>
+            <span style="font-size: 0.75rem; color: #6D28D9; font-weight: 600;">Magnet System &amp; Squeegee Specialists</span>
           </div>
         </div>
         <p style="font-size: 0.86rem; color: #475569; line-height: 1.55; margin-bottom: 18px; flex-grow: 1;">
           Replacement components for <strong>Zimmer rotary printing machines</strong>: magnetic squeegee roll rods, Swedish blue spring steel doctor blade coils (0.15mm / 0.20mm), screen head adaptors, and drive transmission parts.
         </p>
         <a href="{{ url_for('machine_detail', slug='zimmer') }}" class="btn-action-sm" style="font-weight: 700; color: #6D28D9; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Explore Zimmer Spares ➔
+          <span>Explore Zimmer Spares</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
 
       <!-- Reggiani Spares -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-          <span style="width: 44px; height: 44px; border-radius: 8px; background: #FFE4E6; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">📐</span>
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #FFE4E6; display: flex; align-items: center; justify-content: center; color: #BE123C;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
+          </span>
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
               Reggiani Rotary Printing Spares
@@ -394,14 +433,17 @@
           Precision parts for <strong>Reggiani textile rotary machines</strong>: repeat gears, screen clamps, ink pump assemblies, and high-tolerance bearings engineered to prevent backlash and color misregistration.
         </p>
         <a href="{{ url_for('machine_detail', slug='reggiani') }}" class="btn-action-sm" style="font-weight: 700; color: #BE123C; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Explore Reggiani Spares ➔
+          <span>Explore Reggiani Spares</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
 
       <!-- Ichinose Spares -->
       <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 26px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-          <span style="width: 44px; height: 44px; border-radius: 8px; background: #CFFAFE; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">⚡</span>
+          <span style="width: 44px; height: 44px; border-radius: 8px; background: #CFFAFE; display: flex; align-items: center; justify-content: center; color: #0E7490;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </span>
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-navy); margin: 0;">
               Ichinose Screen Printing Spares
@@ -413,7 +455,8 @@
           Custom CNC machined spares for <strong>Ichinose rotary printing machines</strong>: repeat gears, squeegee angle holders, wash-off rings, and color pump accessories manufactured to micron-level accuracy.
         </p>
         <a href="{{ url_for('machine_detail', slug='ichinose') }}" class="btn-action-sm" style="font-weight: 700; color: #0E7490; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Explore Ichinose Spares ➔
+          <span>Explore Ichinose Spares</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
     </div>

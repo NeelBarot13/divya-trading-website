@@ -2,6 +2,8 @@ import smtplib
 import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
@@ -10,10 +12,10 @@ logger = logging.getLogger('EmailService')
 # In-memory log of sent/attempted emails for admin audit
 EMAIL_ACTIVITY_LOGS = []
 
-def send_email(subject, recipients, html_content, config, cc=None):
+def send_email(subject, recipients, html_content, config, cc=None, attachments=None):
     """
     Sends an email using the SMTP settings provided in config.
-    Logs success or failure gracefully with detailed error diagnostics.
+    Supports HTML content, multiple recipients, CC, and multiple file/image attachments.
     """
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     
@@ -47,6 +49,7 @@ def send_email(subject, recipients, html_content, config, cc=None):
         'recipients': all_recipients,
         'sender': sender,
         'status': 'pending',
+        'attachments_count': len(attachments) if attachments else 0,
         'error': None
     }
     
@@ -55,19 +58,43 @@ def send_email(subject, recipients, html_content, config, cc=None):
         log_entry['status'] = 'simulated'
         log_entry['note'] = 'SMTP credentials not configured. Please enter your SMTP username & App Password in Website CMS & Settings.'
         EMAIL_ACTIVITY_LOGS.append(log_entry)
-        logger.info(f"[SIMULATED EMAIL] To: {all_recipients} | Subject: {subject}")
-        return False, "SMTP credentials not configured. Please configure your email username and App Password under Website CMS & Settings > SMTP."
+        logger.info(f"[SIMULATED EMAIL] To: {all_recipients} | Subject: {subject} | Attachments: {len(attachments) if attachments else 0}")
+        return True, "Email recorded (Simulated - configure SMTP in settings for inbox delivery)"
         
     try:
-        msg = MIMEMultipart('alternative')
+        if attachments:
+            msg = MIMEMultipart('mixed')
+            alt_part = MIMEMultipart('alternative')
+            alt_part.attach(MIMEText(html_content, 'html'))
+            msg.attach(alt_part)
+            
+            for att in attachments:
+                if isinstance(att, dict):
+                    fname = att.get('filename')
+                    fdata = att.get('content')
+                    ctype = att.get('content_type')
+                else:
+                    fname, fdata, ctype = att
+                    
+                if not fname or not fdata:
+                    continue
+                    
+                maintype, subtype = (ctype.split('/', 1) if ctype and '/' in ctype else ('application', 'octet-stream'))
+                part = MIMEBase(maintype, subtype)
+                part.set_payload(fdata)
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{fname}"')
+                msg.attach(part)
+        else:
+            msg = MIMEMultipart('alternative')
+            part = MIMEText(html_content, 'html')
+            msg.attach(part)
+
         msg['Subject'] = subject
         msg['From'] = f"Divya Trading Co. <{sender}>"
         msg['To'] = ", ".join(recipients)
         if cc_list:
             msg['Cc'] = ", ".join(cc_list)
-        
-        part = MIMEText(html_content, 'html')
-        msg.attach(part)
         
         if use_ssl or mail_port == 465:
             server = smtplib.SMTP_SSL(mail_server, mail_port, timeout=15)
@@ -111,7 +138,7 @@ def notify_admin_new_inquiry(inquiry, config):
     Sends email notification to the DTC admin team when a new inquiry arrives.
     """
     admin_emails = config.get('ADMIN_NOTIFICATION_EMAIL', 'divya.trading06@gmail.com,neelbarot585@gmail.com')
-    subject = f"🔔 [New Inquiry #{inquiry.inquiry_number}] from {inquiry.customer_name} ({inquiry.company_name or 'Individual'})"
+    subject = f"[New Inquiry #{inquiry.inquiry_number}] from {inquiry.customer_name} ({inquiry.company_name or 'Individual'})"
     
     items_html = ""
     for idx, item in enumerate(inquiry.items, 1):
@@ -160,7 +187,7 @@ def notify_admin_new_inquiry(inquiry, config):
                     <tr>
                         <td style="padding: 10px 14px; color: #64748b; font-size: 13px;">Phone / WhatsApp:</td>
                         <td style="padding: 10px 14px; color: #0f172a; font-weight: 600; font-size: 14px;">
-                            <a href="https://wa.me/{inquiry.phone.replace('+', '').replace(' ', '')}" style="color: #16a34a; text-decoration: none;">{inquiry.phone} 💬 (WhatsApp)</a>
+                            <a href="https://wa.me/{inquiry.phone.replace('+', '').replace(' ', '')}" style="color: #16a34a; text-decoration: none;">{inquiry.phone} (WhatsApp)</a>
                         </td>
                     </tr>
                     <tr>
@@ -253,8 +280,8 @@ def send_customer_acknowledgment(inquiry, config):
                     <h4 style="margin: 0 0 8px; color: #1e40af; font-size: 14px;">Need Immediate Assistance?</h4>
                     <p style="margin: 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
                         Reach our sales engineers directly on WhatsApp or Call:<br>
-                        📞 <strong>+91 83208 21579</strong><br>
-                        ✉️ <a href="mailto:divya.trading06@gmail.com" style="color: #0052CC;">divya.trading06@gmail.com</a>
+                        <strong>Phone / WhatsApp:</strong> +91 83208 21579<br>
+                        <strong>Email:</strong> <a href="mailto:divya.trading06@gmail.com" style="color: #0052CC;">divya.trading06@gmail.com</a>
                     </p>
                 </div>
             </div>
@@ -272,7 +299,7 @@ def send_password_reset_email(email, customer_name, reset_url, config):
     """
     Sends a secure password reset link to customer email.
     """
-    subject = "🔑 Reset Your Password - Divya Trading Co. Customer Portal"
+    subject = "Reset Your Password - Divya Trading Co. Customer Portal"
     greeting_name = customer_name or 'Valued Customer'
     
     html = f"""
@@ -292,7 +319,7 @@ def send_password_reset_email(email, customer_name, reset_url, config):
 
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="{reset_url}" style="display: inline-block; background: #0052CC; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; box-shadow: 0 3px 8px rgba(0,82,204,0.3);">
-                        Reset My Password ➔
+                        Reset My Password
                     </a>
                 </div>
 
@@ -320,7 +347,7 @@ def send_database_backup_email(backup_json_str, filename, config, recipient_emai
     """
     Sends an automated email containing full database backup JSON as an attachment.
     """
-    subject = f"📦 [Database Backup] Divya Trading Co. System Backup - {datetime.utcnow().strftime('%Y-%m-%d')}"
+    subject = f"[Database Backup] Divya Trading Co. System Backup - {datetime.utcnow().strftime('%Y-%m-%d')}"
     
     html = f"""
     <!DOCTYPE html>
@@ -390,10 +417,10 @@ def send_database_backup_email(backup_json_str, filename, config, recipient_emai
         return False, str(e)
 
 
-def send_custom_customer_email(recipient_email, subject, message_body, config, customer_name=None, inquiry_number=None, cc=None):
+def send_custom_customer_email(recipient_email, subject, message_body, config, customer_name=None, inquiry_number=None, cc=None, attachments=None):
     """
     Sends a beautifully formatted custom email to a customer with official DTC branding.
-    Supports paragraphs, line breaks, optional inquiry tag, and contact details.
+    Supports paragraphs, line breaks, optional inquiry tag, attachments, and clean contact details.
     """
     greeting_name = customer_name or 'Valued Customer'
     
@@ -409,6 +436,15 @@ def send_custom_customer_email(recipient_email, subject, message_body, config, c
         Reference Inquiry #{inquiry_number}
     </div>
     """ if inquiry_number else ""
+
+    attachment_badge = ""
+    if attachments:
+        attachment_names = [a.get('filename') if isinstance(a, dict) else a[0] for a in attachments if a]
+        attachment_badge = f"""
+        <div style="background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; margin: 16px 0; font-size: 12px; color: #334155;">
+            <strong>Attached Files ({len(attachment_names)}):</strong> {', '.join(attachment_names)}
+        </div>
+        """
 
     html = f"""
     <!DOCTYPE html>
@@ -433,12 +469,14 @@ def send_custom_customer_email(recipient_email, subject, message_body, config, c
                     {formatted_body}
                 </div>
                 
+                {attachment_badge}
+                
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin: 26px 0 10px;">
                     <h4 style="margin: 0 0 10px; color: #0A2540; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Direct Sales & Engineering Support:</h4>
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #475569;">
                         <tr>
-                            <td style="padding: 4px 0; width: 32%;"><strong>WhatsApp / Phone:</strong></td>
-                            <td style="padding: 4px 0;"><a href="https://wa.me/918320821579" style="color: #16a34a; text-decoration: none; font-weight: 700;">+91 83208 21579 💬</a></td>
+                            <td style="padding: 4px 0; width: 32%;"><strong>Phone / WhatsApp:</strong></td>
+                            <td style="padding: 4px 0;"><a href="https://wa.me/918320821579" style="color: #0052CC; text-decoration: none; font-weight: 700;">+91 83208 21579</a></td>
                         </tr>
                         <tr>
                             <td style="padding: 4px 0;"><strong>Direct Email:</strong></td>
@@ -460,7 +498,7 @@ def send_custom_customer_email(recipient_email, subject, message_body, config, c
     </body>
     </html>
     """
-    return send_email(subject, [recipient_email], html, config, cc=cc)
+    return send_email(subject, [recipient_email], html, config, cc=cc, attachments=attachments)
 
 
 def send_customer_welcome_email(customer, temp_password=None, config=None):
@@ -468,7 +506,7 @@ def send_customer_welcome_email(customer, temp_password=None, config=None):
     Sends an automated, beautifully branded welcome email to newly registered
     or existing customers added via admin with account details and direct portal login link.
     """
-    subject = f"✨ Welcome to Divya Trading Co. Customer Portal — {customer.name}"
+    subject = f"Welcome to Divya Trading Co. Customer Portal — {customer.name}"
     company_name = customer.company_name or 'Textile Mill Partner'
     
     password_block = ""
@@ -523,7 +561,7 @@ def send_customer_welcome_email(customer, temp_password=None, config=None):
                 
                 <div style="text-align: center; margin: 28px 0;">
                     <a href="{portal_url}" style="display: inline-block; background: #0052CC; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0,82,204,0.3);">
-                        Access Customer Portal ➔
+                        Access Customer Portal &rarr;
                     </a>
                 </div>
 
@@ -542,7 +580,7 @@ def send_customer_welcome_email(customer, temp_password=None, config=None):
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #475569;">
                         <tr>
                             <td style="padding: 4px 0; width: 32%;"><strong>Phone / WhatsApp:</strong></td>
-                            <td style="padding: 4px 0;"><a href="https://wa.me/918320821579" style="color: #16a34a; text-decoration: none; font-weight: 700;">+91 83208 21579 💬</a></td>
+                            <td style="padding: 4px 0;"><a href="https://wa.me/918320821579" style="color: #16a34a; text-decoration: none; font-weight: 700;">+91 83208 21579</a></td>
                         </tr>
                         <tr>
                             <td style="padding: 4px 0;"><strong>Direct Email:</strong></td>

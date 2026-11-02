@@ -135,7 +135,10 @@
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </span>
-        <span>View Live Website ↗</span>
+        <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <span>View Live Website</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </span>
       </a>
     </nav>
 
@@ -245,7 +248,9 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               <span>Delete</span>
             </button>
-            <button type="button" class="btn-bulk-close" onclick="deselectAllProducts()" title="Deselect All">✕</button>
+            <button type="button" class="btn-bulk-close" onclick="deselectAllProducts()" title="Deselect All" style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(255,255,255,0.15); border: none; border-radius: 4px; color: white; cursor: pointer;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -278,8 +283,9 @@
               </td>
               <td style="font-weight: 700; color: #0052cc;">{{ prod.part_number }}</td>
               <td style="font-weight: 600;">
-                <a href="{{ url_for('product_detail', slug=prod.slug) }}" target="_blank" style="color: #0F172A; text-decoration: none;">
-                  {{ prod.name }} ↗
+                <a href="{{ url_for('product_detail', slug=prod.slug) }}" target="_blank" style="color: #0F172A; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                  <span>{{ prod.name }}</span>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 </a>
                 {% if prod.is_featured %}
                 <span style="background: #fef3c7; color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; margin-left: 4px;">Featured</span>
@@ -337,28 +343,34 @@
     <div class="modal-box" style="max-width: 620px;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.4rem;">📊</span>
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: #e0f2fe; color: #0284c7; display: inline-flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          </div>
           <div>
             <h3 style="margin: 0; font-size: 1.15rem;">Bulk Product Upload (Excel / CSV)</h3>
             <p style="margin: 2px 0 0; font-size: 0.78rem; color: #64748B;">Add multiple products at once by uploading your spreadsheet</p>
           </div>
         </div>
-        <button class="modal-close-btn" onclick="document.getElementById('bulkImportModal').classList.remove('active')">✕</button>
+        <button class="modal-close-btn" onclick="document.getElementById('bulkImportModal').classList.remove('active')" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 4px; cursor: pointer; color: #64748b;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <div class="modal-body" style="padding: 24px;">
         <!-- Demo File Download Card -->
         <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
           <div>
-            <div style="font-weight: 700; color: #166534; font-size: 0.9rem; margin-bottom: 2px;">
-              📥 Need the sample Excel spreadsheet?
+            <div style="font-weight: 700; color: #166534; font-size: 0.9rem; margin-bottom: 2px; display: flex; align-items: center; gap: 6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Need the sample Excel spreadsheet?</span>
             </div>
             <div style="font-size: 0.8rem; color: #15803D;">
               Download our pre-formatted demo template with realistic spare parts and reference guide.
             </div>
           </div>
-          <a href="{{ url_for('admin_download_product_template') }}" class="btn-admin-export" style="background: #16A34A; color: white; border: none; padding: 7px 14px; font-size: 0.82rem; font-weight: 700; text-decoration: none; border-radius: 6px; white-space: nowrap;">
-            Download Demo Excel (.xlsx) ➔
+          <a href="{{ url_for('admin_download_product_template') }}" class="btn-admin-export" style="background: #16A34A; color: white; border: none; padding: 7px 14px; font-size: 0.82rem; font-weight: 700; text-decoration: none; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Download Demo Excel (.xlsx)</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           </a>
         </div>
 
@@ -369,11 +381,15 @@
               Select Excel or CSV File *
             </label>
             <div style="border: 2px dashed #CBD5E1; border-radius: 10px; padding: 24px; text-align: center; background: #F8FAFC; transition: all 0.2s;" id="dropZoneContainer">
-              <div style="font-size: 2rem; margin-bottom: 8px;">📑</div>
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: #EEF2FF; color: var(--dtc-blue); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              </div>
               <input type="file" name="excel_file" id="excelFileInput" accept=".xlsx, .xls, .csv" required style="display: none;" onchange="updateSelectedFileName(this)">
-              <button type="button" class="btn-action-sm" style="padding: 8px 18px; font-weight: 700; background: white; border: 1px solid #CBD5E1; cursor: pointer; border-radius: 6px;" onclick="document.getElementById('excelFileInput').click()">
-                Choose File from Computer
-              </button>
+              <div>
+                <button type="button" class="btn-action-sm" style="padding: 8px 18px; font-weight: 700; background: white; border: 1px solid #CBD5E1; cursor: pointer; border-radius: 6px;" onclick="document.getElementById('excelFileInput').click()">
+                  Choose File from Computer
+                </button>
+              </div>
               <div id="selectedFileNameDisplay" style="margin-top: 10px; font-size: 0.84rem; color: #64748B; font-weight: 600;">
                 Supported: .xlsx, .xls, .csv (Max 15MB)
               </div>
@@ -387,8 +403,9 @@
               <span style="font-size: 0.74rem; background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Multiple Files or .ZIP</span>
             </label>
             <input type="file" name="product_images" multiple accept="image/*,.zip" class="form-control" style="padding: 8px 12px; font-size: 0.84rem;">
-            <div style="font-size: 0.77rem; color: #64748B; margin-top: 5px; line-height: 1.4;">
-              💡 <strong>Flexible Images:</strong> Select multiple image files or upload a <code>.zip</code> file here. You can also directly place image files into <code>static/images/products/</code> or write their filenames, computer file paths, or image URLs into your spreadsheet!
+            <div style="font-size: 0.77rem; color: #64748B; margin-top: 5px; line-height: 1.4; display: flex; align-items: flex-start; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" style="margin-top: 2px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span><strong>Flexible Images:</strong> Select multiple image files or upload a <code>.zip</code> file here. You can also directly place image files into <code>static/images/products/</code> or write their filenames, computer file paths, or image URLs into your spreadsheet!</span>
             </div>
           </div>
 
@@ -407,7 +424,10 @@
 
           <!-- Helpful Highlights -->
           <div style="font-size: 0.8rem; color: #475569; margin-bottom: 22px; line-height: 1.5; padding-left: 6px;">
-            <div style="font-weight: 700; color: #0F172A; margin-bottom: 4px;">⚡ Smart Import Highlights:</div>
+            <div style="font-weight: 700; color: #0F172A; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>Smart Import Highlights:</span>
+            </div>
             <ul style="margin: 0; padding-left: 18px;">
               <li><strong>Image Path Flexibility:</strong> Write simple filenames (e.g. <code>pinsensor.jpg</code>), folder paths (e.g. <code>/static/images/products/pinsensor.jpg</code>), local PC paths (e.g. <code>D:\Photos\part.jpg</code>), or web URLs. All formats work seamlessly!</li>
               <li><strong>Automatic Categories:</strong> New categories typed in the sheet are automatically created.</li>
@@ -420,8 +440,9 @@
             <button type="button" class="btn-action-sm" onclick="document.getElementById('bulkImportModal').classList.remove('active')" style="padding: 10px 18px; font-size: 0.9rem;">
               Cancel
             </button>
-            <button type="submit" class="btn-admin-primary" style="padding: 10px 22px; font-size: 0.9rem; justify-content: center; background: #0284c7; border-color: #0284c7;">
-              <span>Upload & Import Products ➔</span>
+            <button type="submit" class="btn-admin-primary" style="padding: 10px 22px; font-size: 0.9rem; justify-content: center; background: #0284c7; border-color: #0284c7; display: inline-flex; align-items: center; gap: 6px;">
+              <span>Upload & Import Products</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
           </div>
         </form>
@@ -434,7 +455,9 @@
     <div class="modal-box" style="max-width: 680px;">
       <div class="modal-header">
         <h3>Add New Machine Spare Part</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('addProductModal').classList.remove('active')">✕</button>
+        <button class="modal-close-btn" onclick="document.getElementById('addProductModal').classList.remove('active')" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 4px; cursor: pointer; color: #64748b;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <div class="modal-body">
         <form action="{{ url_for('admin_add_product') }}" method="POST" enctype="multipart/form-data">
@@ -547,7 +570,9 @@
     <div class="modal-box" style="max-width: 680px;">
       <div class="modal-header">
         <h3>Edit Spare Part</h3>
-        <button class="modal-close-btn" onclick="document.getElementById('editProductModal').classList.remove('active')">✕</button>
+        <button class="modal-close-btn" onclick="document.getElementById('editProductModal').classList.remove('active')" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 4px; cursor: pointer; color: #64748b;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <div class="modal-body">
         <form id="editProductForm" action="" method="POST" enctype="multipart/form-data">

@@ -3024,3 +3024,190 @@ body.drawer-open {
   background: #EFF6FF;
   color: #0052CC;
 }
+
+/* ==========================================================================
+   MODERN B2B INDUSTRIAL POLISH & MICRO-ANIMATIONS
+   Clean, Engineered, Ultra-Professional Aesthetic
+   ========================================================================== */
+
+/* Keyframe Animations */
+@keyframes dtcFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dtcShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes dtcPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 82, 204, 0);
+  }
+}
+
+/* Hero Section Entrance Stagger */
+.hero-content h1 {
+  animation: dtcFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-subtitle {
+  animation: dtcFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.hero-actions {
+  animation: dtcFadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
+}
+
+.hero-badges-block {
+  animation: dtcFadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+/* Micro-Interactions on Interactive Elements */
+.btn-primary,
+.btn-enquire-primary,
+.btn-add-cart-primary,
+.btn-cta-blue {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, background-color 0.2s ease, border-color 0.2s ease !important;
+}
+
+.btn-primary:hover,
+.btn-enquire-primary:hover,
+.btn-add-cart-primary:hover,
+.btn-cta-blue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 82, 204, 0.25) !important;
+}
+
+.btn-primary:active,
+.btn-enquire-primary:active,
+.btn-add-cart-primary:active,
+.btn-cta-blue:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-card-add-cart {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease !important;
+}
+
+.btn-card-add-cart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(10, 37, 64, 0.08) !important;
+}
+
+.btn-card-add-cart:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Product Card Premium 3D Elevation */
+.product-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.25s ease !important;
+  will-change: transform, box-shadow;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px rgba(10, 37, 64, 0.08), 0 2px 8px rgba(0, 82, 204, 0.06) !important;
+  border-color: rgba(0, 82, 204, 0.28) !important;
+}
+
+.product-card-img-wrap {
+  overflow: hidden;
+}
+
+.product-card-img-wrap img {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.product-card:hover .product-card-img-wrap img {
+  transform: scale(1.05);
+}
+
+/* Machine Make Card Polish */
+.machine-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.25s ease !important;
+}
+
+.machine-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(10, 37, 64, 0.08) !important;
+  border-color: rgba(0, 82, 204, 0.3) !important;
+}
+
+.machine-card-icon {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease !important;
+}
+
+.machine-card:hover .machine-card-icon {
+  transform: scale(1.08);
+  background: var(--dtc-blue) !important;
+  color: #FFFFFF !important;
+}
+
+/* Value Pillar Cards Hover Effects */
+.pillar-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.2s ease !important;
+}
+
+.pillar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(10, 37, 64, 0.07) !important;
+  border-color: #93c5fd !important;
+}
+
+.pillar-icon-box {
+  transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease !important;
+}
+
+.pillar-card:hover .pillar-icon-box {
+  transform: scale(1.1);
+  background: #0052cc !important;
+  color: #FFFFFF !important;
+}
+
+/* Brand Badges Micro-Interactions */
+.brand-pill-btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+.brand-pill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 82, 204, 0.15);
+  border-color: #0052cc !important;
+}
+
+/* Vector SVG Crispness & Alignment */
+svg {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* Modern Card Glow & Clean Borders */
+.clean-corporate-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(10, 37, 64, 0.04);
+  transition: var(--transition);
+}
+
+.clean-corporate-card:hover {
+  box-shadow: 0 10px 24px rgba(10, 37, 64, 0.07);
+  border-color: #CBD5E1;
+}

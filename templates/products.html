@@ -120,7 +120,10 @@
             <span style="font-size: 0.88rem; font-weight: 700; color: var(--dtc-blue);">
               {{ selected_category.name if selected_category else (selected_machine.name if selected_machine else search_query) }}
             </span>
-            <a href="{{ url_for('products') }}" style="font-size: 0.78rem; color: var(--dtc-accent-red); font-weight: 600;">Clear All ✕</a>
+            <a href="{{ url_for('products') }}" style="font-size: 0.78rem; color: var(--dtc-accent-red); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+              <span>Clear All</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </a>
           </div>
         </div>
         {% endif %}
@@ -261,7 +264,11 @@
         {% else %}
         <!-- Empty Results View -->
         <div style="text-align: center; padding: 60px 20px; background: var(--bg-light); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
-          <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🔍</span>
+          <div style="display: flex; justify-content: center; margin-bottom: 14px;">
+            <span style="width: 56px; height: 56px; border-radius: 50%; background: #EFF6FF; color: #0052CC; display: flex; align-items: center; justify-content: center;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+          </div>
           <h3 style="font-family: var(--font-heading); color: var(--primary-navy); margin-bottom: 8px;">No Spare Parts Found</h3>
           <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 450px; margin: 0 auto 20px;">
             We manufacture over 1000+ custom and standard machine spares. If you cannot find what you are looking for, please share your requirement with our engineering team.

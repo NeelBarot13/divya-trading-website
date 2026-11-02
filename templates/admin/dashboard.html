@@ -72,7 +72,10 @@
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </span>
-        <span>View Live Website ↗</span>
+        <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <span>View Live Website</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </span>
       </a>
     </nav>
 
@@ -105,8 +108,9 @@
       </div>
 
       <div class="admin-top-actions">
-        <a href="{{ url_for('admin_compose_email') }}" class="btn-admin-primary" style="background: #0052CC; border-color: #0052CC; text-decoration: none; padding: 8px 16px;">
-          <span>✉️ Compose Email to Customer</span>
+        <a href="{{ url_for('admin_compose_email') }}" class="btn-admin-primary" style="background: #0052CC; border-color: #0052CC; text-decoration: none; padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          <span>Compose Email to Customer</span>
         </a>
         <a href="{{ url_for('admin_export_inquiries') }}" class="btn-admin-export">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -234,8 +238,9 @@
           </div>
 
           <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="btn-action-sm btn-action-view btn-view-inquiry" data-id="{{ inq.id }}" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem; font-weight: 700;">
-              Manage Quote / Chat ➔
+            <button class="btn-action-sm btn-action-view btn-view-inquiry" data-id="{{ inq.id }}" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+              <span>Manage Quote / Chat</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
             <a href="https://wa.me/{{ inq.phone|replace('+', '')|replace(' ', '') }}" target="_blank" class="btn-admin-wa" title="WhatsApp Customer" style="padding: 8px 12px; border-radius: 6px; background: #DCFCE7; color: #166534; text-decoration: none; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center;">
               WA
@@ -314,15 +319,19 @@
                 {{ inq.created_at.strftime('%d %b %Y, %I:%M %p') }}
               </td>
               <td>
-                <div style="display: flex; gap: 6px;">
-                  <button class="btn-action-sm btn-action-view btn-view-inquiry" data-id="{{ inq.id }}">
-                    Manage Quote / Chat ➔
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button class="btn-action-sm btn-action-view btn-view-inquiry" data-id="{{ inq.id }}" style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span>Manage Quote</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </button>
                   <a href="{{ url_for('admin_compose_email', inquiry_id=inq.id) }}" class="btn-action-sm" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 700;" title="Draft and share email to {{ inq.customer_name }}">
-                    ✉️ Email
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <span>Email</span>
                   </a>
                   <form action="{{ url_for('admin_delete_inquiry', inquiry_id=inq.id) }}" method="POST" onsubmit="return confirm('Delete inquiry record #{{ inq.inquiry_number }}?');" style="display: inline;">
-                    <button type="submit" class="btn-action-sm btn-action-delete">✕</button>
+                    <button type="submit" class="btn-action-sm btn-action-delete" style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                   </form>
                 </div>
               </td>
@@ -351,10 +360,13 @@
           <h3 id="modalInquiryNumber">Inquiry Details</h3>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <a href="#" id="modalComposeEmailBtn" class="btn-admin-export" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-size: 0.82rem; font-weight: 700; padding: 6px 12px; text-decoration: none;">
-            ✉️ Draft & Share Email
+          <a href="#" id="modalComposeEmailBtn" class="btn-admin-export" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-size: 0.82rem; font-weight: 700; padding: 6px 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <span>Draft & Share Email</span>
           </a>
-          <button class="modal-close-btn" id="closeDetailModalBtn">✕</button>
+          <button class="modal-close-btn" id="closeDetailModalBtn" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 4px; border: none; background: #f1f5f9; cursor: pointer; color: #64748b;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
       </div>
 
@@ -433,11 +445,11 @@
               <div class="form-group">
                 <label class="form-label" style="font-size: 0.78rem;">Inquiry Status</label>
                 <select name="status" id="modalStatusSelect" class="form-control">
-                  <option value="new">🟡 New / Pending</option>
-                  <option value="contacted">🔵 In Review</option>
-                  <option value="quoted">🎉 Quoted (Visible to Customer in INR ₹)</option>
-                  <option value="completed">🟢 Order Confirmed / Completed</option>
-                  <option value="cancelled">🔴 Cancelled</option>
+                  <option value="new">New / Pending</option>
+                  <option value="contacted">In Review</option>
+                  <option value="quoted">Quoted (Visible to Customer in INR ₹)</option>
+                  <option value="completed">Order Confirmed / Completed</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
             </div>
@@ -450,10 +462,12 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
               <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #166534; font-weight: 600;">
                 <input type="checkbox" name="notify_customer" value="1" checked>
-                <span>✉️ Dispatch instant quotation email alert to customer</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span>Dispatch instant quotation email alert to customer</span>
               </label>
-              <button type="submit" class="btn-admin-primary" style="background: #15803D; padding: 8px 18px; font-size: 0.85rem;">
-                💾 Save & Publish Quotation
+              <button type="submit" class="btn-admin-primary" style="background: #15803D; padding: 8px 18px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                <span>Save & Publish Quotation</span>
               </button>
             </div>
           </form>
@@ -463,7 +477,8 @@
         <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <h4 style="font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; color: #0A2540; margin: 0; display: flex; align-items: center; gap: 8px;">
-              <span>💬</span> Two-Way Discussion Thread with Customer
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <span>Two-Way Discussion Thread with Customer</span>
             </h4>
             <a id="modalWhatsAppCustomerLink" href="#" target="_blank" style="background: #25D366; color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
@@ -476,11 +491,13 @@
           <form id="modalChatForm" action="" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <input type="text" id="modalChatMessageInput" name="message" class="form-control" placeholder="Type a message or response to customer..." required style="flex: 1; min-width: 240px; font-size: 0.85rem;">
             <div style="display: flex; gap: 8px;">
-              <button type="submit" class="btn-admin-primary" style="padding: 8px 16px; font-size: 0.85rem;">
-                Send Reply ✉
+              <button type="submit" class="btn-admin-primary" style="padding: 8px 16px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                <span>Send Reply</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </button>
               <button type="button" onclick="sendAndOpenWhatsAppAdmin()" class="btn-admin-primary" style="background: #25D366; padding: 8px 14px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
-                <span>Send & Open WhatsApp 💬</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                <span>Send & Open WhatsApp</span>
               </button>
             </div>
           </form>
@@ -582,11 +599,12 @@
                 el.style.borderLeft = '3px solid #0052CC';
                 el.innerHTML = `
                   <div style="flex:1;">
-                    <strong>👔 ${m.sender_name}</strong> <span style="font-size:0.72rem; color:#64748b;">(${m.created_at})</span>
+                    <strong style="color: #0052CC;">${m.sender_name} (Admin)</strong> <span style="font-size:0.72rem; color:#64748b;">(${m.created_at})</span>
                     <div style="margin-top:2px; color:#1e293b;">${m.message}</div>
                   </div>
                   <a href="${waShareUrl}" target="_blank" title="Forward message to customer on WhatsApp" style="color:#25D366; text-decoration:none; font-size:0.75rem; font-weight:700; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">
-                    <span>WhatsApp ↗</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <span>WhatsApp</span>
                   </a>
                 `;
               } else {
@@ -594,11 +612,12 @@
                 el.style.borderLeft = '3px solid #0A2540';
                 el.innerHTML = `
                   <div style="flex:1;">
-                    <strong>👤 ${m.sender_name} (Customer)</strong> <span style="font-size:0.72rem; color:#64748b;">(${m.created_at})</span>
+                    <strong style="color: #0A2540;">${m.sender_name} (Customer)</strong> <span style="font-size:0.72rem; color:#64748b;">(${m.created_at})</span>
                     <div style="margin-top:2px; color:#1e293b;">${m.message}</div>
                   </div>
                   <a href="${waShareUrl}" target="_blank" title="Reply to customer on WhatsApp" style="color:#25D366; text-decoration:none; font-size:0.75rem; font-weight:700; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">
-                    <span>WhatsApp ↗</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <span>WhatsApp</span>
                   </a>
                 `;
               }

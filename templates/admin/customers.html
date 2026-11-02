@@ -72,7 +72,10 @@
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </span>
-        <span>View Live Website ↗</span>
+        <span style="display: inline-flex; align-items: center; gap: 4px;">
+          <span>View Live Website</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </span>
       </a>
     </nav>
 
@@ -126,7 +129,7 @@
       <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <h3 style="margin: 0;">Total Registered Customers (<span id="customerCount">{{ customers|length }}</span>)</h3>
         <div style="position: relative; width: 320px; max-width: 100%;">
-          <input type="text" id="customerSearch" onkeyup="filterCustomers()" placeholder="🔍 Search name, mill, email, city..." style="width: 100%; padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; outline: none; background: #ffffff;">
+          <input type="text" id="customerSearch" onkeyup="filterCustomers()" placeholder="Search name, mill, email, city..." style="width: 100%; padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; outline: none; background: #ffffff;">
         </div>
       </div>
 
@@ -159,17 +162,23 @@
               </td>
               <td>
                 <a href="tel:{{ cust.phone }}" style="color: #475569; text-decoration: none;">{{ cust.phone }}</a>
-                <a href="https://wa.me/{{ cust.phone|replace('+', '')|replace(' ', '') }}" target="_blank" title="WhatsApp Customer" style="margin-left: 6px; text-decoration: none;">💬</a>
+                <a href="https://wa.me/{{ cust.phone|replace('+', '')|replace(' ', '') }}" target="_blank" title="WhatsApp Customer" style="margin-left: 6px; text-decoration: none; color: #16a34a; display: inline-flex; vertical-align: middle;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                </a>
               </td>
               <td>{{ cust.city or '' }}{% if cust.city and cust.country %}, {% endif %}{{ cust.country }}</td>
               <td>
-                <a href="{{ url_for('admin_dashboard', q=cust.email) }}" class="btn-action-sm" style="background: #EFF6FF; color: #0052CC; font-weight: 700;">
-                  {{ cust.inquiries|length }} Quotes ➔
+                <a href="{{ url_for('admin_dashboard', q=cust.email) }}" class="btn-action-sm" style="background: #EFF6FF; color: #0052CC; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                  <span>{{ cust.inquiries|length }} Quotes</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </a>
               </td>
               <td>
                 {% if cust.welcome_email_sent %}
-                  <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">✓ Sent</span>
+                  <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Sent</span>
+                  </span>
                 {% else %}
                   <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;">Pending</span>
                 {% endif %}
@@ -179,15 +188,15 @@
               </td>
               <td>
                 <div style="display: inline-flex; gap: 6px; align-items: center;">
-                  <a href="{{ url_for('admin_compose_email', to=cust.email, name=cust.name) }}" class="btn-action-sm" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; text-decoration: none; font-weight: 700; white-space: nowrap;" title="Compose Email">
-                    ✉️
+                  <a href="{{ url_for('admin_compose_email', to=cust.email, name=cust.name) }}" class="btn-action-sm" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;" title="Compose Email">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                   </a>
-                  <button type="button" class="btn-action-sm" onclick="openResetPasswordModal({{ cust.id }}, '{{ cust.name|replace('\'', '\\\'') }}', '{{ cust.email|replace('\'', '\\\'') }}')" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; cursor: pointer; font-weight: 700;" title="Reset Portal Password">
-                    🔑
+                  <button type="button" class="btn-action-sm" onclick="openResetPasswordModal({{ cust.id }}, '{{ cust.name|replace('\'', '\\\'') }}', '{{ cust.email|replace('\'', '\\\'') }}')" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;" title="Reset Portal Password">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3L22 7l-3-3"></path></svg>
                   </button>
                   <form method="POST" action="{{ url_for('admin_delete_customer', cust_id=cust.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove customer account for {{ cust.name }}? Their quote history will be safely preserved.');">
-                    <button type="submit" class="btn-action-sm" style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; cursor: pointer; font-weight: 700;" title="Delete Customer">
-                      🗑️
+                    <button type="submit" class="btn-action-sm" style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;" title="Delete Customer">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                   </form>
                 </div>
@@ -256,7 +265,10 @@
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Portal Initial Password</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" id="addCustomerPassword" name="password" placeholder="Leave blank to auto-generate" style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; font-family: monospace;">
-            <button type="button" onclick="generatePassword('addCustomerPassword')" style="padding: 8px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; color: #334155;">⚡ Auto-Gen</button>
+            <button type="button" onclick="generatePassword('addCustomerPassword')" style="padding: 8px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Auto-Gen</span>
+            </button>
           </div>
           <span style="font-size: 0.76rem; color: #64748b; margin-top: 4px; display: block;">If left blank, an 8-character secure password will be generated automatically.</span>
         </div>
@@ -280,7 +292,10 @@
   <div id="resetPasswordModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
     <div style="background: #ffffff; width: 440px; max-width: 100%; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); overflow: hidden;">
       <div style="background: #0A2540; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #f59e0b;">
-        <h3 style="color: #ffffff; margin: 0; font-size: 1.1rem; font-weight: 700;">🔑 Reset Customer Password</h3>
+        <h3 style="color: #ffffff; margin: 0; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3L22 7l-3-3"></path></svg>
+          <span>Reset Customer Password</span>
+        </h3>
         <button type="button" onclick="closeResetPasswordModal()" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
       </div>
 
@@ -294,7 +309,10 @@
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">New Password *</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" id="newPasswordInput" name="new_password" required style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; font-family: monospace;">
-            <button type="button" onclick="generatePassword('newPasswordInput')" style="padding: 8px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; color: #334155;">⚡ Auto-Gen</button>
+            <button type="button" onclick="generatePassword('newPasswordInput')" style="padding: 8px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Auto-Gen</span>
+            </button>
           </div>
         </div>
 

@@ -128,8 +128,9 @@
       </p>
 
       <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-        <a href="#machine-catalog" class="btn-enquire-primary" style="padding: 12px 22px;">
-          View {{ machine.name }} Catalog ({{ products|length }}) ➔
+        <a href="#machine-catalog" class="btn-enquire-primary" style="padding: 12px 22px; display: inline-flex; align-items: center; gap: 8px;">
+          <span>View {{ machine.name }} Catalog ({{ products|length }})</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </a>
         <a href="{{ url_for('contact') }}" class="btn-card-add-cart" style="padding: 12px 20px; background: rgba(255,255,255,0.08); color: white; border-color: rgba(255,255,255,0.2);">
           Request Custom RFQ
@@ -178,7 +179,9 @@
         <!-- Technical Capabilities 4-Grid -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px;">
           <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
-            <div style="font-size: 1.3rem; margin-bottom: 6px;">⚙️</div>
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: #EEF2FF; color: var(--dtc-blue); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </div>
             <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Repeat Circumferences</strong>
             <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
               640mm (64R), 819mm (81.9R), 914mm (91.4R), 1018mm (101.8R), and custom repeats.
@@ -186,7 +189,9 @@
           </div>
 
           <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
-            <div style="font-size: 1.3rem; margin-bottom: 6px;">🛡️</div>
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: #EEF2FF; color: var(--dtc-blue); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
             <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Material Metallurgy</strong>
             <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
               SS316 Stainless Steel, Phosphor Bronze, Swedish Spring Steel, High-Tensile Forged Alloys.
@@ -194,7 +199,9 @@
           </div>
 
           <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
-            <div style="font-size: 1.3rem; margin-bottom: 6px;">🔬</div>
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: #EEF2FF; color: var(--dtc-blue); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
+            </div>
             <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Precision Inspection</strong>
             <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
               100% Dimensional verification and dynamic balancing for zero pattern registration marks.
@@ -202,7 +209,9 @@
           </div>
 
           <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px;">
-            <div style="font-size: 1.3rem; margin-bottom: 6px;">📦</div>
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: #EEF2FF; color: var(--dtc-blue); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
             <strong style="color: var(--primary-navy); display: block; font-size: 0.92rem; margin-bottom: 4px;">Global Export Crating</strong>
             <span style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: block;">
               Reinforced wooden export packaging with anti-corrosion protective wrap. Air & sea dispatch.
@@ -223,18 +232,22 @@
 
           <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
             <a href="tel:{{ site_settings.phone_primary or '+918320821579' }}" style="display: flex; align-items: center; gap: 8px; color: var(--primary-navy); text-decoration: none; font-size: 0.88rem; font-weight: 700;">
-              <span>📞</span> <span>{{ site_settings.phone_primary or '+91 83208 21579' }}</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>{{ site_settings.phone_primary or '+91 83208 21579' }}</span>
             </a>
             <a href="mailto:{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}" style="display: flex; align-items: center; gap: 8px; color: var(--dtc-blue); text-decoration: none; font-size: 0.85rem; font-weight: 600;">
-              <span>✉️</span> <span>{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>{{ site_settings.email_primary or 'divya.trading06@gmail.com' }}</span>
             </a>
             <a href="https://wa.me/{{ (site_settings.whatsapp_number or '918320821579')|replace('+', '')|replace(' ', '') }}?text={{ ('Hello Divya Trading Co., I would like to inquire about ' + machine.name + ' rotary printing spare parts.')|urlencode }}" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #16a34a; text-decoration: none; font-size: 0.88rem; font-weight: 700;">
-              <span>💬</span> <span>WhatsApp Direct Chat</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              <span>WhatsApp Direct Chat</span>
             </a>
           </div>
 
-          <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="width: 100%; justify-content: center; font-size: 0.88rem;">
-            Submit Quotation Request ➔
+          <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="width: 100%; justify-content: center; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Submit Quotation Request</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </a>
         </div>
       </div>
@@ -316,7 +329,9 @@
     {% else %}
     <!-- Custom Machine Requirement Box if no specific products yet -->
     <div style="background: #F8FAFC; border: 2px dashed #CBD5E1; border-radius: var(--radius-lg); padding: 50px 30px; text-align: center; max-width: 750px; margin: 0 auto;">
-      <div style="font-size: 2.6rem; margin-bottom: 12px;">⚙️</div>
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #EEF2FF; color: var(--dtc-blue); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
       <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 8px;">
         Complete {{ machine.name }} Spares Manufactured to Order
       </h3>
@@ -324,7 +339,10 @@
         We manufacture all replacement components for <strong>{{ machine.name }}</strong> rotary screen printing machines according to original part numbers, physical samples, or customer CAD drawings with zero-play tolerances.
       </p>
       <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-        <a href="{{ url_for('contact') }}" class="btn-enquire-primary">Send {{ machine.name }} Part Specs ➔</a>
+        <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+          <span>Send {{ machine.name }} Part Specs</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
         <a href="{{ url_for('products') }}" class="btn-card-add-cart" style="padding: 10px 18px;">View Universal Catalog</a>
       </div>
     </div>
@@ -351,7 +369,7 @@
       <a href="{{ url_for('machine_detail', slug=m.slug) }}" 
          style="background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; color: var(--primary-navy); text-decoration: none; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;"
          title="{{ m.name }} Rotary Printing Spare Parts">
-        <span>⚙️</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         <span>{{ m.name }}</span>
       </a>
       {% endif %}

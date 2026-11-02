@@ -70,7 +70,10 @@
         </p>
         
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-          <a href="{{ url_for('products') }}" class="btn-enquire-primary">Explore Products ➔</a>
+          <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+            <span>Explore Products</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
           <a href="{{ url_for('contact') }}" class="btn-card-add-cart" style="padding: 12px 20px; font-weight: 700;">Get in Touch</a>
         </div>
       </div>
@@ -98,9 +101,11 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
       <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px;">
-        <div style="font-size: 2rem; margin-bottom: 12px;">⚙️</div>
+        <div style="margin-bottom: 14px; width: 48px; height: 48px; border-radius: 8px; background: #DBEAFE; color: #0052CC; display: flex; align-items: center; justify-content: center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
         <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
-          RD-DD & Pegasus Development
+          RD-DD &amp; Pegasus Development
         </h3>
         <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
           We have an active number of developments for the new RD - DD Pegasus parts. This includes complete Screen heads in R640, R819, R914 up to normal wear and tear parts.
@@ -108,7 +113,9 @@
       </div>
 
       <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px;">
-        <div style="font-size: 2rem; margin-bottom: 12px;">🔬</div>
+        <div style="margin-bottom: 14px; width: 48px; height: 48px; border-radius: 8px; background: #DCFCE7; color: #166534; display: flex; align-items: center; justify-content: center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+        </div>
         <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
           Zero-Tolerance Quality Inspection
         </h3>
@@ -118,7 +125,9 @@
       </div>
 
       <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px;">
-        <div style="font-size: 2rem; margin-bottom: 12px;">✈️</div>
+        <div style="margin-bottom: 14px; width: 48px; height: 48px; border-radius: 8px; background: #FEF3C7; color: #92400E; display: flex; align-items: center; justify-content: center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        </div>
         <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--primary-navy); margin-bottom: 8px;">
           Global Exporter Network
         </h3>

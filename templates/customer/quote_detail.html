@@ -9,7 +9,8 @@
     <!-- Back to Quotes Link -->
     <div style="margin-bottom: 20px;">
       <a href="{{ url_for('customer_dashboard') }}" style="font-weight: 700; color: var(--dtc-blue); font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
-        <span>←</span> Back to All Quotes
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Back to All Quotes</span>
       </a>
     </div>
 
@@ -43,20 +44,24 @@
         <!-- Status Badge -->
         <div>
           {% if inquiry.status == 'new' %}
-            <span style="background: #FEF3C7; color: #92400E; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
-              🟡 Under Engineering Review
+            <span style="background: #FEF3C7; color: #92400E; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #D97706;"></span>
+              <span>Under Engineering Review</span>
             </span>
           {% elif inquiry.status == 'contacted' %}
-            <span style="background: #EFF6FF; color: #1E40AF; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
-              🔵 In Review by Sales Team
+            <span style="background: #EFF6FF; color: #1E40AF; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563EB;"></span>
+              <span>In Review by Sales Team</span>
             </span>
           {% elif inquiry.status == 'quoted' %}
-            <span style="background: #ECFDF5; color: #065F46; font-size: 0.85rem; font-weight: 800; padding: 6px 16px; border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid #A7F3D0;">
-              🎉 Quotation Prepared & Ready
+            <span style="background: #ECFDF5; color: #065F46; font-size: 0.85rem; font-weight: 800; padding: 6px 16px; border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid #A7F3D0; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Quotation Prepared & Ready</span>
             </span>
           {% elif inquiry.status == 'completed' %}
-            <span style="background: #E0E7FF; color: #3730A3; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
-              🟢 Order Confirmed / Ready
+            <span style="background: #E0E7FF; color: #3730A3; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Order Confirmed / Ready</span>
             </span>
           {% else %}
             <span style="background: #F1F5F9; color: #475569; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); text-transform: uppercase;">
@@ -99,7 +104,9 @@
     <div style="background: #F0FDF4; border: 2px solid #86EFAC; border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.5rem;">📋</span>
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: #DCFCE7; color: #15803D; display: inline-flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+          </div>
           <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #14532D; margin: 0;">
             Divya Trading Co. Formal Quotation (in Indian Rupees ₹)
           </h3>
@@ -174,7 +181,10 @@
                 <div>
                   <strong style="color: var(--primary-navy); display: block;">{{ item.product_name }}</strong>
                   {% if item.product %}
-                  <a href="{{ url_for('product_detail', slug=item.product.slug) }}" target="_blank" style="font-size: 0.75rem; color: var(--dtc-blue);">View in catalog ↗</a>
+                  <a href="{{ url_for('product_detail', slug=item.product.slug) }}" target="_blank" style="font-size: 0.75rem; color: var(--dtc-blue); display: inline-flex; align-items: center; gap: 3px;">
+                    <span>View in catalog</span>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
                   {% endif %}
                 </div>
               </div>
@@ -200,7 +210,9 @@
     <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;">
       <div style="background: var(--primary-navy); padding: 18px 24px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.3rem;">💬</span>
+          <div style="width: 30px; height: 30px; border-radius: 6px; background: rgba(255,255,255,0.12); display: inline-flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </div>
           <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin: 0;">
             Discussion & Messages Thread with Divya Trading Co.
           </h3>
@@ -218,8 +230,11 @@
           
           <!-- Initial Auto Message -->
           <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px; font-size: 0.85rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-              <strong style="color: var(--primary-navy);">⚙️ Divya Trading Co. System</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: var(--primary-navy); display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Divya Trading Co. System</span>
+              </strong>
               <span style="font-size: 0.75rem; color: var(--text-light);">{{ inquiry.created_at.strftime('%b %d, %Y %I:%M %p') }}</span>
             </div>
             <p style="margin: 0; color: var(--text-muted);">
@@ -236,13 +251,15 @@
                       {% endif %}">
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <strong style="{% if msg.sender_type == 'admin' %}color: #0052CC;{% else %}color: var(--primary-navy);{% endif %}">
-                {% if msg.sender_type == 'admin' %}👔 {{ msg.sender_name }}{% else %}👤 {{ msg.sender_name }} (You){% endif %}
+              <strong style="{% if msg.sender_type == 'admin' %}color: #0052CC;{% else %}color: var(--primary-navy);{% endif %} display: inline-flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>{{ msg.sender_name }}{% if msg.sender_type != 'admin' %} (You){% endif %}</span>
               </strong>
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span style="font-size: 0.75rem; color: var(--text-light);">{{ msg.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
                 <a href="https://wa.me/918320821579?text=Hello%20Divya%20Trading%20Co.,%20regarding%20Quote%20%23{{ inquiry.inquiry_number }}:%0A%0A{{ msg.message|urlencode }}" target="_blank" title="Forward/Reply on WhatsApp" style="color: #25D366; text-decoration: none; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
-                  <span>WhatsApp ↗</span>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  <span>WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -268,11 +285,13 @@
               Our sales team in Ahmedabad will be notified immediately upon submission.
             </span>
             <div style="display: flex; gap: 8px;">
-              <button type="submit" class="btn-enquire-primary" style="font-size: 0.86rem; padding: 9px 18px;">
-                <span>Send Message ➔</span>
+              <button type="submit" class="btn-enquire-primary" style="font-size: 0.86rem; padding: 9px 18px; display: inline-flex; align-items: center; gap: 6px;">
+                <span>Send Message</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>
               <button type="button" onclick="sendAndOpenWhatsAppCustomer()" class="btn-enquire-primary" style="background: #25D366; font-size: 0.86rem; padding: 9px 16px; border: none; display: inline-flex; align-items: center; gap: 6px;">
-                <span>Send & Open in WhatsApp 💬</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                <span>Send & Open in WhatsApp</span>
               </button>
             </div>
           </div>

@@ -103,8 +103,9 @@
           {{ m.description or ('Precision replacement spare parts manufactured for ' + m.name + ' rotary screen printing machines. Guaranteed zero-vibration dynamic balancing.') }}
         </p>
 
-        <a href="{{ url_for('machine_detail', slug=m.slug) }}" class="btn-view-products" style="padding: 10px 14px; font-size: 0.85rem; font-weight: 700;">
-          Explore {{ m.name }} Spares ➔
+        <a href="{{ url_for('machine_detail', slug=m.slug) }}" class="btn-view-products" style="padding: 10px 14px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span>Explore {{ m.name }} Spares</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
       </div>
       {% endfor %}
@@ -118,7 +119,10 @@
       <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 650px; margin: 0 auto 20px; line-height: 1.6;">
         We manufacture custom repeat gear sets, screen head rings, squeegee assemblies, and precision shafts as per physical sample or CAD drawing with full quality certification and worldwide export packaging.
       </p>
-      <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="display: inline-flex; padding: 12px 24px;">Send Machine Specifications ➔</a>
+      <a href="{{ url_for('contact') }}" class="btn-enquire-primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;">
+        <span>Send Machine Specifications</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
     </div>
   </div>
 </section>

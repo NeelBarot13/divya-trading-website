@@ -112,14 +112,18 @@
         
         <div style="display: flex; gap: 12px; margin-top: 16px;">
           <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
-            <span style="font-size: 1.3rem;">⚙️</span>
+            <span style="display: flex; align-items: center; color: #0052CC;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </span>
             <div>
               <strong style="font-size: 0.8rem; color: var(--primary-navy); display: block;">100% In-House Made</strong>
               <span style="font-size: 0.72rem; color: var(--text-muted);">Precision CNC Machined</span>
             </div>
           </div>
           <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
-            <span style="font-size: 1.3rem;">🌍</span>
+            <span style="display: flex; align-items: center; color: #0052CC;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </span>
             <div>
               <strong style="font-size: 0.8rem; color: var(--primary-navy); display: block;">Export Quality</strong>
               <span style="font-size: 0.72rem; color: var(--text-muted);">Trusted Worldwide</span>
@@ -189,9 +193,9 @@
                   data-product-name="{{ product.name }}" 
                   data-part-number="{{ product.part_number }}"
                   data-repeat-sizes="{{ product.repeat_sizes }}"
-                  style="flex: 1; justify-content: center; padding: 14px 20px;">
+                  style="flex: 1; justify-content: center; padding: 14px 20px; display: inline-flex; align-items: center; gap: 8px;">
             <span>Inquire About This Part</span>
-            <span>✉</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
           </button>
           
           <button class="btn-card-add-cart btn-add-quote-cart" 
@@ -205,15 +209,16 @@
         </div>
 
         <!-- WhatsApp Quick Chat Link -->
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
           <div>
             <strong style="color: #166534; font-size: 0.9rem; display: block;">Need Urgent Delivery or Custom Fitment?</strong>
             <span style="font-size: 0.8rem; color: #15803d;">Chat directly with our textile parts engineer on WhatsApp</span>
           </div>
           <a href="https://wa.me/918320821579?text=Hello,%20I%20am%20interested%20in%20product%20{{ product.name }}%20(Part%20No:%20{{ product.part_number }})." 
              target="_blank" 
-             style="background: #16a34a; color: white; padding: 8px 16px; border-radius: 4px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">
-            WhatsApp Now ➔
+             style="background: #16a34a; color: white; padding: 8px 16px; border-radius: 4px; font-size: 0.82rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>WhatsApp Now</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </a>
         </div>
       </div>

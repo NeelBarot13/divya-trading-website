@@ -169,14 +169,27 @@ def get_why_choose_pillars(settings):
             
     if not pillars and 'why_choose_pillars_json' not in settings:
         default_pillars = [
-            {"title": settings.get("pillar_1_title", "27+ YEARS OF EXPERIENCE"), "desc": settings.get("pillar_1_desc", "Serving the textile industry since 1997 with excellence and reliability."), "icon": "⭐"},
-            {"title": settings.get("pillar_2_title", "PREMIUM QUALITY"), "desc": settings.get("pillar_2_desc", "High precision CNC machined parts for reliable machine performance."), "icon": "🛡️"},
-            {"title": settings.get("pillar_3_title", "WIDE RANGE OF PRODUCTS"), "desc": settings.get("pillar_3_desc", "Complete range of textile spare parts and consumables under one roof."), "icon": "🏭"},
-            {"title": settings.get("pillar_4_title", "GLOBAL REACH"), "desc": settings.get("pillar_4_desc", "Exporting to clients across 30+ countries with global trust."), "icon": "🌐"},
-            {"title": settings.get("pillar_5_title", "EXPERT SUPPORT"), "desc": settings.get("pillar_5_desc", "Dedicated engineering support for all your technical requirements."), "icon": "🎧"},
-            {"title": settings.get("pillar_6_title", "ON TIME DELIVERY"), "desc": settings.get("pillar_6_desc", "Timely worldwide delivery with safe and secure export packaging."), "icon": "🚚"}
+            {"title": settings.get("pillar_1_title", "27+ YEARS OF EXPERIENCE"), "desc": settings.get("pillar_1_desc", "Serving the textile industry since 1997 with excellence and reliability."), "icon": "experience"},
+            {"title": settings.get("pillar_2_title", "PREMIUM QUALITY"), "desc": settings.get("pillar_2_desc", "High precision CNC machined parts for reliable machine performance."), "icon": "quality"},
+            {"title": settings.get("pillar_3_title", "WIDE RANGE OF PRODUCTS"), "desc": settings.get("pillar_3_desc", "Complete range of textile spare parts and consumables under one roof."), "icon": "range"},
+            {"title": settings.get("pillar_4_title", "GLOBAL REACH"), "desc": settings.get("pillar_4_desc", "Exporting to clients across 30+ countries with global trust."), "icon": "global"},
+            {"title": settings.get("pillar_5_title", "EXPERT SUPPORT"), "desc": settings.get("pillar_5_desc", "Dedicated engineering support for all your technical requirements."), "icon": "support"},
+            {"title": settings.get("pillar_6_title", "ON TIME DELIVERY"), "desc": settings.get("pillar_6_desc", "Timely worldwide delivery with safe and secure export packaging."), "icon": "delivery"}
         ]
         pillars = default_pillars
+
+    # Sanitize icons: map legacy emojis to clean SVG icon tokens
+    emoji_to_token = {
+        "⭐": "experience", "🛡️": "quality", "🛡": "quality",
+        "🏭": "range", "🌐": "global", "🎧": "support", "🚚": "delivery"
+    }
+    for p in pillars:
+        raw = p.get('icon', '').strip()
+        if raw in emoji_to_token:
+            p['icon'] = emoji_to_token[raw]
+        elif not raw:
+            p['icon'] = 'quality'
+
     return pillars
 
 
@@ -2823,13 +2836,126 @@ def admin_catalog():
                            last_modified=last_modified_str)
 
 
+DEFAULT_EMAIL_TEMPLATES = [
+    {
+        "id": "formal_quotation",
+        "title": "Formal Quotation",
+        "subject": "Formal Quotation for Precision Rotary Printing Spares — Divya Trading Co.",
+        "body": "Thank you for inquiring with Divya Trading Co.\n\nWe are pleased to submit our formal price quotation for your precision rotary printing machine spare parts requirement:\n\n• Inquired Item(s): {items}\n• Repeat Size / Specification: 64R Standard / Precision Alloy Steel\n• Stock Status: Ready in Stock at Ahmedabad Works\n• Delivery Timeline: Dispatched within 24-48 hours via express cargo\n• Quality Assurance: 100% precision CNC machined & dimensional quality inspected\n• Commercial Terms: 100% advance against Proforma Invoice / RTGS\n• Quotation Validity: 15 Days\n\nPlease let us know if you require any technical drawings, sample dispatch, or custom repeat bore sizes."
+    },
+    {
+        "id": "stock_dispatch",
+        "title": "Stock & Dispatch",
+        "subject": "Stock Availability & Dispatch Details — Divya Trading Co.",
+        "body": "Thank you for contacting Divya Trading Co.\n\nWe are pleased to confirm that the requested rotary screen printing machine spare parts are in ready stock at our Ahmedabad facility:\n\n• Stock Status: Ready in Stock\n• Dispatch: Same day / Next working day from Ahmedabad, Gujarat\n• Packaging: Heavy-duty export seaworthy / transport corrugated packaging\n• Transit Time: 2-3 days across India / 5-7 days worldwide\n\nKindly confirm your billing & shipping address to initiate the dispatch process."
+    },
+    {
+        "id": "catalog_link",
+        "title": "Catalog Brochure Link",
+        "subject": "Divya Trading Co. — Complete Rotary Printing Machine Spares Technical Catalog",
+        "body": "Dear {name},\n\nThank you for your interest in Divya Trading Co. textile machinery precision spares.\n\nYou can view and download our complete 8-page Technical Brochure & Spare Parts Catalog using this direct link:\nhttps://divyatradingco.com/catalog\n\nOur manufacturing program covers spares for:\n• Stormac (RD-3, RD-4, Pegasus, RD-DD)\n• Stork Box, Screen Heads & Repeats (64R, 81.9R, 91.4R, 101.8R)\n• Colour Pumps (SB-4, SB-5, SB-7)\n• Swedish Steel Squeegee Blades\n• Laxmi, Ichinose, Reggiani & Zimmer Rotary Machines\n\nFeel free to reply to this email or reach us on WhatsApp at +91 83208 21579 for any technical assistance."
+    },
+    {
+        "id": "specifications_request",
+        "title": "Specifications Request",
+        "subject": "Specification Confirmation for Rotary Printing Machine Spares — Divya Trading Co.",
+        "body": "Dear {name},\n\nWe are following up regarding your recent inquiry for rotary printing machine spares.\n\nTo ensure a 100% exact engineering match for your machine, could you please confirm:\n1. Machine Make & Model (e.g. Stork RD-4, Stormac, Laxmi, Reggiani, Zimmer)\n2. Screen Repeat Size (e.g. 640mm / 64R, 819mm / 81.9R, 914mm / 91.4R, 1018mm / 101.8R)\n3. Current part photo, bearing/shaft dimensions, or tooth count if available\n\nOnce confirmed, we will promptly issue your quotation and dispatch schedule."
+    },
+    {
+        "id": "proforma_invoice",
+        "title": "Proforma & Order Confirmation",
+        "subject": "Proforma Invoice & Order Confirmation — Divya Trading Co.",
+        "body": "Dear {name},\n\nThank you for confirming your order with Divya Trading Co. We have scheduled the manufacturing inspection and dispatch of your rotary printing machine spare parts.\n\nPlease find attached the official Proforma Invoice detailing the part quantities, HSN codes, and bank dispatch details.\n\nWe will update you with the consignment tracking number as soon as the material is handed over to the courier/transport partner."
+    }
+]
+
+def get_email_templates():
+    setting = SiteSetting.query.filter_by(key='email_predefined_templates').first()
+    if setting and setting.value:
+        try:
+            return json.loads(setting.value)
+        except Exception:
+            pass
+    return DEFAULT_EMAIL_TEMPLATES
+
+def save_email_templates(templates):
+    setting = SiteSetting.query.filter_by(key='email_predefined_templates').first()
+    if setting:
+        setting.value = json.dumps(templates)
+    else:
+        db.session.add(SiteSetting(key='email_predefined_templates', value=json.dumps(templates)))
+    db.session.commit()
+
+
+@app.route('/admin/email/templates/manage', methods=['POST'])
+@admin_required
+def admin_manage_email_templates():
+    data = request.get_json(silent=True) or request.form
+    action = data.get('action')
+    templates = get_email_templates()
+    
+    if action == 'save':
+        t_id = data.get('id', '').strip()
+        title = data.get('title', '').strip()
+        subject = data.get('subject', '').strip()
+        body = data.get('body', '').strip()
+        
+        if not title or not subject or not body:
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Title, subject, and body are required.'}), 400
+            flash('Template title, subject, and body are required.', 'danger')
+            return redirect(url_for('admin_compose_email'))
+            
+        if not t_id:
+            t_id = f"tpl_{int(time.time())}"
+            templates.append({'id': t_id, 'title': title, 'subject': subject, 'body': body})
+        else:
+            updated = False
+            for t in templates:
+                if t['id'] == t_id:
+                    t['title'] = title
+                    t['subject'] = subject
+                    t['body'] = body
+                    updated = True
+                    break
+            if not updated:
+                templates.append({'id': t_id, 'title': title, 'subject': subject, 'body': body})
+                
+        save_email_templates(templates)
+        msg = f'Email template "{title}" saved successfully.'
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': msg, 'templates': templates})
+        flash(msg, 'success')
+        return redirect(url_for('admin_compose_email'))
+        
+    elif action == 'delete':
+        t_id = data.get('id', '').strip()
+        templates = [t for t in templates if t['id'] != t_id]
+        save_email_templates(templates)
+        msg = 'Template deleted successfully.'
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': msg, 'templates': templates})
+        flash(msg, 'info')
+        return redirect(url_for('admin_compose_email'))
+        
+    elif action == 'reset':
+        save_email_templates(DEFAULT_EMAIL_TEMPLATES)
+        msg = 'Templates restored to default presets.'
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': msg, 'templates': DEFAULT_EMAIL_TEMPLATES})
+        flash(msg, 'success')
+        return redirect(url_for('admin_compose_email'))
+        
+    return redirect(url_for('admin_compose_email'))
+
+
 @app.route('/admin/email/compose', methods=['GET', 'POST'])
 @admin_required
 def admin_compose_email():
     """
     Dedicated Admin Composer: Allows admins to draft and send customized,
     professionally branded emails directly to any customer email address,
-    with pre-filled templates, dynamic placeholders, live preview, and tracking.
+    with pre-filled templates, dynamic placeholders, live preview, multi-file attachments, and tracking.
     """
     prefill_to = request.args.get('to', '').strip()
     prefill_name = request.args.get('name', '').strip()
@@ -2862,6 +2988,20 @@ def admin_compose_email():
             flash('Recipient Email, Subject, and Message Body are all required.', 'danger')
             return redirect(url_for('admin_compose_email', to=to_email, name=customer_name, subject=subject))
             
+        # Parse uploaded attachments (multiple files and images)
+        attachments = []
+        uploaded_files = request.files.getlist('attachments')
+        for f in uploaded_files:
+            if f and f.filename:
+                fname = secure_filename(f.filename)
+                fdata = f.read()
+                if fdata:
+                    attachments.append({
+                        'filename': fname,
+                        'content': fdata,
+                        'content_type': f.content_type or 'application/octet-stream'
+                    })
+
         smtp_cfg = get_smtp_config()
         success, msg = send_custom_customer_email(
             recipient_email=to_email,
@@ -2870,25 +3010,31 @@ def admin_compose_email():
             config=smtp_cfg,
             customer_name=customer_name,
             inquiry_number=inquiry_number,
-            cc=cc_email
+            cc=cc_email,
+            attachments=attachments
         )
         
         # If this email was sent in reference to an inquiry, record it in the inquiry chat history
         if inquiry_number:
             inq = Inquiry.query.filter_by(inquiry_number=inquiry_number).first()
             if inq:
+                att_note = ""
+                if attachments:
+                    att_names = ", ".join([a['filename'] for a in attachments])
+                    att_note = f"<br><br><span style='font-size:12px; color:#475569;'><strong>Attachments ({len(attachments)}):</strong> {att_names}</span>"
                 db_msg = InquiryMessage(
                     inquiry_id=inq.id,
                     sender_type='admin',
                     sender_name=f"Admin Email ({session.get('admin_username', 'DTC')})",
-                    message=f"<strong>[Emailed to {to_email}]</strong><br><strong>Subject:</strong> {subject}<br><br>{message_body}"
+                    message=f"<strong>[Emailed to {to_email}]</strong><br><strong>Subject:</strong> {subject}<br><br>{message_body}{att_note}"
                 )
                 db.session.add(db_msg)
                 inq.updated_at = datetime.utcnow()
                 db.session.commit()
                 
         if success:
-            flash(f"Email successfully delivered to <strong>{to_email}</strong>! (Subject: {subject})", 'success')
+            att_info = f" with {len(attachments)} attachment(s)" if attachments else ""
+            flash(f"Email successfully delivered to <strong>{to_email}</strong>{att_info}! (Subject: {subject})", 'success')
             if inquiry:
                 return redirect(url_for('admin_dashboard'))
             return redirect(url_for('admin_compose_email'))
@@ -2906,6 +3052,7 @@ def admin_compose_email():
                 inquiry=inquiry,
                 inquiries=inquiries,
                 customers=customers,
+                email_templates=get_email_templates(),
                 smtp_cfg=smtp_cfg
             )
 
@@ -2924,6 +3071,7 @@ def admin_compose_email():
         inquiry=inquiry,
         inquiries=inquiries,
         customers=customers,
+        email_templates=get_email_templates(),
         smtp_cfg=smtp_cfg
     )
 

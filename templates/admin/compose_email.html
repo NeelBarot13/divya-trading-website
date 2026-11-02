@@ -30,12 +30,13 @@
       font-weight: 700;
       color: #334155;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
     .template-pill-btn:hover {
       background: #E2E8F0;
       border-color: #94A3B8;
       color: #0F172A;
+      transform: translateY(-1px);
     }
     .email-preview-box {
       background: #FFFFFF;
@@ -64,6 +65,133 @@
       text-align: center;
       font-size: 0.78rem;
       color: #64748B;
+    }
+
+    /* Attachment Dropzone & Chips */
+    .attachment-dropzone {
+      border: 2px dashed #CBD5E1;
+      background: #F8FAFC;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .attachment-dropzone:hover, .attachment-dropzone.dragover {
+      border-color: #0052CC;
+      background: #EFF6FF;
+    }
+    .attachment-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .attachment-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      color: #1E293B;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      max-width: 100%;
+    }
+    .attachment-chip-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid #E2E8F0;
+    }
+    .attachment-chip-icon {
+      color: #0052CC;
+      display: flex;
+      align-items: center;
+    }
+    .attachment-chip-name {
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .attachment-chip-size {
+      font-size: 0.72rem;
+      color: #64748B;
+    }
+    .attachment-chip-remove {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .attachment-chip-remove:hover {
+      color: #EF4444;
+      background: #FEE2E2;
+    }
+
+    /* Modal styling */
+    .tpl-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .tpl-modal-overlay.active {
+      display: flex;
+    }
+    .tpl-modal-card {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 760px;
+      max-height: 90vh;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2), 0 10px 10px -5px rgba(0,0,0,0.04);
+    }
+    .tpl-modal-header {
+      background: #0A2540;
+      color: #FFFFFF;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #0052CC;
+    }
+    .tpl-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .tpl-list-item {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      background: #F8FAFC;
+      transition: all 0.2s;
+    }
+    .tpl-list-item:hover {
+      border-color: #93C5FD;
+      background: #FFFFFF;
     }
   </style>
 </head>
@@ -132,7 +260,7 @@
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </span>
-        <span>View Live Website ↗</span>
+        <span>View Live Website</span>
       </a>
     </nav>
 
@@ -159,12 +287,17 @@
     <div class="admin-top-bar">
       <div class="admin-page-title">
         <h1>Compose & Send Customer Email</h1>
-        <p>Draft quotations, spare parts availability, technical updates, and send branded emails directly to any client address.</p>
+        <p>Draft quotations, spare parts availability, attach technical drawings & PDFs, and send branded emails directly to any client address.</p>
       </div>
 
       <div class="admin-top-actions">
-        <a href="{{ url_for('admin_settings') }}#tab-email" class="btn-admin-export" style="background: #F8FAFC; border-color: #CBD5E1; color: #334155;">
-          <span>⚙️ SMTP Server Settings</span>
+        <button type="button" class="btn-admin-export" onclick="openTemplatesModal()" style="background: #FFFFFF; border-color: #0052CC; color: #0052CC; display: inline-flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <span>Manage Predefined Templates</span>
+        </button>
+        <a href="{{ url_for('admin_settings') }}#tab-email" class="btn-admin-export" style="background: #F8FAFC; border-color: #CBD5E1; color: #334155; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>SMTP Settings</span>
         </a>
       </div>
     </div>
@@ -180,8 +313,14 @@
 
     <!-- SMTP Connection Status Banner -->
     <div style="background: {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}#ECFDF5; border-color: #A7F3D0; color: #065F46;{% else %}#FFFBEB; border-color: #FDE68A; color: #92400E;{% endif %} border-width: 1px; border-style: solid; border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 1.2rem;">{% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}🟢{% else %}⚠️{% endif %}</span>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}#D1FAE5; color: #059669;{% else %}#FEF3C7; color: #D97706;{% endif %};">
+          {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          {% else %}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          {% endif %}
+        </span>
         <div>
           <strong style="font-size: 0.88rem;">
             {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}
@@ -192,9 +331,9 @@
           </strong>
           <div style="font-size: 0.78rem; opacity: 0.9; margin-top: 2px;">
             {% if smtp_cfg.MAIL_USERNAME and smtp_cfg.MAIL_PASSWORD %}
-              Ready to send live emails directly to customer inboxes.
+              Ready to send live emails directly to customer inboxes with attachments.
             {% else %}
-              Click <a href="{{ url_for('admin_settings') }}#tab-email" style="font-weight: 700; text-decoration: underline; color: inherit;">Website Settings > SMTP</a> to save your Gmail App Password.
+              Click <a href="{{ url_for('admin_settings') }}#tab-email" style="font-weight: 700; text-decoration: underline; color: inherit;">Website Settings &gt; SMTP</a> to save your Gmail App Password.
             {% endif %}
           </div>
         </div>
@@ -206,16 +345,20 @@
       <!-- Left Column: Compose Form -->
       <div class="admin-card" style="padding: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-          <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A;">✉️ Email Composer</h3>
-          <span style="font-size: 0.75rem; background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-weight: 700;">HTML Delivery</span>
+          <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Email Composer
+          </h3>
+          <span style="font-size: 0.75rem; background: #EFF6FF; color: #0052CC; padding: 3px 10px; border-radius: 4px; font-weight: 700; border: 1px solid #BFDBFE;">HTML &amp; Attachments</span>
         </div>
 
-        <form action="{{ url_for('admin_compose_email') }}" method="POST" id="emailComposeForm">
+        <form action="{{ url_for('admin_compose_email') }}" method="POST" enctype="multipart/form-data" id="emailComposeForm">
           
           <!-- Quick Customer / Inquiry Selector Dropdown -->
           <div class="form-group" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 4px;">
-              ⚡ Quick-Select from Inquiries or Registered Customers:
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Quick-Select from Inquiries or Registered Customers:
             </label>
             <select class="form-control" style="font-size: 0.84rem;" onchange="loadSelectedContact(this)">
               <option value="">-- Choose a customer or inquiry to auto-fill --</option>
@@ -270,25 +413,26 @@
           </div>
 
           <!-- Template Pills Toolbar -->
-          <div class="form-group" style="margin-bottom: 10px;">
-            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px;">
-              📄 Quick Templates:
-            </label>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button type="button" class="template-pill-btn" onclick="applyTemplate('quotation')">
-                📋 Formal Quotation
+          <div class="form-group" style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label class="form-label" style="font-size: 0.78rem; font-weight: 700; color: #475569; margin: 0; display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                Predefined Templates:
+              </label>
+              <button type="button" onclick="openTemplatesModal()" style="font-size: 0.75rem; color: #0052CC; background: none; border: none; font-weight: 700; cursor: pointer; text-decoration: underline;">
+                Manage / Add Templates
               </button>
-              <button type="button" class="template-pill-btn" onclick="applyTemplate('stock')">
-                📦 Stock & Dispatch
+            </div>
+            <div id="templatesPillsContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              {% for t in email_templates %}
+              <button type="button" class="template-pill-btn" onclick="applyTemplateById('{{ t.id }}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>{{ t.title }}</span>
               </button>
-              <button type="button" class="template-pill-btn" onclick="applyTemplate('catalog')">
-                📖 Catalog Brochure Link
-              </button>
-              <button type="button" class="template-pill-btn" onclick="applyTemplate('specs')">
-                ⚙️ Specifications Request
-              </button>
-              <button type="button" class="template-pill-btn" onclick="applyTemplate('clear')" style="color: #991b1b; background: #FEF2F2; border-color: #FECACA;">
-                ✕ Clear
+              {% endfor %}
+              <button type="button" class="template-pill-btn" onclick="clearMessageBody()" style="color: #991B1B; background: #FEF2F2; border-color: #FECACA;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <span>Clear Body</span>
               </button>
             </div>
           </div>
@@ -299,12 +443,35 @@
               <span>Message Body *</span>
               <span style="font-size: 0.75rem; color: #64748B; font-weight: 400;">Paragraphs and line breaks are formatted automatically</span>
             </label>
-            <textarea id="messageBodyInput" name="message_body" class="form-control" rows="12" required placeholder="Type your email message to the customer here..." oninput="updateLivePreview()">{{ message_body or '' }}</textarea>
+            <textarea id="messageBodyInput" name="message_body" class="form-control" rows="11" required placeholder="Type your email message to the customer here..." oninput="updateLivePreview()">{{ message_body or '' }}</textarea>
+          </div>
+
+          <!-- Multiple Files & Images Attachment Section -->
+          <div class="form-group" style="margin-top: 18px;">
+            <label class="form-label" style="font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                Attach Files & Images
+              </span>
+              <span style="font-size: 0.75rem; color: #64748B; font-weight: 400;">PDF, Drawings, Word, Excel, JPG, PNG, WEBP</span>
+            </label>
+
+            <div class="attachment-dropzone" id="dropzoneBox" onclick="document.getElementById('emailAttachmentsInput').click()">
+              <input type="file" name="attachments" id="emailAttachmentsInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.webp,.zip" style="display: none;" onchange="handleFileSelect(event)">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #1E293B;">Click to browse or drag &amp; drop files here</div>
+                <div style="font-size: 0.75rem; color: #64748B;">Select multiple files to attach to this customer email</div>
+              </div>
+            </div>
+
+            <!-- Selected Files Chips List -->
+            <div class="attachment-chips-container" id="attachmentChipsContainer"></div>
           </div>
 
           <!-- Send Actions -->
-          <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 20px;">
-            <button type="submit" class="btn-admin-primary" style="padding: 12px 28px; font-size: 0.92rem; font-weight: 700; background: #0052CC; border-color: #0052CC; display: inline-flex; align-items: center; gap: 8px;">
+          <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E2E8F0;">
+            <button type="submit" class="btn-admin-primary" style="padding: 12px 32px; font-size: 0.92rem; font-weight: 700; background: #0052CC; border-color: #0052CC; display: inline-flex; align-items: center; gap: 8px;">
               <span>Send Email to Customer</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
@@ -316,7 +483,10 @@
       <div>
         <div class="admin-card" style="padding: 24px; position: sticky; top: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-            <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A;">👁️ Live Email Preview</h3>
+            <h3 style="margin: 0; font-size: 1.15rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              Live Email Preview
+            </h3>
             <span style="font-size: 0.74rem; background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 4px; font-weight: 700;">Customer's Inbox View</span>
           </div>
 
@@ -339,12 +509,32 @@
                 <p style="color: #94A3B8; font-style: italic;">(Your drafted message will appear here in real time...)</p>
               </div>
 
+              <!-- Attachments Badge in Preview -->
+              <div id="previewAttachmentsBox" style="display: none; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 6px; padding: 10px 14px; margin: 16px 0; font-size: 0.8rem; color: #334155;">
+                <div style="font-weight: 700; color: #0F172A; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0052CC" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                  <span>Attached Documents &amp; Drawings (<span id="previewAttCount">0</span>):</span>
+                </div>
+                <div id="previewAttList" style="color: #475569; font-size: 0.78rem;"></div>
+              </div>
+
               <!-- Official DTC Contact Details Card in Preview -->
-              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; margin-top: 20px; font-size: 0.82rem; color: #475569;">
-                <strong style="color: #0A2540; font-size: 0.84rem; display: block; margin-bottom: 6px;">Direct Sales & Engineering Support:</strong>
-                <div>📞 WhatsApp / Call: <strong>+91 83208 21579</strong></div>
-                <div>✉️ Direct Email: <strong>divya.trading06@gmail.com</strong></div>
-                <div>🏭 Works: 15, Nageshwar Estate, Amraiwadi, Ahmedabad, India</div>
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-top: 20px; font-size: 0.82rem; color: #475569;">
+                <strong style="color: #0A2540; font-size: 0.84rem; display: block; margin-bottom: 8px;">Direct Sales &amp; Engineering Support:</strong>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                  <tr>
+                    <td style="padding: 3px 0; width: 32%; font-weight: 600; color: #1E293B;">Phone / WhatsApp:</td>
+                    <td style="padding: 3px 0; color: #0052CC; font-weight: 700;">+91 83208 21579</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 3px 0; font-weight: 600; color: #1E293B;">Direct Email:</td>
+                    <td style="padding: 3px 0; color: #0052CC;">divya.trading06@gmail.com</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 3px 0; font-weight: 600; color: #1E293B;">Works &amp; Office:</td>
+                    <td style="padding: 3px 0; color: #475569;">15, Nageshwar Estate, Amraiwadi, Ahmedabad, India</td>
+                  </tr>
+                </table>
               </div>
             </div>
 
@@ -357,7 +547,80 @@
     </div>
   </main>
 
+  <!-- ==========================================
+       MANAGE PREDEFINED TEMPLATES MODAL
+       ========================================== -->
+  <div class="tpl-modal-overlay" id="templatesModalOverlay">
+    <div class="tpl-modal-card">
+      <div class="tpl-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93C5FD" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <h3 style="margin: 0; font-size: 1.1rem; color: #FFFFFF; font-family: 'Outfit', sans-serif;">Manage Predefined Email Templates</h3>
+        </div>
+        <button type="button" onclick="closeTemplatesModal()" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="tpl-modal-body">
+        <!-- Add / Edit Template Form -->
+        <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 18px; margin-bottom: 24px;">
+          <h4 id="formHeading" style="margin: 0 0 14px; font-size: 0.95rem; color: #0F172A; font-weight: 700;">
+            Add New Email Template
+          </h4>
+          <input type="hidden" id="editTplId" value="">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label class="form-label" style="font-size: 0.78rem; font-weight: 700;">Template Title (Button Label) *</label>
+              <input type="text" id="tplTitleInput" class="form-control" placeholder="e.g. Price Quotation">
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.78rem; font-weight: 700;">Email Subject Line *</label>
+              <input type="text" id="tplSubjectInput" class="form-control" placeholder="e.g. Quotation for Spare Parts — Divya Trading Co.">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; display: flex; justify-content: space-between;">
+              <span>Message Body Content *</span>
+              <span style="font-size: 0.72rem; color: #64748B;">Supported tags: {name}, {items}, {inquiry}</span>
+            </label>
+            <textarea id="tplBodyInput" class="form-control" rows="6" placeholder="Enter predefined template body text..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" id="cancelEditBtn" onclick="resetTemplateForm()" style="display: none; padding: 8px 16px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; font-weight: 600; cursor: pointer;">
+              Cancel Edit
+            </button>
+            <button type="button" onclick="saveTemplate()" style="padding: 8px 20px; background: #0052CC; color: white; border: none; border-radius: 6px; font-size: 0.84rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span id="saveBtnText">Save Template</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Existing Templates List -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; font-size: 0.95rem; color: #0F172A; font-weight: 700;">Saved Templates (<span id="tplCount">0</span>)</h4>
+            <button type="button" onclick="restoreDefaultTemplates()" style="font-size: 0.75rem; color: #64748B; background: none; border: 1px solid #CBD5E1; border-radius: 4px; padding: 4px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+              Restore Factory Presets
+            </button>
+          </div>
+
+          <div id="templatesListModalContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Templates Array loaded from Flask
+    let currentTemplates = {{ email_templates|tojson }};
+    let attachedFilesArray = [];
+
     function toggleAdminSidebar() {
       const sidebar = document.getElementById('adminSidebar');
       const overlay = document.getElementById('adminSidebarOverlay');
@@ -365,6 +628,282 @@
       overlay?.classList.toggle('active');
     }
 
+    // ==========================================
+    // PREDEFINED TEMPLATE LOGIC
+    // ==========================================
+    function applyTemplateById(tplId) {
+      const tpl = currentTemplates.find(t => t.id === tplId);
+      if (!tpl) return;
+
+      const name = document.getElementById('custNameInput').value.trim() || 'Valued Customer';
+      const inq = document.getElementById('inqRefInput').value.trim() || 'DTC-QUOTE';
+      
+      let processedSubject = tpl.subject.replace(/\{name\}/g, name).replace(/\{inquiry\}/g, inq);
+      let processedBody = tpl.body.replace(/\{name\}/g, name).replace(/\{inquiry\}/g, inq).replace(/\{items\}/g, 'Precision Rotary Machine Spares');
+
+      document.getElementById('subjectInput').value = processedSubject;
+      document.getElementById('messageBodyInput').value = processedBody;
+      updateLivePreview();
+    }
+
+    function clearMessageBody() {
+      document.getElementById('messageBodyInput').value = '';
+      updateLivePreview();
+    }
+
+    function renderTemplatePills() {
+      const container = document.getElementById('templatesPillsContainer');
+      let html = '';
+      currentTemplates.forEach(t => {
+        html += `
+          <button type="button" class="template-pill-btn" onclick="applyTemplateById('${t.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>${t.title}</span>
+          </button>
+        `;
+      });
+      html += `
+        <button type="button" class="template-pill-btn" onclick="clearMessageBody()" style="color: #991B1B; background: #FEF2F2; border-color: #FECACA;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <span>Clear Body</span>
+        </button>
+      `;
+      container.innerHTML = html;
+    }
+
+    function openTemplatesModal() {
+      renderModalTemplatesList();
+      resetTemplateForm();
+      document.getElementById('templatesModalOverlay').classList.add('active');
+    }
+
+    function closeTemplatesModal() {
+      document.getElementById('templatesModalOverlay').classList.remove('active');
+    }
+
+    function renderModalTemplatesList() {
+      const countEl = document.getElementById('tplCount');
+      if (countEl) countEl.textContent = currentTemplates.length;
+
+      const container = document.getElementById('templatesListModalContainer');
+      if (!currentTemplates.length) {
+        container.innerHTML = '<p style="color: #64748B; font-size: 0.85rem; font-style: italic;">No templates configured yet. Add your first template above or restore defaults.</p>';
+        return;
+      }
+
+      let html = '';
+      currentTemplates.forEach(t => {
+        const bodySnippet = t.body.length > 120 ? t.body.substring(0, 120) + '...' : t.body;
+        html += `
+          <div class="tpl-list-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+              <div>
+                <strong style="color: #0A2540; font-size: 0.92rem;">${t.title}</strong>
+                <div style="font-size: 0.8rem; color: #0052CC; margin: 2px 0;"><strong>Subject:</strong> ${t.subject}</div>
+                <div style="font-size: 0.78rem; color: #475569; margin-top: 4px; white-space: pre-line;">${bodySnippet}</div>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" onclick="editTemplate('${t.id}')" style="background: #EFF6FF; color: #0052CC; border: 1px solid #BFDBFE; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                  Edit
+                </button>
+                <button type="button" onclick="deleteTemplate('${t.id}')" style="background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function editTemplate(tplId) {
+      const t = currentTemplates.find(x => x.id === tplId);
+      if (!t) return;
+      document.getElementById('editTplId').value = t.id;
+      document.getElementById('tplTitleInput').value = t.title;
+      document.getElementById('tplSubjectInput').value = t.subject;
+      document.getElementById('tplBodyInput').value = t.body;
+      document.getElementById('formHeading').textContent = `Edit Template: "${t.title}"`;
+      document.getElementById('saveBtnText').textContent = 'Update Template';
+      document.getElementById('cancelEditBtn').style.display = 'inline-block';
+      document.getElementById('tplTitleInput').focus();
+    }
+
+    function resetTemplateForm() {
+      document.getElementById('editTplId').value = '';
+      document.getElementById('tplTitleInput').value = '';
+      document.getElementById('tplSubjectInput').value = '';
+      document.getElementById('tplBodyInput').value = '';
+      document.getElementById('formHeading').textContent = 'Add New Email Template';
+      document.getElementById('saveBtnText').textContent = 'Save Template';
+      document.getElementById('cancelEditBtn').style.display = 'none';
+    }
+
+    async function saveTemplate() {
+      const id = document.getElementById('editTplId').value;
+      const title = document.getElementById('tplTitleInput').value.trim();
+      const subject = document.getElementById('tplSubjectInput').value.trim();
+      const body = document.getElementById('tplBodyInput').value.trim();
+
+      if (!title || !subject || !body) {
+        alert('Please fill in Template Title, Subject, and Body.');
+        return;
+      }
+
+      try {
+        const resp = await fetch('{{ url_for("admin_manage_email_templates") }}', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'save', id, title, subject, body})
+        });
+        const data = await resp.json();
+        if (data.success) {
+          currentTemplates = data.templates;
+          renderTemplatePills();
+          renderModalTemplatesList();
+          resetTemplateForm();
+        } else {
+          alert(data.message || 'Error saving template');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Could not save template. Please try again.');
+      }
+    }
+
+    async function deleteTemplate(tplId) {
+      if (!confirm('Are you sure you want to remove this template?')) return;
+      try {
+        const resp = await fetch('{{ url_for("admin_manage_email_templates") }}', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'delete', id: tplId})
+        });
+        const data = await resp.json();
+        if (data.success) {
+          currentTemplates = data.templates;
+          renderTemplatePills();
+          renderModalTemplatesList();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function restoreDefaultTemplates() {
+      if (!confirm('Reset all templates to factory defaults? Any custom templates will be overwritten.')) return;
+      try {
+        const resp = await fetch('{{ url_for("admin_manage_email_templates") }}', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'reset'})
+        });
+        const data = await resp.json();
+        if (data.success) {
+          currentTemplates = data.templates;
+          renderTemplatePills();
+          renderModalTemplatesList();
+          resetTemplateForm();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ==========================================
+    // MULTIPLE FILES & IMAGES ATTACHMENT LOGIC
+    // ==========================================
+    const dropzone = document.getElementById('dropzoneBox');
+    ['dragenter', 'dragover'].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      });
+    });
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        addFiles(dt.files);
+      }
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files && e.target.files.length) {
+        addFiles(e.target.files);
+      }
+    }
+
+    function addFiles(fileList) {
+      for (let i = 0; i < fileList.length; i++) {
+        const f = fileList[i];
+        // avoid duplicate by name and size
+        if (!attachedFilesArray.some(existing => existing.name === f.name && existing.size === f.size)) {
+          attachedFilesArray.push(f);
+        }
+      }
+      syncFileInputAndRender();
+    }
+
+    function removeFile(index) {
+      attachedFilesArray.splice(index, 1);
+      syncFileInputAndRender();
+    }
+
+    function syncFileInputAndRender() {
+      // Rebuild DataTransfer
+      const dt = new DataTransfer();
+      attachedFilesArray.forEach(file => dt.items.add(file));
+      document.getElementById('emailAttachmentsInput').files = dt.files;
+
+      // Render Chips
+      const container = document.getElementById('attachmentChipsContainer');
+      container.innerHTML = '';
+
+      attachedFilesArray.forEach((file, idx) => {
+        const sizeStr = file.size >= 1024 * 1024 
+          ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+          : Math.round(file.size / 1024) + ' KB';
+
+        const isImg = file.type.startsWith('image/');
+        const chip = document.createElement('div');
+        chip.className = 'attachment-chip';
+
+        let iconOrThumbHtml = '';
+        if (isImg) {
+          const thumbUrl = URL.createObjectURL(file);
+          iconOrThumbHtml = `<img src="${thumbUrl}" class="attachment-chip-thumb" alt="${file.name}">`;
+        } else {
+          iconOrThumbHtml = `
+            <span class="attachment-chip-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            </span>
+          `;
+        }
+
+        chip.innerHTML = `
+          ${iconOrThumbHtml}
+          <span class="attachment-chip-name" title="${file.name}">${file.name}</span>
+          <span class="attachment-chip-size">(${sizeStr})</span>
+          <button type="button" class="attachment-chip-remove" onclick="removeFile(${idx})" title="Remove file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        `;
+        container.appendChild(chip);
+      });
+
+      updateLivePreview();
+    }
+
+    // ==========================================
+    // AUTO-FILL & LIVE PREVIEW
+    // ==========================================
     function loadSelectedContact(selectEl) {
       const opt = selectEl.options[selectEl.selectedIndex];
       if (!opt || !opt.value) return;
@@ -382,84 +921,7 @@
 
       const items = opt.dataset.items || '';
       if (items && !document.getElementById('messageBodyInput').value) {
-        applyTemplate('quotation', items, inq);
-      }
-
-      updateLivePreview();
-    }
-
-    function applyTemplate(type, customItems = '', customInq = '') {
-      const name = document.getElementById('custNameInput').value || 'Customer';
-      const inq = customInq || document.getElementById('inqRefInput').value || 'DTC-QUOTE';
-      const subjectInput = document.getElementById('subjectInput');
-      const bodyInput = document.getElementById('messageBodyInput');
-
-      if (type === 'quotation') {
-        subjectInput.value = `Quotation for Textile Machine Spare Parts - Divya Trading Co. [Ref: #${inq}]`;
-        bodyInput.value = 
-`Thank you for inquiring with Divya Trading Co.
-
-We are pleased to submit our formal quotation for your precision rotary printing machine spare parts requirement:
-
-• Inquired Items: ${customItems || 'Precision Screen Head Assembly / Rotary Spares'}
-• Repeat Size / Specification: 64R Standard / Alloy Steel
-• Stock Status: Ready in Stock
-• Delivery Timeline: Dispatched within 24-48 hours via express cargo from Ahmedabad works.
-• Quality Guarantee: 100% precision engineered & quality inspected prior to dispatch.
-• Commercial Terms: 100% advance against Proforma Invoice / RTGS.
-• Validity: Quotation valid for 15 days.
-
-Please let us know if you require a formal PDF Proforma Invoice or additional technical specifications.`;
-      } 
-      else if (type === 'stock') {
-        subjectInput.value = `Stock Availability & Dispatch Confirmation - Divya Trading Co.`;
-        bodyInput.value = 
-`Thank you for contacting Divya Trading Co.
-
-We are pleased to confirm that the requested rotary screen printing machine spare parts are in ready stock at our Ahmedabad facility:
-
-• Stock Status: Ready in Stock
-• Dispatch: Same day / Next working day from Ahmedabad, Gujarat
-• Packaging: Heavy-duty export seaworthy / transport corrugated packaging
-• Transit Time: 2-3 days across India / 5-7 days worldwide
-
-Kindly confirm your billing & shipping address to initiate the dispatch process.`;
-      }
-      else if (type === 'catalog') {
-        subjectInput.value = `Technical Catalog & Spare Parts Guide - Divya Trading Co.`;
-        bodyInput.value = 
-`Dear ${name},
-
-Thank you for your interest in Divya Trading Co. textile machinery precision spares.
-
-You can download our complete 8-page Technical Brochure & Spare Parts Catalog using this direct link:
-https://divyatradingco.com/catalog.pdf
-
-Our manufacturing program covers spares for:
-• Stormac (RD-3, RD-4, Pegasus, RD-DD)
-• Stork Box, Screen Heads & Repeats (64R, 81.9R, 91.4R, 101.8R)
-• Colour Pumps (SB-4, SB-5, SB-7)
-• Swedish Steel Squeegee Blades
-• Laxmi, Ichinose, Reggiani & Zimmer Rotary Machines
-
-Feel free to reply to this email or reach us on WhatsApp at +91 83208 21579 for any technical assistance.`;
-      }
-      else if (type === 'specs') {
-        subjectInput.value = `Specification Confirmation for Rotary Printing Machine Spares - Divya Trading Co.`;
-        bodyInput.value = 
-`Dear ${name},
-
-We are following up regarding your recent inquiry for rotary printing machine spares.
-
-To ensure a 100% exact engineering match for your machine, could you please confirm:
-1. Machine Make & Model (e.g. Stork RD-4, Stormac, Laxmi, etc.)
-2. Screen Repeat Size (e.g. 640mm / 64R, 819mm / 81.9R, 914mm / 91.4R)
-3. Current part photo or bearing/shaft dimensions if available
-
-Once confirmed, we will promptly issue your quotation and dispatch schedule.`;
-      }
-      else if (type === 'clear') {
-        bodyInput.value = '';
+        applyTemplateById('formal_quotation');
       }
 
       updateLivePreview();
@@ -487,6 +949,18 @@ Once confirmed, we will promptly issue your quotation and dispatch schedule.`;
         const paragraphs = rawBody.split('\n\n').filter(p => p.trim());
         const html = paragraphs.map(p => `<p style="margin: 0 0 12px; line-height: 1.6;">${p.replace(/\n/g, '<br>')}</p>`).join('');
         contentBox.innerHTML = html;
+      }
+
+      // Attachments live preview
+      const attBox = document.getElementById('previewAttachmentsBox');
+      const attCount = document.getElementById('previewAttCount');
+      const attList = document.getElementById('previewAttList');
+      if (attachedFilesArray.length > 0) {
+        attBox.style.display = 'block';
+        attCount.textContent = attachedFilesArray.length;
+        attList.textContent = attachedFilesArray.map(f => f.name).join(', ');
+      } else {
+        attBox.style.display = 'none';
       }
     }
 

@@ -91,8 +91,10 @@
             style="margin-bottom: 24px; background: #F8FAFC; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <label class="form-label"
-                style="margin-bottom: 0; font-weight: 700; color: var(--primary-navy); font-size: 0.82rem;">🛡️ Anti-Bot
-                Verification:</label>
+                style="margin-bottom: 0; font-weight: 700; color: var(--primary-navy); font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dtc-blue)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Anti-Bot Verification:</span>
+              </label>
               <span id="regCaptchaQ"
                 style="font-weight: 800; color: var(--dtc-blue); background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid #CBD5E1; font-size: 0.88rem;">Loading...</span>
             </div>
@@ -100,15 +102,18 @@
               <input type="text" name="captcha" id="regCaptchaInput" class="form-control" placeholder="Answer (e.g. 8)"
                 required style="padding: 8px 12px; font-size: 0.85rem;">
               <button type="button" onclick="loadRegCaptcha()"
-                style="background: #E2E8F0; border: none; border-radius: 6px; padding: 0 12px; font-size: 0.8rem; cursor: pointer; color: #475569;"
-                title="Refresh">↻ Refresh</button>
+                style="background: #E2E8F0; border: none; border-radius: 6px; padding: 0 12px; font-size: 0.8rem; cursor: pointer; color: #475569; display: inline-flex; align-items: center; gap: 4px;"
+                title="Refresh">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Refresh</span>
+              </button>
             </div>
           </div>
 
           <button type="submit" class="btn-enquire-primary"
-            style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm);">
+            style="width: 100%; justify-content: center; padding: 13px; font-size: 0.95rem; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 8px;">
             <span>Create Account & Continue</span>
-            <span>➔</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
         </form>
 
@@ -128,7 +133,10 @@
           <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">
             Already have an account?
             <a href="{{ url_for('customer_login', next=next_url) }}"
-              style="font-weight: 700; color: var(--dtc-blue);">Sign In Here ➔</a>
+              style="font-weight: 700; color: var(--dtc-blue); display: inline-flex; align-items: center; gap: 4px;">
+              <span>Sign In Here</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </a>
           </p>
         </div>
       </div>
