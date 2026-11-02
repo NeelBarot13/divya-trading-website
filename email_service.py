@@ -461,3 +461,108 @@ def send_custom_customer_email(recipient_email, subject, message_body, config, c
     </html>
     """
     return send_email(subject, [recipient_email], html, config, cc=cc)
+
+
+def send_customer_welcome_email(customer, temp_password=None, config=None):
+    """
+    Sends an automated, beautifully branded welcome email to newly registered
+    or existing customers added via admin with account details and direct portal login link.
+    """
+    subject = f"✨ Welcome to Divya Trading Co. Customer Portal — {customer.name}"
+    company_name = customer.company_name or 'Textile Mill Partner'
+    
+    password_block = ""
+    if temp_password:
+        password_block = f"""
+        <div style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 16px 20px; margin: 20px 0;">
+            <p style="margin: 0 0 6px; color: #92400E; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Portal Login Credentials</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #78350F;">
+                <tr>
+                    <td style="padding: 4px 0; width: 35%; font-weight: 600;">Login Email:</td>
+                    <td style="padding: 4px 0; font-family: monospace; font-size: 15px;"><strong>{customer.email}</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px 0; font-weight: 600;">Initial Password:</td>
+                    <td style="padding: 4px 0; font-family: monospace; font-size: 15px; color: #B45309;"><strong>{temp_password}</strong></td>
+                </tr>
+            </table>
+            <p style="margin: 8px 0 0; font-size: 12px; color: #92400E;">
+                You can change this password at any time from your customer dashboard.
+            </p>
+        </div>
+        """
+        
+    portal_url = "https://divyatradingco.com/customer/login"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Welcome to Divya Trading Co.</title>
+    </head>
+    <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px;">
+        <div style="max-width: 650px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <div style="background: #0A2540; padding: 30px 28px; text-align: center; border-bottom: 4px solid #0052CC;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 0.5px;">DIVYA TRADING CO.</h1>
+                <p style="color: #93c5fd; margin: 6px 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Precision Rotary Printing Machine Spares • Since 1997</p>
+            </div>
+            
+            <div style="padding: 32px 28px;">
+                <div style="background: #EFF6FF; border-left: 4px solid #0052CC; padding: 12px 18px; border-radius: 4px; margin-bottom: 24px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #1E40AF;">B2B CUSTOMER ACCOUNT ACTIVATED</span>
+                </div>
+                
+                <p style="font-size: 16px; color: #0F172A; margin-top: 0;">Dear <strong>{customer.name}</strong> ({company_name}),</p>
+                
+                <p style="font-size: 14px; color: #334155; line-height: 1.6;">
+                    Welcome to <strong>Divya Trading Co.</strong>! We are pleased to confirm that your customer account has been successfully set up on our B2B procurement portal.
+                </p>
+                
+                {password_block}
+                
+                <div style="text-align: center; margin: 28px 0;">
+                    <a href="{portal_url}" style="display: inline-block; background: #0052CC; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0,82,204,0.3);">
+                        Access Customer Portal ➔
+                    </a>
+                </div>
+
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px; margin: 26px 0;">
+                    <h3 style="margin: 0 0 12px; color: #0A2540; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">What You Can Do on Your Portal:</h3>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #475569; line-height: 1.8;">
+                        <li><strong>Track Your RFQs & Quotations:</strong> View real-time pricing, delivery timelines, and proforma status.</li>
+                        <li><strong>One-Click Reorders:</strong> Quickly request quotes for Stormac, Laxmi, Stork RD-4, Pegasus, Zimmer & Reggiani machine spares.</li>
+                        <li><strong>Order Repeat Gears & Screen Heads:</strong> Specify 64R, 81.9R, 91.4R, 101.8R repeat sizes directly online.</li>
+                        <li><strong>Direct Engineering Support:</strong> Chat or message our technical team for custom CNC precision drawings.</li>
+                    </ul>
+                </div>
+                
+                <div style="background: #F1F5F9; border-radius: 8px; padding: 18px; margin-top: 24px;">
+                    <h4 style="margin: 0 0 10px; color: #0A2540; font-size: 13px; text-transform: uppercase;">Direct Sales & WhatsApp Contact:</h4>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #475569;">
+                        <tr>
+                            <td style="padding: 4px 0; width: 32%;"><strong>Phone / WhatsApp:</strong></td>
+                            <td style="padding: 4px 0;"><a href="https://wa.me/918320821579" style="color: #16a34a; text-decoration: none; font-weight: 700;">+91 83208 21579 💬</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Direct Email:</strong></td>
+                            <td style="padding: 4px 0;"><a href="mailto:divya.trading06@gmail.com" style="color: #0052CC; text-decoration: none;">divya.trading06@gmail.com</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Works Address:</strong></td>
+                            <td style="padding: 4px 0;">15, Nageshwar Estate, Amraiwadi, Ahmedabad - 380026, Gujarat, India</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="background: #0A2540; padding: 16px 20px; text-align: center; font-size: 12px; color: #94A3B8;">
+                Divya Trading Co. • Serving Leading Textile Mills Across India & Worldwide Since 1997<br>
+                <a href="https://divyatradingco.com" style="color: #60A5FA; text-decoration: none;">https://divyatradingco.com</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(subject, [customer.email], html, config)
+

@@ -8,7 +8,7 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-from models import db, Category, MachineMake, Product
+from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, InquiryMessage, CustomerUser, AdminUser, SiteSetting
 from seed_data import slugify
 
 
@@ -801,3 +801,433 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None)
         'total': total_processed,
         'errors': errors
     }
+
+
+def generate_complete_system_backup_excel():
+    """
+    Compiles an all-inclusive, beautifully formatted multi-sheet Excel (.xlsx) workbook
+    containing the entire Divya Trading Co database: Products, Inquiries & Quotes,
+    Inquiry Items, Customer Accounts, Categories & Makes, CMS Settings, and System Overview.
+    """
+    wb = openpyxl.Workbook()
+    # Remove default sheet
+    wb.remove(wb.active)
+
+    # Styles
+    navy_header_fill = PatternFill(start_color="0A2540", end_color="0A2540", fill_type="solid")
+    blue_title_fill = PatternFill(start_color="0052CC", end_color="0052CC", fill_type="solid")
+    accent_sub_fill = PatternFill(start_color="EFF6FF", end_color="EFF6FF", fill_type="solid")
+    even_row_fill = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid")
+    odd_row_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+    
+    header_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+    title_font = Font(name="Segoe UI", size=14, bold=True, color="FFFFFF")
+    kpi_bold_font = Font(name="Segoe UI", size=11, bold=True, color="0A2540")
+    data_font = Font(name="Segoe UI", size=9, color="1E293B")
+    
+    thin_side = Side(border_style="thin", color="CBD5E1")
+    cell_border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+    center_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    left_align = Alignment(horizontal="left", vertical="center", wrap_text=True)
+
+    # Fetch data
+    products = Product.query.order_by(Product.id.asc()).all()
+    categories = Category.query.order_by(Category.order_index.asc()).all()
+    machines = MachineMake.query.order_by(MachineMake.name.asc()).all()
+    customers = CustomerUser.query.order_by(CustomerUser.id.desc()).all()
+    inquiries = Inquiry.query.order_by(Inquiry.id.desc()).all()
+    settings = SiteSetting.query.order_by(SiteSetting.key.asc()).all()
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
+
+    # ----------------------------------------------------
+    # Sheet 1: System Overview & Metadata
+    # ----------------------------------------------------
+    ws_meta = wb.create_sheet(title="System Overview")
+    ws_meta.views.sheetView[0].showGridLines = True
+    
+    ws_meta.merge_cells("A1:E1")
+    t_cell = ws_meta["A1"]
+    t_cell.value = "DIVYA TRADING CO. — COMPLETE SYSTEM DATABASE BACKUP"
+    t_cell.font = title_font
+    t_cell.fill = navy_header_fill
+    t_cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws_meta.row_dimensions[1].height = 36
+
+    ws_meta["A3"] = "Generated At:"
+    ws_meta["B3"] = now_str
+    ws_meta["A4"] = "Company:"
+    ws_meta["B4"] = "Divya Trading Co. (Ahmedabad, Gujarat, India)"
+    ws_meta["A5"] = "Target Website:"
+    ws_meta["B5"] = "https://divyatradingco.com"
+    ws_meta["A6"] = "System Version:"
+    ws_meta["B6"] = "Divya Trading Co. v2.5 B2B Cloud Platform"
+
+    for r in range(3, 7):
+        ws_meta[f"A{r}"].font = Font(name="Segoe UI", size=10, bold=True, color="0A2540")
+        ws_meta[f"B{r}"].font = data_font
+
+    ws_meta.merge_cells("A8:E8")
+    kpi_hdr = ws_meta["A8"]
+    kpi_hdr.value = "DATABASE ENTITY METRICS"
+    kpi_hdr.font = Font(name="Segoe UI", size=11, bold=True, color="FFFFFF")
+    kpi_hdr.fill = blue_title_fill
+    kpi_hdr.alignment = Alignment(horizontal="left", vertical="center", indent=1)
+    ws_meta.row_dimensions[8].height = 24
+
+    kpi_rows = [
+        ("Catalog Products", len(products), "Precision spare parts for rotary machines"),
+        ("Categories", len(categories), "Rotary screen printing part categories"),
+        ("Machine Makes", len(machines), "Supported machine makes (Stormac, Laxmi, Stork, etc.)"),
+        ("Registered Customer Mills", len(customers), "B2B customer mill portal accounts"),
+        ("Inquiries & Quotes", len(inquiries), "Quote submissions & RFQs"),
+        ("Website CMS Settings", len(settings), "Dynamic website CMS configuration parameters")
+    ]
+
+    ws_meta["A9"] = "Entity Name"
+    ws_meta["B9"] = "Total Records"
+    ws_meta["C9"] = "Description"
+    for col in ["A9", "B9", "C9"]:
+        ws_meta[col].font = header_font
+        ws_meta[col].fill = navy_header_fill
+        ws_meta[col].alignment = left_align
+    ws_meta.row_dimensions[9].height = 22
+
+    cur_r = 10
+    for entity, count, desc in kpi_rows:
+        ws_meta[f"A{cur_r}"] = entity
+        ws_meta[f"B{cur_r}"] = count
+        ws_meta[f"C{cur_r}"] = desc
+        ws_meta[f"A{cur_r}"].font = kpi_bold_font
+        ws_meta[f"B{cur_r}"].font = kpi_bold_font
+        ws_meta[f"B{cur_r}"].alignment = center_align
+        ws_meta[f"C{cur_r}"].font = data_font
+        for c in ["A", "B", "C"]:
+            ws_meta[f"{c}{cur_r}"].border = cell_border
+            ws_meta[f"{c}{cur_r}"].fill = even_row_fill if cur_r % 2 == 0 else odd_row_fill
+        ws_meta.row_dimensions[cur_r].height = 20
+        cur_r += 1
+
+    ws_meta.column_dimensions['A'].width = 28
+    ws_meta.column_dimensions['B'].width = 18
+    ws_meta.column_dimensions['C'].width = 50
+
+    # ----------------------------------------------------
+    # Sheet 2: Products
+    # ----------------------------------------------------
+    ws_prod = wb.create_sheet(title="Products")
+    ws_prod.views.sheetView[0].showGridLines = True
+    prod_headers = [
+        "Product ID", "Part Number", "Product Name", "Category", "Machine Make",
+        "Stock Status", "Short Description", "Full Technical Description",
+        "Specifications", "Repeat Sizes", "Material Grade", "Featured", "Active",
+        "Image Web Path", "Created Date", "Last Updated"
+    ]
+    ws_prod.append(prod_headers)
+    ws_prod.row_dimensions[1].height = 26
+    for col_idx in range(1, len(prod_headers) + 1):
+        cell = ws_prod.cell(row=1, column=col_idx)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+
+    row_idx = 2
+    for p in products:
+        ws_prod.append([
+            p.id,
+            p.part_number,
+            p.name,
+            p.category.name if p.category else '',
+            p.machine_make.name if p.machine_make else 'Universal / All Makes',
+            p.stock_status or 'in_stock',
+            p.short_description or '',
+            p.description or '',
+            p.specifications or '',
+            p.repeat_sizes or '',
+            p.material or '',
+            'Yes' if p.is_featured else 'No',
+            'Yes' if p.is_active else 'No',
+            p.image_url or '',
+            p.created_at.strftime('%Y-%m-%d %H:%M') if p.created_at else '',
+            p.updated_at.strftime('%Y-%m-%d %H:%M') if p.updated_at else ''
+        ])
+        fill = even_row_fill if row_idx % 2 == 0 else odd_row_fill
+        for col_idx in range(1, len(prod_headers) + 1):
+            cell = ws_prod.cell(row=row_idx, column=col_idx)
+            cell.font = data_font
+            cell.fill = fill
+            cell.border = cell_border
+            cell.alignment = left_align if col_idx not in (1, 6, 12, 13) else center_align
+        ws_prod.row_dimensions[row_idx].height = 20
+        row_idx += 1
+
+    # ----------------------------------------------------
+    # Sheet 3: Inquiries & Quotes
+    # ----------------------------------------------------
+    ws_inq = wb.create_sheet(title="Inquiries & Quotes")
+    ws_inq.views.sheetView[0].showGridLines = True
+    inq_headers = [
+        "Inquiry ID", "Inquiry Reference #", "Status", "Customer ID", "Customer Contact Person",
+        "Textile Mill / Company", "Email Address", "Phone / WhatsApp", "Country",
+        "Machine Model", "Quote Amount", "Delivery Timeline", "Payment Terms",
+        "Quote Valid Until", "Admin Internal Notes", "Customer Initial Message", "Created Date"
+    ]
+    ws_inq.append(inq_headers)
+    ws_inq.row_dimensions[1].height = 26
+    for col_idx in range(1, len(inq_headers) + 1):
+        cell = ws_inq.cell(row=1, column=col_idx)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+
+    row_idx = 2
+    for inq in inquiries:
+        ws_inq.append([
+            inq.id,
+            inq.inquiry_number,
+            inq.status.upper() if inq.status else 'NEW',
+            inq.customer_id or 'Guest',
+            inq.customer_name,
+            inq.company_name or 'Independent Mill',
+            inq.email,
+            inq.phone,
+            inq.country or 'India',
+            inq.machine_model or '',
+            inq.quote_amount or '',
+            inq.delivery_timeline or '',
+            inq.payment_terms or '',
+            inq.quote_valid_until or '',
+            inq.admin_notes or '',
+            inq.message or '',
+            inq.created_at.strftime('%Y-%m-%d %H:%M') if inq.created_at else ''
+        ])
+        fill = even_row_fill if row_idx % 2 == 0 else odd_row_fill
+        for col_idx in range(1, len(inq_headers) + 1):
+            cell = ws_inq.cell(row=row_idx, column=col_idx)
+            cell.font = data_font
+            cell.fill = fill
+            cell.border = cell_border
+            cell.alignment = left_align if col_idx not in (1, 3, 4, 17) else center_align
+        ws_inq.row_dimensions[row_idx].height = 20
+        row_idx += 1
+
+    # ----------------------------------------------------
+    # Sheet 4: Inquiry Items (Line Items Breakdown)
+    # ----------------------------------------------------
+    ws_items = wb.create_sheet(title="Inquiry Line Items")
+    ws_items.views.sheetView[0].showGridLines = True
+    item_headers = [
+        "Item ID", "Inquiry Ref #", "Product ID", "Part Number", "Product Name",
+        "Quantity", "Item Notes / Repeat Size", "Inquiry Customer Name", "Inquiry Mill"
+    ]
+    ws_items.append(item_headers)
+    ws_items.row_dimensions[1].height = 26
+    for col_idx in range(1, len(item_headers) + 1):
+        cell = ws_items.cell(row=1, column=col_idx)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+
+    row_idx = 2
+    for inq in inquiries:
+        for itm in inq.items:
+            ws_items.append([
+                itm.id,
+                inq.inquiry_number,
+                itm.product_id or '-',
+                itm.part_number or '-',
+                itm.product_name,
+                itm.quantity,
+                itm.notes or '',
+                inq.customer_name,
+                inq.company_name or 'Independent Mill'
+            ])
+            fill = even_row_fill if row_idx % 2 == 0 else odd_row_fill
+            for col_idx in range(1, len(item_headers) + 1):
+                cell = ws_items.cell(row=row_idx, column=col_idx)
+                cell.font = data_font
+                cell.fill = fill
+                cell.border = cell_border
+                cell.alignment = center_align if col_idx in (1, 2, 3, 4, 6) else left_align
+            ws_items.row_dimensions[row_idx].height = 19
+            row_idx += 1
+
+    # ----------------------------------------------------
+    # Sheet 5: Customer Accounts
+    # ----------------------------------------------------
+    ws_cust = wb.create_sheet(title="Customer Accounts")
+    ws_cust.views.sheetView[0].showGridLines = True
+    cust_headers = [
+        "Customer ID", "Customer Name", "Textile Mill / Company", "Email Address",
+        "Phone / WhatsApp", "City", "Country", "Welcome Email Sent", "Total Quotes Submitted", "Member Since"
+    ]
+    ws_cust.append(cust_headers)
+    ws_cust.row_dimensions[1].height = 26
+    for col_idx in range(1, len(cust_headers) + 1):
+        cell = ws_cust.cell(row=1, column=col_idx)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+
+    row_idx = 2
+    for c in customers:
+        ws_cust.append([
+            c.id,
+            c.name,
+            c.company_name or 'Independent Mill',
+            c.email,
+            c.phone,
+            c.city or '',
+            c.country or 'India',
+            'Yes' if getattr(c, 'welcome_email_sent', False) else 'No',
+            len(c.inquiries),
+            c.created_at.strftime('%Y-%m-%d') if c.created_at else ''
+        ])
+        fill = even_row_fill if row_idx % 2 == 0 else odd_row_fill
+        for col_idx in range(1, len(cust_headers) + 1):
+            cell = ws_cust.cell(row=row_idx, column=col_idx)
+            cell.font = data_font
+            cell.fill = fill
+            cell.border = cell_border
+            cell.alignment = left_align if col_idx not in (1, 8, 9, 10) else center_align
+        ws_cust.row_dimensions[row_idx].height = 20
+        row_idx += 1
+
+    # ----------------------------------------------------
+    # Sheet 6: Categories & Makes
+    # ----------------------------------------------------
+    ws_cat = wb.create_sheet(title="Categories & Makes")
+    ws_cat.views.sheetView[0].showGridLines = True
+    
+    # Categories Header
+    ws_cat.merge_cells("A1:F1")
+    cat_t = ws_cat["A1"]
+    cat_t.value = "PRODUCT CATEGORIES"
+    cat_t.font = header_font
+    cat_t.fill = blue_title_fill
+    cat_t.alignment = left_align
+    ws_cat.row_dimensions[1].height = 24
+
+    cat_cols = ["Category ID", "Category Name", "URL Slug", "Description", "Order Index", "Products Count"]
+    ws_cat.append(cat_cols)
+    ws_cat.row_dimensions[2].height = 22
+    for col_idx in range(1, len(cat_cols) + 1):
+        cell = ws_cat.cell(row=2, column=col_idx)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+
+    r_cat = 3
+    for cat in categories:
+        ws_cat.append([
+            cat.id,
+            cat.name,
+            cat.slug,
+            cat.description or '',
+            cat.order_index,
+            len(cat.products)
+        ])
+        fill = even_row_fill if r_cat % 2 == 0 else odd_row_fill
+        for col_idx in range(1, len(cat_cols) + 1):
+            cell = ws_cat.cell(row=r_cat, column=col_idx)
+            cell.font = data_font
+            cell.fill = fill
+            cell.border = cell_border
+            cell.alignment = left_align if col_idx not in (1, 5, 6) else center_align
+        ws_cat.row_dimensions[r_cat].height = 19
+        r_cat += 1
+
+    # Space & Machine Makes Header
+    r_mk_t = r_cat + 2
+    ws_cat.merge_cells(f"A{r_mk_t}:E{r_mk_t}")
+    mk_t = ws_cat[f"A{r_mk_t}"]
+    mk_t.value = "MACHINE MAKES (Stormac, Laxmi, Stork, Zimmer, etc.)"
+    mk_t.font = header_font
+    mk_t.fill = blue_title_fill
+    mk_t.alignment = left_align
+    ws_cat.row_dimensions[r_mk_t].height = 24
+
+    mk_cols = ["Make ID", "Machine Make Name", "URL Slug", "Description", "Products Count"]
+    ws_cat.cell(row=r_mk_t + 1, column=1, value=mk_cols[0])
+    for col_idx, col_name in enumerate(mk_cols, 1):
+        cell = ws_cat.cell(row=r_mk_t + 1, column=col_idx, value=col_name)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+    ws_cat.row_dimensions[r_mk_t + 1].height = 22
+
+    r_mk = r_mk_t + 2
+    for m in machines:
+        ws_cat.append([
+            m.id,
+            m.name,
+            m.slug,
+            m.description or '',
+            len(m.products)
+        ])
+        fill = even_row_fill if r_mk % 2 == 0 else odd_row_fill
+        for col_idx in range(1, len(mk_cols) + 1):
+            cell = ws_cat.cell(row=r_mk, column=col_idx)
+            cell.font = data_font
+            cell.fill = fill
+            cell.border = cell_border
+            cell.alignment = left_align if col_idx not in (1, 5) else center_align
+        ws_cat.row_dimensions[r_mk].height = 19
+        r_mk += 1
+
+    # ----------------------------------------------------
+    # Sheet 7: Website CMS Settings
+    # ----------------------------------------------------
+    ws_set = wb.create_sheet(title="CMS Settings")
+    ws_set.views.sheetView[0].showGridLines = True
+    set_headers = ["Setting Key", "Configuration Description", "Configured Value", "Last Updated"]
+    ws_set.append(set_headers)
+    ws_set.row_dimensions[1].height = 26
+    for col_idx in range(1, len(set_headers) + 1):
+        cell = ws_set.cell(row=1, column=col_idx)
+        cell.font = header_font
+        cell.fill = navy_header_fill
+        cell.alignment = center_align
+        cell.border = cell_border
+
+    row_idx = 2
+    for s in settings:
+        ws_set.append([
+            s.key,
+            s.description or '',
+            s.value or '',
+            getattr(s, 'updated_at', None).strftime('%Y-%m-%d %H:%M') if getattr(s, 'updated_at', None) else 'Active'
+        ])
+        fill = even_row_fill if row_idx % 2 == 0 else odd_row_fill
+        for col_idx in range(1, len(set_headers) + 1):
+            cell = ws_set.cell(row=row_idx, column=col_idx)
+            cell.font = data_font
+            cell.fill = fill
+            cell.border = cell_border
+            cell.alignment = left_align if col_idx != 4 else center_align
+        ws_set.row_dimensions[row_idx].height = 19
+        row_idx += 1
+
+    # Auto-adjust column widths across all sheets
+    for sheet in wb.worksheets:
+        for col in sheet.columns:
+            max_len = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                val = str(cell.value or '')
+                if '\n' in val:
+                    val = val.split('\n')[0]
+                if len(val) > max_len and len(val) < 80:
+                    max_len = len(val)
+            sheet.column_dimensions[col_letter].width = max(max_len + 4, 12)
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output
+

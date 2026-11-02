@@ -5,6 +5,8 @@ import json
 import time
 import random
 import string
+import ssl
+import urllib.request
 from functools import wraps
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, Response, send_file, send_from_directory
@@ -13,8 +15,8 @@ from werkzeug.utils import secure_filename
 from config import Config
 from models import db, Category, MachineMake, Product, Inquiry, InquiryItem, InquiryMessage, CustomerUser, AdminUser, SiteSetting
 from seed_data import seed_database, slugify
-from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS, send_password_reset_email, send_custom_customer_email
-from export_service import export_inquiries_csv, export_products_csv, generate_product_template_excel, import_products_from_file, resolve_product_image_path
+from email_service import notify_admin_new_inquiry, send_customer_acknowledgment, send_email, send_database_backup_email, EMAIL_ACTIVITY_LOGS, send_password_reset_email, send_custom_customer_email, send_customer_welcome_email
+from export_service import export_inquiries_csv, export_products_csv, generate_product_template_excel, import_products_from_file, resolve_product_image_path, generate_complete_system_backup_excel
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -43,6 +45,12 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     seed_database()
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(db.text("ALTER TABLE customer_users ADD COLUMN welcome_email_sent BOOLEAN DEFAULT 0"))
+            conn.commit()
+    except Exception:
+        pass
 
 
 def allowed_file(filename):
@@ -644,6 +652,15 @@ def customer_login():
             
             # Automatically link past guest inquiries matching this email
             Inquiry.query.filter_by(email=email, customer_id=None).update({'customer_id': user.id})
+            
+            # If customer has never received a welcome email, send it upon login
+            if not getattr(user, 'welcome_email_sent', False):
+                try:
+                    send_customer_welcome_email(user, config=get_smtp_config())
+                    user.welcome_email_sent = True
+                except Exception:
+                    pass
+                    
             db.session.commit()
             
             flash(f'Welcome back, {user.name}!', 'success')
@@ -691,7 +708,8 @@ def customer_register():
             email=email,
             phone=phone,
             country=country,
-            city=city
+            city=city,
+            welcome_email_sent=True
         )
         user.set_password(password)
         db.session.add(user)
@@ -701,6 +719,12 @@ def customer_register():
         Inquiry.query.filter_by(email=email).update({'customer_id': user.id})
         db.session.commit()
         
+        # Send automated welcome email to new registered customer
+        try:
+            send_customer_welcome_email(user, config=get_smtp_config())
+        except Exception:
+            pass
+
         session.permanent = True
         session['customer_id'] = user.id
         session['customer_name'] = user.name
@@ -708,7 +732,7 @@ def customer_register():
         session['customer_company'] = user.company_name or ''
         session['customer_login_time'] = time.time()
         
-        flash(f'Account created successfully! Welcome to Divya Trading Co., {user.name}.', 'success')
+        flash(f'Account created successfully! Welcome to Divya Trading Co., {user.name}. A welcome email has been sent to your inbox.', 'success')
         return redirect(next_url)
         
     return render_template('customer/register.html', next_url=next_url)
@@ -1984,7 +2008,25 @@ def restore_system_backup_from_dict(data):
 @app.route('/admin/backup/download')
 @admin_required
 def admin_download_backup():
-    """Downloads instant complete system database backup JSON"""
+    """Downloads complete multi-sheet system database backup as an Excel (.xlsx) file"""
+    try:
+        excel_buffer = generate_complete_system_backup_excel()
+        filename = f"DTC_Complete_System_Backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        
+        return Response(
+            excel_buffer.getvalue(),
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            headers={'Content-Disposition': f'attachment; filename={filename}'}
+        )
+    except Exception as e:
+        flash(f'Failed to generate Excel backup download: {str(e)}', 'danger')
+        return redirect(url_for('admin_settings'))
+
+
+@app.route('/admin/backup/download/json')
+@admin_required
+def admin_download_backup_json():
+    """Downloads instant complete system database backup JSON for migration"""
     try:
         backup_data = generate_system_backup_dict()
         json_content = json.dumps(backup_data, indent=2)
@@ -1996,7 +2038,7 @@ def admin_download_backup():
             headers={'Content-Disposition': f'attachment; filename={filename}'}
         )
     except Exception as e:
-        flash(f'Failed to generate backup download: {str(e)}', 'danger')
+        flash(f'Failed to generate JSON backup: {str(e)}', 'danger')
         return redirect(url_for('admin_settings'))
 
 
@@ -2049,6 +2091,49 @@ def admin_email_backup():
     return redirect(url_for('admin_settings'))
 
 
+@app.route('/admin/seo/ping', methods=['POST'])
+@admin_required
+def admin_ping_search_engines():
+    """Pings Google and Bing with the live sitemap URL for immediate indexing"""
+    sitemap_url = "https://divyatradingco.com/sitemap.xml"
+    results = {}
+    
+    # 1. Google Ping
+    try:
+        req = urllib.request.Request(
+            f"https://www.google.com/ping?sitemap={sitemap_url}",
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        with urllib.request.urlopen(req, context=ctx, timeout=8) as res:
+            results['google'] = f"Notified (HTTP {res.status})"
+    except Exception as e:
+        results['google'] = f"Notice: {str(e)} (Ensure site is verified in Google Search Console)"
+        
+    # 2. Bing Ping
+    try:
+        req = urllib.request.Request(
+            f"https://www.bing.com/ping?sitemap={sitemap_url}",
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        with urllib.request.urlopen(req, context=ctx, timeout=8) as res:
+            results['bing'] = f"Notified (HTTP {res.status})"
+    except Exception as e:
+        results['bing'] = f"Notice: {str(e)}"
+        
+    return jsonify({
+        'success': True,
+        'sitemap_url': sitemap_url,
+        'results': results,
+        'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
+    })
+
+
 @app.route('/api/cron/backup', methods=['GET', 'POST'])
 def cron_backup_webhook():
     """Automated 24-Hour Backup Cron Webhook - Dispatches full backup to neelbarot585@gmail.com"""
@@ -2085,6 +2170,110 @@ def cron_backup_webhook():
 def admin_customers():
     customers = CustomerUser.query.order_by(CustomerUser.id.desc()).all()
     return render_template('admin/customers.html', customers=customers)
+
+
+@app.route('/admin/customers/add', methods=['POST'])
+@admin_required
+def admin_add_customer():
+    """Allows Admin to add an existing or offline textile mill customer directly into the portal"""
+    name = request.form.get('name', '').strip()
+    company_name = request.form.get('company_name', '').strip()
+    email = request.form.get('email', '').strip().lower()
+    phone = request.form.get('phone', '').strip()
+    city = request.form.get('city', '').strip()
+    country = request.form.get('country', 'India').strip()
+    raw_password = request.form.get('password', '').strip()
+    send_welcome = request.form.get('send_welcome') == '1'
+
+    if not name or not email or not phone:
+        flash('Customer name, email address, and phone number are required.', 'danger')
+        return redirect(url_for('admin_customers'))
+
+    existing = CustomerUser.query.filter_by(email=email).first()
+    if existing:
+        flash(f'A customer account with email "{email}" already exists (ID #{existing.id}).', 'warning')
+        return redirect(url_for('admin_customers'))
+
+    # If no password provided, auto-generate a secure random 8-char password
+    if not raw_password:
+        raw_password = 'DTC' + ''.join(random.choices(string.digits + string.ascii_uppercase, k=5))
+
+    new_customer = CustomerUser(
+        name=name,
+        company_name=company_name,
+        email=email,
+        phone=phone,
+        city=city,
+        country=country or 'India',
+        welcome_email_sent=False
+    )
+    new_customer.set_password(raw_password)
+    db.session.add(new_customer)
+    db.session.commit()
+
+    # Link any past guest inquiries matching this email address
+    Inquiry.query.filter_by(email=email, customer_id=None).update({'customer_id': new_customer.id})
+    db.session.commit()
+
+    # Send welcome email if requested
+    if send_welcome:
+        try:
+            send_customer_welcome_email(new_customer, temp_password=raw_password, config=get_smtp_config())
+            new_customer.welcome_email_sent = True
+            db.session.commit()
+            flash(f'Success! Customer "{name}" ({company_name or email}) added and welcome email with portal credentials sent to {email}. Initial Password: {raw_password}', 'success')
+        except Exception as e:
+            flash(f'Customer added successfully! Initial Password: {raw_password} (Welcome email notification error: {str(e)})', 'info')
+    else:
+        flash(f'Success! Customer "{name}" ({company_name or email}) added successfully. Initial Password: {raw_password}', 'success')
+
+    return redirect(url_for('admin_customers'))
+
+
+@app.route('/admin/customers/<int:cust_id>/reset-password', methods=['POST'])
+@admin_required
+def admin_reset_customer_password(cust_id):
+    """Admin resets customer password directly"""
+    customer = CustomerUser.query.get_or_404(cust_id)
+    new_password = request.form.get('new_password', '').strip()
+    notify = request.form.get('notify') == '1'
+
+    if not new_password:
+        new_password = 'DTC' + ''.join(random.choices(string.digits + string.ascii_uppercase, k=5))
+
+    customer.set_password(new_password)
+    db.session.commit()
+
+    if notify:
+        try:
+            subject = f"🔑 Your Updated Customer Portal Password — Divya Trading Co."
+            body = f"""Dear {customer.name},<br><br>
+Your password for the Divya Trading Co. customer portal ({customer.email}) has been updated by an administrator:<br><br>
+<strong>New Password:</strong> <code style="font-size: 16px; color: #0052cc;">{new_password}</code><br><br>
+You can log in now at: <a href="https://divyatradingco.com/customer/login">https://divyatradingco.com/customer/login</a><br><br>
+Best regards,<br>Divya Trading Co. Support"""
+            send_email(subject, [customer.email], body, get_smtp_config())
+            flash(f'Password updated for {customer.name}. New password: {new_password} (Notification sent to {customer.email})', 'success')
+        except Exception as e:
+            flash(f'Password updated. New password: {new_password} (Email notification note: {str(e)})', 'info')
+    else:
+        flash(f'Password updated for {customer.name}. New password: {new_password}', 'success')
+
+    return redirect(url_for('admin_customers'))
+
+
+@app.route('/admin/customers/<int:cust_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_customer(cust_id):
+    """Safely removes customer account while preserving their past quote inquiries"""
+    customer = CustomerUser.query.get_or_404(cust_id)
+    name = customer.name
+    # Unlink past inquiries so records are never lost
+    Inquiry.query.filter_by(customer_id=customer.id).update({'customer_id': None})
+    db.session.delete(customer)
+    db.session.commit()
+    flash(f'Customer account "{name}" has been removed. Past inquiries preserved in system.', 'info')
+    return redirect(url_for('admin_customers'))
 
 
 @app.route('/admin/categories', methods=['GET', 'POST'])

@@ -13,7 +13,7 @@ from models import Product, Category, MachineMake, CustomerUser, Inquiry, Inquir
 from email_service import send_email, send_custom_customer_email, EMAIL_ACTIVITY_LOGS
 from export_service import resolve_product_image_path
 
-def run_tests():
+def run_tests():    
     print("=" * 65)
     print("RUNNING COMPREHENSIVE E2E VERIFICATION FOR DIVYA TRADING CO.")
     print("=" * 65)

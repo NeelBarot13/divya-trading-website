@@ -96,20 +96,42 @@
 
   <!-- Main Content -->
   <main class="admin-main">
-    <div class="admin-top-bar">
+    <div class="admin-top-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
       <div class="admin-page-title">
         <h1>Registered Customer Accounts</h1>
-        <p>View registered textile mill buyers, contact info, and their submitted quote histories.</p>
+        <p>Manage textile mill buyers, add offline or existing clients, and track submitted quote histories.</p>
+      </div>
+      <div>
+        <button type="button" onclick="openAddCustomerModal()" style="display: inline-flex; align-items: center; gap: 8px; background: #0052cc; color: #ffffff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,82,204,0.3); transition: background 0.2s;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>+ Add Existing Customer</span>
+        </button>
       </div>
     </div>
 
+    <!-- Flash Messages Notification Container -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 20px;">
+          {% for category, message in messages %}
+            <div style="padding: 12px 18px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; {% if category == 'success' %}background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;{% elif category == 'danger' %}background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;{% else %}background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Total Registered Customers ({{ customers|length }})</h3>
+      <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <h3 style="margin: 0;">Total Registered Customers (<span id="customerCount">{{ customers|length }}</span>)</h3>
+        <div style="position: relative; width: 320px; max-width: 100%;">
+          <input type="text" id="customerSearch" onkeyup="filterCustomers()" placeholder="🔍 Search name, mill, email, city..." style="width: 100%; padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; outline: none; background: #ffffff;">
+        </div>
       </div>
 
       <div class="table-responsive">
-        <table class="admin-table">
+        <table class="admin-table" id="customersTable">
           <thead>
             <tr>
               <th>ID</th>
@@ -119,24 +141,25 @@
               <th>Phone / WhatsApp</th>
               <th>Location</th>
               <th>Quotes Submitted</th>
+              <th>Welcome Email</th>
               <th>Member Since</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for cust in customers %}
-            <tr>
+            <tr class="customer-row" data-search="{{ cust.name|lower }} {{ (cust.company_name or '')|lower }} {{ cust.email|lower }} {{ cust.phone|lower }} {{ (cust.city or '')|lower }} {{ (cust.country or '')|lower }}">
               <td style="color: #64748b; font-weight: 700;">#{{ cust.id }}</td>
               <td>
-                <strong style="color: #0F172A;">{{ cust.name }}</strong>
+                <strong style="color: #0F172A; display: block;">{{ cust.name }}</strong>
               </td>
               <td>{{ cust.company_name or 'Independent Mill' }}</td>
               <td>
-                <a href="mailto:{{ cust.email }}" style="color: #0052cc;">{{ cust.email }}</a>
+                <a href="mailto:{{ cust.email }}" style="color: #0052cc; font-weight: 600;">{{ cust.email }}</a>
               </td>
               <td>
-                <a href="tel:{{ cust.phone }}" style="color: #475569;">{{ cust.phone }}</a>
-                <a href="https://wa.me/{{ cust.phone|replace('+', '')|replace(' ', '') }}" target="_blank" title="WhatsApp Customer" style="margin-left: 4px; text-decoration: none;">💬</a>
+                <a href="tel:{{ cust.phone }}" style="color: #475569; text-decoration: none;">{{ cust.phone }}</a>
+                <a href="https://wa.me/{{ cust.phone|replace('+', '')|replace(' ', '') }}" target="_blank" title="WhatsApp Customer" style="margin-left: 6px; text-decoration: none;">💬</a>
               </td>
               <td>{{ cust.city or '' }}{% if cust.city and cust.country %}, {% endif %}{{ cust.country }}</td>
               <td>
@@ -144,20 +167,37 @@
                   {{ cust.inquiries|length }} Quotes ➔
                 </a>
               </td>
-              <td style="font-size: 0.8rem; color: #64748b;">
+              <td>
+                {% if cust.welcome_email_sent %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">✓ Sent</span>
+                {% else %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;">Pending</span>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.82rem; color: #64748b; white-space: nowrap;">
                 {{ cust.created_at.strftime('%d %b %Y') if cust.created_at else '-' }}
               </td>
               <td>
-                <a href="{{ url_for('admin_compose_email', to=cust.email, name=cust.name) }}" class="btn-action-sm" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; text-decoration: none; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
-                  ✉️ Email
-                </a>
+                <div style="display: inline-flex; gap: 6px; align-items: center;">
+                  <a href="{{ url_for('admin_compose_email', to=cust.email, name=cust.name) }}" class="btn-action-sm" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; text-decoration: none; font-weight: 700; white-space: nowrap;" title="Compose Email">
+                    ✉️
+                  </a>
+                  <button type="button" class="btn-action-sm" onclick="openResetPasswordModal({{ cust.id }}, '{{ cust.name|replace('\'', '\\\'') }}', '{{ cust.email|replace('\'', '\\\'') }}')" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; cursor: pointer; font-weight: 700;" title="Reset Portal Password">
+                    🔑
+                  </button>
+                  <form method="POST" action="{{ url_for('admin_delete_customer', cust_id=cust.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove customer account for {{ cust.name }}? Their quote history will be safely preserved.');">
+                    <button type="submit" class="btn-action-sm" style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; cursor: pointer; font-weight: 700;" title="Delete Customer">
+                      🗑️
+                    </button>
+                  </form>
+                </div>
               </td>
             </tr>
             {% endfor %}
             {% if not customers %}
-            <tr>
-              <td colspan="9" style="text-align: center; padding: 40px; color: #64748b;">
-                No customer accounts registered yet. Customers can register on the customer portal to track their quotes.
+            <tr id="emptyTableRow">
+              <td colspan="10" style="text-align: center; padding: 40px; color: #64748b;">
+                No customer accounts registered yet. Click <strong>+ Add Existing Customer</strong> above to register your offline textile clients.
               </td>
             </tr>
             {% endif %}
@@ -167,6 +207,112 @@
     </div>
   </main>
 
+  <!-- Modal: Add Existing Customer -->
+  <div id="addCustomerModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #ffffff; width: 540px; max-width: 100%; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); overflow: hidden; animation: modalFadeIn 0.2s ease-out;">
+      <div style="background: #0A2540; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0052cc;">
+        <div>
+          <h3 style="color: #ffffff; margin: 0; font-size: 1.15rem; font-weight: 700;">+ Add Existing Customer to Portal</h3>
+          <p style="color: #93c5fd; margin: 4px 0 0; font-size: 0.8rem;">Register existing textile mill clients for 1-click quote tracking</p>
+        </div>
+        <button type="button" onclick="closeAddCustomerModal()" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin_add_customer') }}" style="padding: 24px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div style="grid-column: span 1;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Contact Person Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Rajesh Shah" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+          </div>
+          <div style="grid-column: span 1;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Textile Mill / Company Name</label>
+            <input type="text" name="company_name" placeholder="e.g. Arvind Mills Ltd" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div style="grid-column: span 1;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Email Address *</label>
+            <input type="email" name="email" required placeholder="client@textilemill.com" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+          </div>
+          <div style="grid-column: span 1;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Phone / WhatsApp *</label>
+            <input type="text" name="phone" required placeholder="+91 98765 43210" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">City</label>
+            <input type="text" name="city" placeholder="Ahmedabad / Surat" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Country</label>
+            <input type="text" name="country" value="India" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">Portal Initial Password</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="addCustomerPassword" name="password" placeholder="Leave blank to auto-generate" style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; font-family: monospace;">
+            <button type="button" onclick="generatePassword('addCustomerPassword')" style="padding: 8px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; color: #334155;">⚡ Auto-Gen</button>
+          </div>
+          <span style="font-size: 0.76rem; color: #64748b; margin-top: 4px; display: block;">If left blank, an 8-character secure password will be generated automatically.</span>
+        </div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #1e40af; margin: 0;">
+            <input type="checkbox" name="send_welcome" value="1" checked style="width: 16px; height: 16px;">
+            <span>Send automated Welcome Email with login details to customer email</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" onclick="closeAddCustomerModal()" style="padding: 10px 18px; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; color: #475569;">Cancel</button>
+          <button type="submit" style="padding: 10px 22px; background: #0052cc; color: #ffffff; border: none; border-radius: 6px; font-weight: 700; font-size: 0.88rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,82,204,0.3);">Save & Register Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Reset Customer Password -->
+  <div id="resetPasswordModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #ffffff; width: 440px; max-width: 100%; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); overflow: hidden;">
+      <div style="background: #0A2540; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #f59e0b;">
+        <h3 style="color: #ffffff; margin: 0; font-size: 1.1rem; font-weight: 700;">🔑 Reset Customer Password</h3>
+        <button type="button" onclick="closeResetPasswordModal()" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <form id="resetPasswordForm" method="POST" action="" style="padding: 22px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+          <strong id="resetCustomerName" style="display: block; color: #0F172A; font-size: 0.95rem;">Customer Name</strong>
+          <span id="resetCustomerEmail" style="font-size: 0.82rem; color: #64748b;">email@example.com</span>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">New Password *</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="newPasswordInput" name="new_password" required style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; font-family: monospace;">
+            <button type="button" onclick="generatePassword('newPasswordInput')" style="padding: 8px 14px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; color: #334155;">⚡ Auto-Gen</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #334155;">
+            <input type="checkbox" name="notify" value="1" checked style="width: 16px; height: 16px;">
+            <span>Send email notification with new password to customer</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" onclick="closeResetPasswordModal()" style="padding: 8px 16px; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; color: #475569;">Cancel</button>
+          <button type="submit" style="padding: 8px 18px; background: #f59e0b; color: #ffffff; border: none; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     function toggleAdminSidebar() {
       const sidebar = document.getElementById('adminSidebar');
@@ -174,6 +320,64 @@
       sidebar?.classList.toggle('open');
       overlay?.classList.toggle('active');
     }
+
+    function openAddCustomerModal() {
+      const m = document.getElementById('addCustomerModal');
+      m.style.display = 'flex';
+      generatePassword('addCustomerPassword');
+    }
+
+    function closeAddCustomerModal() {
+      document.getElementById('addCustomerModal').style.display = 'none';
+    }
+
+    function openResetPasswordModal(id, name, email) {
+      const m = document.getElementById('resetPasswordModal');
+      document.getElementById('resetPasswordForm').action = '/admin/customers/' + id + '/reset-password';
+      document.getElementById('resetCustomerName').textContent = name;
+      document.getElementById('resetCustomerEmail').textContent = email;
+      generatePassword('newPasswordInput');
+      m.style.display = 'flex';
+    }
+
+    function closeResetPasswordModal() {
+      document.getElementById('resetPasswordModal').style.display = 'none';
+    }
+
+    function generatePassword(targetInputId) {
+      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz';
+      let res = 'DTC@';
+      for (let i = 0; i < 5; i++) {
+        res += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      const el = document.getElementById(targetInputId);
+      if (el) el.value = res;
+    }
+
+    function filterCustomers() {
+      const q = document.getElementById('customerSearch').value.toLowerCase().trim();
+      const rows = document.querySelectorAll('.customer-row');
+      let visibleCount = 0;
+      rows.forEach(r => {
+        const text = r.getAttribute('data-search') || '';
+        if (!q || text.includes(q)) {
+          r.style.display = '';
+          visibleCount++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      const counter = document.getElementById('customerCount');
+      if (counter) counter.textContent = visibleCount;
+    }
+
+    // Close modals on escape key
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAddCustomerModal();
+        closeResetPasswordModal();
+      }
+    });
   </script>
 
 </body>

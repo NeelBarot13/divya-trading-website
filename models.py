@@ -109,6 +109,7 @@ class CustomerUser(db.Model):
     country = db.Column(db.String(100), default='India')
     city = db.Column(db.String(100), nullable=True)
     password_hash = db.Column(db.String(255), nullable=False)
+    welcome_email_sent = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -129,6 +130,7 @@ class CustomerUser(db.Model):
             'phone': self.phone,
             'country': self.country,
             'city': self.city,
+            'welcome_email_sent': bool(self.welcome_email_sent),
             'created_at': self.created_at.strftime('%Y-%m-%d') if self.created_at else ''
         }
 

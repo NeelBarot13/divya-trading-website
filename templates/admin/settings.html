@@ -210,6 +210,9 @@
       <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-email', this)">
         <span>✉️</span> SMTP Notifications
       </button>
+      <button type="button" class="cms-tab-btn" onclick="switchCmsTab('tab-seo', this)">
+        <span>🚀</span> SEO & Search Engines
+      </button>
     </div>
 
     <!-- Main Settings Form -->
@@ -868,9 +871,12 @@
               
               <!-- Download Backup -->
               <div style="display: flex; flex-direction: column; gap: 8px;">
-                <a href="{{ url_for('admin_download_backup') }}" class="btn-admin-primary" style="width: 100%; justify-content: center; text-decoration: none;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  <span>Download Complete Backup (.json)</span>
+                <a href="{{ url_for('admin_download_backup') }}" class="btn-admin-primary" style="width: 100%; justify-content: center; text-decoration: none; background: #16a34a; border-color: #15803d; font-weight: 700;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  <span>Download Complete Backup (Excel .xlsx)</span>
+                </a>
+                <a href="{{ url_for('admin_download_backup_json') }}" style="font-size: 0.76rem; color: #64748b; text-align: center; text-decoration: none; padding: 4px; display: block;">
+                  Download Raw Server Migration File (.json) ➔
                 </a>
               </div>
 
@@ -917,6 +923,84 @@
               {% else %}
               <p style="font-size: 0.8rem; color: #94a3b8; text-align: center; padding: 12px;">No email activity yet.</p>
               {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           TAB 9: SEO & SEARCH ENGINES
+           =================================================================== -->
+      <div id="tab-seo" class="cms-tab-content">
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+          <div class="admin-card" style="padding: 28px;">
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--admin-navy); margin-bottom: 8px;">
+              Search Engine Optimization (SEO) & Verification
+            </h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 22px;">
+              Boost organic Google, Bing, and international buyer visibility for Stormac, Laxmi, and Stork rotary printing machine spares.
+            </p>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+              <label class="form-label" style="font-weight: 700;">Google Search Console Verification Meta Tag</label>
+              <input type="text" name="google_site_verification" class="form-control" value="{{ get_val('google_site_verification', '') }}" placeholder="e.g. AbCdEf1234567890 (or paste the content value from Google Search Console)">
+              <span style="font-size: 0.74rem; color: #64748b; margin-top: 4px; display: block;">Adds <code>&lt;meta name="google-site-verification" content="..."&gt;</code> automatically to your homepage.</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+              <label class="form-label" style="font-weight: 700;">Bing Webmaster Tools Verification Meta Tag</label>
+              <input type="text" name="bing_site_verification" class="form-control" value="{{ get_val('bing_site_verification', '') }}" placeholder="e.g. 1234567890ABCDEF1234567890ABCDEF">
+              <span style="font-size: 0.74rem; color: #64748b; margin-top: 4px; display: block;">Adds <code>&lt;meta name="msvalidate.01" content="..."&gt;</code> automatically to your homepage.</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 18px;">
+              <label class="form-label" style="font-weight: 700;">Primary Target Search Keywords</label>
+              <textarea name="seo_keywords" class="form-control" rows="3">{{ get_val('seo_keywords', 'rotary printing spare parts, stormac rotary printing spare parts, laxmi rotary printing spare parts, stork rotary printing spare parts, stork rd4 screen head ring, repeat spur gears 64r 81.9r 91.4r, textile rotary printing machine spares manufacturer, rotary colour pumps, doctor squeegee blade coils, screen end rings, laxmi rotary parts surat, stormac spares ahmedabad, textile printing machinery spares exporter india') }}</textarea>
+              <span style="font-size: 0.74rem; color: #64748b; margin-top: 4px; display: block;">Comma-separated keywords embedded into search engine crawlers and meta tags.</span>
+            </div>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-top: 20px;">
+              <h4 style="margin: 0 0 6px; color: #166534; font-size: 0.95rem; font-weight: 700;">✓ Automated Dynamic SEO Included:</h4>
+              <ul style="margin: 0; padding-left: 18px; font-size: 0.82rem; color: #15803d; line-height: 1.6;">
+                <li><strong>Dynamic XML Sitemap:</strong> Fully auto-indexes all 24+ products, machine makes, categories & images.</li>
+                <li><strong>Google Schema.org JSON-LD:</strong> Full Organization, LocalBusiness, Product, and BreadcrumbList schemas.</li>
+                <li><strong>OpenGraph & Twitter Cards:</strong> Rich previews when shared on WhatsApp, LinkedIn, or Facebook.</li>
+                <li><strong>Mobile First Design:</strong> Fast responsive loading optimized for international mobile buyers.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- SEO Operations & Search Ping Column -->
+          <div>
+            <div class="admin-card" style="padding: 24px; margin-bottom: 20px;">
+              <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 10px;">Instant Search Engine Ping</h4>
+              <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">
+                Notify Google and Bing immediately to re-crawl your updated sitemap with new products and catalog changes.
+              </p>
+              <button type="button" onclick="pingSearchEnginesAjax()" id="btnPingSeo" class="btn-admin-primary" style="width: 100%; justify-content: center; background: #0052cc; font-weight: 700;">
+                <span>🚀 Ping Google & Bing Now</span>
+              </button>
+              <div id="seoPingStatus" style="display: none; margin-top: 12px; padding: 12px; border-radius: 6px; font-size: 0.8rem; line-height: 1.4;"></div>
+            </div>
+
+            <div class="admin-card" style="padding: 24px;">
+              <h4 style="font-size: 1rem; font-weight: 700; color: var(--admin-navy); margin-bottom: 12px;">Live Search Engine Assets</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 12px;">
+                  <strong style="display: block; font-size: 0.82rem; color: #0F172A;">XML Sitemap</strong>
+                  <span style="font-size: 0.76rem; color: #64748B;">https://divyatradingco.com/sitemap.xml</span>
+                  <div style="margin-top: 6px;">
+                    <a href="/sitemap.xml" target="_blank" style="font-size: 0.76rem; color: #0052CC; font-weight: 700; text-decoration: none;">View Live XML ↗</a>
+                  </div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 12px;">
+                  <strong style="display: block; font-size: 0.82rem; color: #0F172A;">Robots.txt</strong>
+                  <span style="font-size: 0.76rem; color: #64748B;">https://divyatradingco.com/robots.txt</span>
+                  <div style="margin-top: 6px;">
+                    <a href="/robots.txt" target="_blank" style="font-size: 0.76rem; color: #0052CC; font-weight: 700; text-decoration: none;">View Live Robots.txt ↗</a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1107,6 +1191,34 @@
         window.location.reload();
       } catch (e) {
         alert('Error uploading or restoring backup file.');
+      }
+    }
+
+    async function pingSearchEnginesAjax() {
+      const btn = document.getElementById('btnPingSeo');
+      const statusDiv = document.getElementById('seoPingStatus');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Pinging Google & Bing...</span>';
+      statusDiv.style.display = 'block';
+      statusDiv.style.background = '#EFF6FF';
+      statusDiv.style.color = '#1E40AF';
+      statusDiv.textContent = 'Connecting to Google and Bing search indexers...';
+      try {
+        const res = await fetch('{{ url_for("admin_ping_search_engines") }}', { method: 'POST' });
+        const data = await res.json();
+        statusDiv.style.background = '#ECFDF5';
+        statusDiv.style.color = '#065F46';
+        statusDiv.innerHTML = '<strong>✓ Search Engines Notified!</strong><br>' +
+          'Google: ' + data.results.google + '<br>' +
+          'Bing: ' + data.results.bing + '<br>' +
+          '<small style="color: #047857;">Sitemap URL: ' + data.sitemap_url + '</small>';
+      } catch (e) {
+        statusDiv.style.background = '#FEF2F2';
+        statusDiv.style.color = '#991B1B';
+        statusDiv.textContent = 'Notice connecting to search engines: ' + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀 Ping Google & Bing Now</span>';
       }
     }
 
