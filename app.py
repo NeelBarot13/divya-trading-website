@@ -51,6 +51,12 @@ with app.app_context():
             conn.commit()
     except Exception:
         pass
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(db.text("ALTER TABLE products ADD COLUMN gallery_images TEXT"))
+            conn.commit()
+    except Exception:
+        pass
 
 
 def allowed_file(filename):
@@ -296,15 +302,22 @@ def home():
     settings_records = SiteSetting.query.all()
     settings = {s.key: s.value for s in settings_records}
     
-    # Homepage featured products limit (default 4 as requested)
+    # Homepage featured products limit (default 8 for diverse showcase)
     try:
-        featured_limit = int(settings.get('home_featured_limit', 4))
+        featured_limit = int(settings.get('home_featured_limit', 8))
     except (ValueError, TypeError):
-        featured_limit = 4
+        featured_limit = 8
         
-    featured_products = Product.query.filter_by(is_featured=True, is_active=True).limit(featured_limit).all()
+    featured_products = Product.query.filter_by(is_featured=True, is_active=True).order_by(Product.id.desc()).limit(featured_limit).all()
+    if not featured_products:
+        # Fallback to active catalog items so homepage showcase is never empty
+        featured_products = Product.query.filter_by(is_active=True).order_by(Product.id.desc()).limit(featured_limit).all()
+
     categories = Category.query.order_by(Category.order_index).all()
     machines = MachineMake.query.all()
+    total_product_count = Product.query.filter_by(is_active=True).count()
+    total_category_count = Category.query.count()
+    total_machine_count = MachineMake.query.count()
     
     # Parse brand pills from structured JSON or fallback
     import json
@@ -336,7 +349,10 @@ def home():
         featured_products=featured_products,
         categories=categories,
         machines=machines,
-        brand_pills=brand_pills
+        brand_pills=brand_pills,
+        total_product_count=total_product_count,
+        total_category_count=total_category_count,
+        total_machine_count=total_machine_count
     )
 
 
@@ -1451,6 +1467,25 @@ def admin_add_product():
         image_url = resolve_product_image_path(custom_img_url, app_root=app.root_path)
     elif preset_img_url:
         image_url = preset_img_url
+
+    # Multiple gallery photos upload
+    gallery_list = []
+    if 'gallery_files' in request.files:
+        for idx, gfile in enumerate(request.files.getlist('gallery_files')):
+            if gfile and gfile.filename and allowed_file(gfile.filename):
+                g_fname = secure_filename(f"prod_gal_{int(time.time())}_{idx}_{gfile.filename}")
+                g_path = os.path.join(app.config['UPLOAD_FOLDER'], g_fname)
+                gfile.save(g_path)
+                gallery_list.append(f"/static/uploads/{g_fname}")
+
+    custom_gallery = request.form.get('custom_gallery_urls', '').strip()
+    if custom_gallery:
+        for g_url in custom_gallery.split('\n'):
+            g_url = g_url.strip()
+            if g_url:
+                resolved_g = resolve_product_image_path(g_url, app_root=app.root_path)
+                if resolved_g and resolved_g not in gallery_list:
+                    gallery_list.append(resolved_g)
             
     product = Product(
         name=name,
@@ -1464,6 +1499,7 @@ def admin_add_product():
         repeat_sizes=repeat_sizes,
         material=material,
         image_url=image_url,
+        gallery_images=json.dumps(gallery_list) if gallery_list else None,
         is_featured=is_featured,
         is_active=is_active,
         stock_status=stock_status
@@ -1471,7 +1507,7 @@ def admin_add_product():
     db.session.add(product)
     db.session.commit()
     
-    flash(f'Product "{name}" added successfully.', 'success')
+    flash(f'Product "{name}" added successfully with {1 + len(gallery_list)} photo(s).', 'success')
     return redirect(url_for('admin_products'))
 
 
@@ -1493,7 +1529,7 @@ def admin_edit_product(product_id):
     product.is_featured = 'is_featured' in request.form
     product.is_active = 'is_active' in request.form
     
-    # Image upload or path update
+    # Primary image upload or path update
     custom_img_url = request.form.get('custom_image_url', '').strip()
     preset_img_url = request.form.get('image_preset', '').strip()
     
@@ -1508,6 +1544,30 @@ def admin_edit_product(product_id):
         product.image_url = resolve_product_image_path(custom_img_url, app_root=app.root_path)
     elif preset_img_url:
         product.image_url = preset_img_url
+
+    # Multiple gallery photos upload and management
+    existing_gallery = product.get_gallery_images()
+    remove_gallery = request.form.getlist('remove_gallery_images')
+    updated_gallery = [img for img in existing_gallery if img not in remove_gallery]
+
+    if 'gallery_files' in request.files:
+        for idx, gfile in enumerate(request.files.getlist('gallery_files')):
+            if gfile and gfile.filename and allowed_file(gfile.filename):
+                g_fname = secure_filename(f"prod_gal_{int(time.time())}_{idx}_{gfile.filename}")
+                g_path = os.path.join(app.config['UPLOAD_FOLDER'], g_fname)
+                gfile.save(g_path)
+                updated_gallery.append(f"/static/uploads/{g_fname}")
+
+    custom_gallery = request.form.get('custom_gallery_urls', '').strip()
+    if custom_gallery:
+        for g_url in custom_gallery.split('\n'):
+            g_url = g_url.strip()
+            if g_url:
+                resolved_g = resolve_product_image_path(g_url, app_root=app.root_path)
+                if resolved_g and resolved_g not in updated_gallery:
+                    updated_gallery.append(resolved_g)
+
+    product.gallery_images = json.dumps(updated_gallery) if updated_gallery else None
         
     db.session.commit()
     flash(f'Product "{product.name}" updated successfully.', 'success')
@@ -1526,6 +1586,22 @@ def admin_toggle_product_active(product_id):
     return jsonify({
         'success': True,
         'is_active': product.is_active,
+        'message': f'Product "{product.name}" is now {status_label}.'
+    })
+
+
+@app.route('/admin/products/<int:product_id>/toggle-featured', methods=['POST'])
+@admin_required
+def admin_toggle_product_featured(product_id):
+    """1-Click Quick Toggle for Homepage Featured Product Status"""
+    product = Product.query.get_or_404(product_id)
+    product.is_featured = not product.is_featured
+    db.session.commit()
+    
+    status_label = 'Featured on Homepage' if product.is_featured else 'Standard Catalog (Unfeatured)'
+    return jsonify({
+        'success': True,
+        'is_featured': product.is_featured,
         'message': f'Product "{product.name}" is now {status_label}.'
     })
 
@@ -1553,16 +1629,22 @@ def admin_toggle_stock_status(product_id):
 def admin_delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     name = product.name
-    db.session.delete(product)
-    db.session.commit()
-    flash(f'Product "{name}" deleted.', 'info')
+    try:
+        # Decouple foreign keys from inquiry items to preserve inquiry records and prevent constraint errors
+        InquiryItem.query.filter_by(product_id=product_id).update({'product_id': None})
+        db.session.delete(product)
+        db.session.commit()
+        flash(f'Product "{name}" deleted successfully.', 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Could not delete product "{name}": {str(e)}', 'danger')
     return redirect(url_for('admin_products'))
 
 
 @app.route('/admin/products/bulk-action', methods=['POST'])
 @admin_required
 def admin_bulk_product_action():
-    """Bulk activate, deactivate, update stock, or delete multiple products in 1 click"""
+    """Bulk activate, deactivate, update stock, feature, or delete multiple products in 1 click"""
     data = request.get_json() or {}
     action = data.get('action')
     product_ids = data.get('product_ids', [])
@@ -1587,45 +1669,60 @@ def admin_bulk_product_action():
     if count == 0:
         return jsonify({'success': False, 'message': 'No matching products found.'}), 404
         
-    if action == 'activate':
-        for p in products:
-            p.is_active = True
-        db.session.commit()
-        msg = f'Successfully activated {count} product(s).'
-    elif action == 'deactivate':
-        for p in products:
-            p.is_active = False
-        db.session.commit()
-        msg = f'Successfully deactivated {count} product(s).'
-    elif action == 'delete':
-        for p in products:
-            db.session.delete(p)
-        db.session.commit()
-        msg = f'Successfully deleted {count} product(s).'
-    elif action == 'stock_in':
-        for p in products:
-            p.stock_status = 'in_stock'
-        db.session.commit()
-        msg = f'Updated {count} product(s) to In Stock.'
-    elif action == 'stock_out':
-        for p in products:
-            p.stock_status = 'out_of_stock'
-        db.session.commit()
-        msg = f'Updated {count} product(s) to Out of Stock.'
-    elif action == 'stock_order':
-        for p in products:
-            p.stock_status = 'made_to_order'
-        db.session.commit()
-        msg = f'Updated {count} product(s) to Made to Order.'
-    else:
-        return jsonify({'success': False, 'message': f'Unknown action: {action}'}), 400
-        
-    return jsonify({
-        'success': True,
-        'action': action,
-        'count': count,
-        'message': msg
-    })
+    try:
+        if action == 'activate':
+            for p in products:
+                p.is_active = True
+            db.session.commit()
+            msg = f'Successfully activated {count} product(s).'
+        elif action == 'deactivate':
+            for p in products:
+                p.is_active = False
+            db.session.commit()
+            msg = f'Successfully deactivated {count} product(s).'
+        elif action == 'delete':
+            # Decouple foreign keys to prevent SQLite foreign key constraint failure
+            InquiryItem.query.filter(InquiryItem.product_id.in_(valid_ids)).update({'product_id': None}, synchronize_session=False)
+            for p in products:
+                db.session.delete(p)
+            db.session.commit()
+            msg = f'Successfully deleted {count} product(s).'
+        elif action == 'feature':
+            for p in products:
+                p.is_featured = True
+            db.session.commit()
+            msg = f'Successfully marked {count} product(s) as Featured on Homepage.'
+        elif action == 'unfeature':
+            for p in products:
+                p.is_featured = False
+            db.session.commit()
+            msg = f'Removed {count} product(s) from Featured.'
+        elif action == 'stock_in':
+            for p in products:
+                p.stock_status = 'in_stock'
+            db.session.commit()
+            msg = f'Updated {count} product(s) to In Stock.'
+        elif action == 'stock_out':
+            for p in products:
+                p.stock_status = 'out_of_stock'
+            db.session.commit()
+            msg = f'Updated {count} product(s) to Out of Stock.'
+        elif action == 'stock_order':
+            for p in products:
+                p.stock_status = 'made_to_order'
+            db.session.commit()
+            msg = f'Updated {count} product(s) to Made to Order.'
+        else:
+            return jsonify({'success': False, 'message': f'Unknown action: {action}'}), 400
+            
+        return jsonify({
+            'success': True,
+            'message': msg,
+            'count': count
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Failed to execute bulk action: {str(e)}'}), 500
 
 
 @app.route('/admin/export/products')

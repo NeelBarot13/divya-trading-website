@@ -236,15 +236,23 @@
             <span style="font-size: 0.85rem; color: #94A3B8; font-weight: 600;">Bulk Actions:</span>
           </div>
           <div class="bulk-toolbar-actions">
-            <button type="button" class="btn-bulk btn-bulk-activate" onclick="executeBulkAction('activate')">
+            <button type="button" class="btn-bulk btn-bulk-activate" onclick="executeBulkAction('activate')" title="Activate selected products on live site">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
               <span>Activate</span>
             </button>
-            <button type="button" class="btn-bulk btn-bulk-deactivate" onclick="executeBulkAction('deactivate')">
+            <button type="button" class="btn-bulk btn-bulk-deactivate" onclick="executeBulkAction('deactivate')" title="Disable selected products from live site">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
               <span>Deactivate</span>
             </button>
-            <button type="button" class="btn-bulk btn-bulk-delete" onclick="executeBulkAction('delete')">
+            <button type="button" class="btn-bulk" onclick="executeBulkAction('feature')" style="background: #f59e0b; color: white;" title="Show selected products on homepage featured grid">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Feature on Home</span>
+            </button>
+            <button type="button" class="btn-bulk" onclick="executeBulkAction('unfeature')" style="background: #475569; color: white;" title="Remove from homepage featured grid">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><line x1="2" y1="2" x2="22" y2="22"></line></svg>
+              <span>Unfeature</span>
+            </button>
+            <button type="button" class="btn-bulk btn-bulk-delete" onclick="executeBulkAction('delete')" title="Permanently delete selected products">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               <span>Delete</span>
             </button>
@@ -268,6 +276,7 @@
               <th>Category</th>
               <th>Machine Make</th>
               <th>Stock Status</th>
+              <th>Home Feature</th>
               <th>Live Status</th>
               <th>Actions</th>
             </tr>
@@ -279,7 +288,12 @@
                 <input type="checkbox" class="product-select-chk" value="{{ prod.id }}" onchange="updateBulkActionToolbar()" style="cursor: pointer; transform: scale(1.15);">
               </td>
               <td>
-                <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
+                <div style="position: relative; width: 44px; height: 44px;">
+                  <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
+                  {% if prod.gallery_images and prod.gallery_images|length > 0 %}
+                  <span style="position: absolute; bottom: -2px; right: -2px; background: #0052cc; color: white; font-size: 0.6rem; font-weight: 800; border-radius: 3px; padding: 0 3px;" title="{{ prod.gallery_images|length }} extra photo(s)">+{{ prod.gallery_images|length }}</span>
+                  {% endif %}
+                </div>
               </td>
               <td style="font-weight: 700; color: #0052cc;">{{ prod.part_number }}</td>
               <td style="font-weight: 600;">
@@ -287,9 +301,6 @@
                   <span>{{ prod.name }}</span>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 </a>
-                {% if prod.is_featured %}
-                <span style="background: #fef3c7; color: #d97706; padding: 1px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; margin-left: 4px;">Featured</span>
-                {% endif %}
                 {% if prod.short_description %}
                 <div style="font-size: 0.76rem; color: #64748b; font-weight: normal; margin-top: 2px;">
                   {{ prod.short_description[:80] }}...
@@ -306,6 +317,19 @@
                   <option value="out_of_stock" {% if prod.stock_status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
                   <option value="made_to_order" {% if prod.stock_status == 'made_to_order' %}selected{% endif %}>Made to Order</option>
                 </select>
+              </td>
+
+              <!-- 1-Click Featured on Homepage Toggle -->
+              <td style="text-align: center;">
+                <button type="button" 
+                        class="btn-feature-star" 
+                        id="feature-btn-{{ prod.id }}"
+                        onclick="toggleProductFeatured({{ prod.id }}, this)" 
+                        title="{% if prod.is_featured %}Featured on homepage! Click to remove.{% else %}Click to feature on homepage grid.{% endif %}"
+                        style="background: {% if prod.is_featured %}#FEF3C7{% else %}#F8FAFC{% endif %}; border: 1px solid {% if prod.is_featured %}#F59E0B{% else %}#E2E8F0{% endif %}; color: {% if prod.is_featured %}#D97706{% else %}#94A3B8{% endif %}; border-radius: 6px; padding: 4px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 700; transition: all 0.2s;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="{% if prod.is_featured %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <span>{{ 'Featured' if prod.is_featured else 'Standard' }}</span>
+                </button>
               </td>
 
               <!-- 1-Click Active / Deactive Switch Toggle -->
@@ -529,7 +553,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Product Image (Preset, File Upload, or Custom Path)</label>
+            <label class="form-label">Primary Product Image (Preset, File Upload, or Custom Path)</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center; margin-bottom: 8px;">
               <select name="image_preset" class="form-control">
                 <option value="/static/images/cat_screen_heads.jpg">Preset: Screen Heads</option>
@@ -543,9 +567,20 @@
               <input type="file" name="image_file" class="form-control" accept="image/*">
             </div>
             <div>
-              <input type="text" name="custom_image_url" class="form-control" placeholder="OR paste image path / filename (e.g. pinsensor.jpg, /static/images/products/...)" style="font-size: 0.83rem;">
+              <input type="text" name="custom_image_url" class="form-control" placeholder="OR paste primary image path / filename (e.g. pinsensor.jpg, /static/images/products/...)" style="font-size: 0.83rem;">
               <div style="font-size: 0.74rem; color: #64748B; margin-top: 3px;">Accepts filenames in static/images/products/, full paths, or web URLs.</div>
             </div>
+          </div>
+
+          <!-- Multi-Image Upload for Product Gallery -->
+          <div class="form-group" style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px; margin-top: 14px;">
+            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 700; color: #0f172a;">Additional Product Photos (Multi-Photo Upload)</span>
+              <span style="font-size: 0.74rem; color: #0052cc; font-weight: 700;">Select multiple images (.jpg, .png, .webp)</span>
+            </label>
+            <input type="file" name="gallery_files" multiple accept="image/*" class="form-control" onchange="previewMultiFiles(this, 'addGalleryPreview')">
+            <div id="addGalleryPreview" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;"></div>
+            <textarea name="custom_gallery_urls" class="form-control" placeholder="OR paste additional image URLs/paths (one per line, e.g. /static/images/products/photo2.jpg)" style="font-size: 0.78rem; min-height: 48px; margin-top: 8px;"></textarea>
           </div>
 
           <div style="display: flex; gap: 24px; margin: 16px 0;">
@@ -644,7 +679,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Update Image</label>
+            <label class="form-label">Primary Product Image</label>
             <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
               <img id="editImagePreview" src="" alt="Preview" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1;">
               <input type="file" name="image_file" class="form-control" accept="image/*" style="flex: 1;">
@@ -653,6 +688,18 @@
               <input type="text" id="editCustomImageUrl" name="custom_image_url" class="form-control" placeholder="OR enter custom image path / filename (e.g. pinsensor.jpg, /static/images/...)" style="font-size: 0.83rem;">
               <div style="font-size: 0.74rem; color: #64748B; margin-top: 3px;">Accepts filenames in static/images/products/, full paths, or web URLs.</div>
             </div>
+          </div>
+
+          <!-- Multi-Image Gallery Photos for Edit -->
+          <div class="form-group" style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px; margin-top: 14px;">
+            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 700; color: #0f172a;">Additional Gallery Photos</span>
+              <span style="font-size: 0.74rem; color: #0052cc; font-weight: 700;">Upload extra photos / angles</span>
+            </label>
+            <div id="existingGalleryList" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;"></div>
+            <input type="file" name="gallery_files" multiple accept="image/*" class="form-control" onchange="previewMultiFiles(this, 'editGalleryPreview')">
+            <div id="editGalleryPreview" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;"></div>
+            <textarea id="editCustomGalleryUrls" name="custom_gallery_urls" class="form-control" placeholder="OR paste additional image URLs/paths (one per line)" style="font-size: 0.78rem; min-height: 48px; margin-top: 8px;"></textarea>
           </div>
 
           <div style="display: flex; gap: 24px; margin: 16px 0;">
@@ -738,10 +785,86 @@
         document.getElementById('editImagePreview').src = p.image_url || '/static/images/hero_parts.jpg';
         const editCustomImg = document.getElementById('editCustomImageUrl');
         if (editCustomImg) editCustomImg.value = p.image_url || '';
+
+        // Populate existing gallery photos
+        const galContainer = document.getElementById('existingGalleryList');
+        if (galContainer) {
+          galContainer.innerHTML = '';
+          const galImages = p.gallery_images || [];
+          if (galImages.length > 0) {
+            galImages.forEach((imgUrl) => {
+              const div = document.createElement('div');
+              div.style = 'position: relative; width: 68px; text-align: center; background: white; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+              div.innerHTML = `
+                <img src="${imgUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto 4px;">
+                <label style="font-size: 0.68rem; color: #dc2626; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 2px; font-weight: 700;">
+                  <input type="checkbox" name="remove_gallery_images" value="${imgUrl}"> Remove
+                </label>
+              `;
+              galContainer.appendChild(div);
+            });
+          } else {
+            galContainer.innerHTML = '<span style="font-size: 0.76rem; color: #94a3b8; font-style: italic;">No extra photos uploaded yet. Select below to add photos.</span>';
+          }
+        }
         
         document.getElementById('editProductModal').classList.add('active');
       });
     });
+
+    // Multi-File Previewer for Galleries
+    function previewMultiFiles(input, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      if (input.files) {
+        Array.from(input.files).forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const wrap = document.createElement('div');
+            wrap.style = 'position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.06);';
+            wrap.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            container.appendChild(wrap);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    }
+
+    // 1-Click Star Toggle for Homepage Featured
+    async function toggleProductFeatured(productId, btn) {
+      btn.disabled = true;
+      try {
+        const res = await fetch(`/admin/products/${productId}/toggle-featured`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (data.is_featured) {
+            btn.style.background = '#FEF3C7';
+            btn.style.borderColor = '#F59E0B';
+            btn.style.color = '#D97706';
+            btn.title = 'Featured on homepage! Click to remove.';
+            btn.querySelector('svg').setAttribute('fill', 'currentColor');
+            btn.querySelector('span').textContent = 'Featured';
+          } else {
+            btn.style.background = '#F8FAFC';
+            btn.style.borderColor = '#E2E8F0';
+            btn.style.color = '#94A3B8';
+            btn.title = 'Click to feature on homepage grid.';
+            btn.querySelector('svg').setAttribute('fill', 'none');
+            btn.querySelector('span').textContent = 'Standard';
+          }
+        } else {
+          alert(data.message || 'Error toggling featured status');
+        }
+      } catch (err) {
+        alert('Failed to update featured status: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
 
     function toggleAdminSidebar() {
       const sidebar = document.getElementById('adminSidebar');
@@ -809,6 +932,8 @@
       const actionLabels = {
         'activate': 'ACTIVATE on live catalog',
         'deactivate': 'DEACTIVATE / DISABLE from catalog',
+        'feature': 'MARK AS FEATURED ON HOMEPAGE',
+        'unfeature': 'REMOVE FROM FEATURED LIST',
         'delete': 'PERMANENTLY DELETE'
       };
       
@@ -823,14 +948,14 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: action, product_ids: selected })
         });
-        const data = await res.json();
-        if (data.success) {
+        const data = await res.json().catch(() => ({ success: false, message: 'Server returned non-JSON response' }));
+        if (res.ok && data.success) {
           window.location.reload();
         } else {
-          alert(data.message || 'Error executing bulk action.');
+          alert(data.message || `Error executing action (${res.status}: ${res.statusText})`);
         }
       } catch (err) {
-        alert('Failed to execute bulk action. Please try again.');
+        alert('Failed to execute bulk action: ' + err.message);
       }
     }
 

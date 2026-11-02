@@ -123,7 +123,110 @@
       <div class="hero-visual">
         <div class="hero-img-card">
           <img src="{{ site_settings.hero_image or url_for('static', filename='images/hero_parts.jpg') }}" alt="Divya Trading Co Precision Spare Parts Showcase">
+          <!-- Floating High-Tech Engineering Badges -->
+          <div class="hero-float-badge float-top-right">
+            <span class="float-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            </span>
+            <div class="float-text-box">
+              <strong>±0.01 mm</strong>
+              <span>CNC Micro Tolerance</span>
+            </div>
+          </div>
+          <div class="hero-float-badge float-bottom-left">
+            <span class="float-pulse-green"></span>
+            <div class="float-text-box">
+              <strong>150+ Spares</strong>
+              <span>Ready Stock Dispatch</span>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==========================================================================
+     1B. INTERACTIVE PRECISION SPARE PARTS FINDER (Quick Filter & Search Widget)
+     ========================================================================== -->
+<section class="precision-parts-finder-section">
+  <div class="container">
+    <div class="parts-finder-card">
+      <div class="finder-header">
+        <div class="finder-title-group">
+          <span class="finder-badge">
+            <span class="pulse-dot"></span> DIRECT OEM SPECIFICATION MATCH
+          </span>
+          <h3 class="finder-heading">Interactive Rotary Spare Parts Finder</h3>
+          <p class="finder-subtext">Instantly locate 100% compatible precision spares for your textile printing machine make and model</p>
+        </div>
+        <div class="finder-stats-chip">
+          <span class="finder-stat-num">{{ total_product_count or '150+' }}+</span>
+          <span class="finder-stat-label">Active Spares</span>
+        </div>
+      </div>
+
+      <form action="{{ url_for('products') }}" method="GET" class="finder-form-grid">
+        <!-- Machine Make Selector -->
+        <div class="finder-input-group">
+          <label for="finder_machine">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Machine Make
+          </label>
+          <div class="finder-select-wrapper">
+            <select name="machine" id="finder_machine">
+              <option value="">All Makes (Stormac, Laxmi, Stork...)</option>
+              {% for m in machines %}
+              <option value="{{ m.slug }}">{{ m.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Spare Category Selector -->
+        <div class="finder-input-group">
+          <label for="finder_category">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            Component Category
+          </label>
+          <div class="finder-select-wrapper">
+            <select name="category" id="finder_category">
+              <option value="">All Categories (Gears, Pumps, Rings...)</option>
+              {% for c in categories %}
+              <option value="{{ c.slug }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Keyword / Part Number Input -->
+        <div class="finder-input-group">
+          <label for="finder_q">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Part No. or Keyword
+          </label>
+          <input type="text" name="q" id="finder_q" placeholder="e.g. 64R, RD-IV, Pump, End Ring...">
+        </div>
+
+        <!-- Submit Button -->
+        <div class="finder-action-group">
+          <button type="submit" class="btn-finder-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Search Spares</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Search Quick Tags -->
+      <div class="finder-quick-tags">
+        <span class="quick-tags-label">Popular Searches:</span>
+        <a href="{{ url_for('products', q='64R') }}" class="quick-tag-chip">64R Repeat Gears</a>
+        <a href="{{ url_for('products', q='Pump') }}" class="quick-tag-chip">Rotary Colour Pumps</a>
+        <a href="{{ url_for('products', q='End Ring') }}" class="quick-tag-chip">Screen End Rings</a>
+        <a href="{{ url_for('products', q='Squeegee') }}" class="quick-tag-chip">Squeegee Blade Coils</a>
+        <a href="{{ url_for('products', machine='stormac') }}" class="quick-tag-chip">Stormac Spares</a>
+        <a href="{{ url_for('products', machine='laxmi') }}" class="quick-tag-chip">Laxmi Spares</a>
       </div>
     </div>
   </div>
@@ -233,57 +336,84 @@
 
 
 <!-- ==========================================================================
-     5. FEATURED PRECISION PRODUCTS (Limited to exactly 4 items on Homepage)
+     5. FEATURED PRECISION PRODUCTS (Multi-Photo Ready & Dynamic Catalog Showcase)
      ========================================================================== -->
 {% if site_settings.show_featured_products != 'false' and featured_products %}
-<section style="padding: 60px 0; background: var(--bg-white);">
+<section class="featured-showcase-section" style="padding: 68px 0; background: var(--bg-white);">
   <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
       <div>
-        <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1px;">
-          {{ site_settings.featured_section_subtitle or 'Precision Catalog' }}
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--dtc-blue); text-transform: uppercase; letter-spacing: 1.2px; display: inline-flex; align-items: center; gap: 6px;">
+          <span class="pulse-dot-blue"></span> {{ site_settings.featured_section_subtitle or 'ENGINEERED FOR PEAK PERFORMANCE' }}
         </span>
-        <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--primary-navy);">
-          {{ site_settings.featured_section_title or 'Featured Spare Parts' }}
+        <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-navy); margin-top: 4px;">
+          {{ site_settings.featured_section_title or 'Featured Precision Spare Parts' }}
         </h2>
       </div>
-      <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.85rem; padding: 9px 18px; display: inline-flex; align-items: center; gap: 6px;">
-        <span>View Complete Catalog</span>
+      <a href="{{ url_for('products') }}" class="btn-enquire-primary" style="font-size: 0.85rem; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px;">
+        <span>View Complete Catalog ({{ total_product_count or '150+' }}+)</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </a>
     </div>
 
-    <!-- 4-Product Grid -->
-    <div class="featured-4-grid">
+    <!-- Responsive Product Grid -->
+    <div class="featured-products-grid featured-4-grid">
       {% for prod in featured_products %}
-      <div class="product-card">
+      {% set prod_imgs = prod.get_images() %}
+      <div class="product-card featured-item-card">
+        <!-- Badges Row -->
         {% if prod.is_featured %}
-        <span class="product-badge-featured">Featured</span>
+        <span class="product-badge-featured" title="Featured in Home Showcase">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          Featured
+        </span>
+        {% endif %}
+
+        {% if prod_imgs|length > 1 %}
+        <span class="product-badge-gallery" title="{{ prod_imgs|length }} High-Resolution Product Angles">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          {{ prod_imgs|length }} Photos
+        </span>
         {% endif %}
 
         {% if prod.stock_status == 'out_of_stock' %}
         <span class="product-badge-stock out_of_stock">Out of Stock</span>
         {% elif prod.stock_status == 'made_to_order' %}
         <span class="product-badge-stock made_to_order">Made to Order</span>
+        {% else %}
+        <span class="product-badge-stock in_stock"><span class="pulse-dot-green"></span> In Stock</span>
         {% endif %}
         
-        <a href="{{ url_for('product_detail', slug=prod.slug) }}" class="product-card-img-wrap">
-          <img src="{{ prod.image_url }}" alt="{{ prod.name }}">
+        <a href="{{ url_for('product_detail', slug=prod.slug) }}" class="product-card-img-wrap" title="View {{ prod.name }} Specifications &amp; Multi-Angle Photos">
+          <img src="{{ prod.image_url or (prod_imgs[0] if prod_imgs else url_for('static', filename='images/hero_parts.jpg')) }}" alt="{{ prod.name }}" loading="lazy">
         </a>
         
         <div class="product-card-body">
           <div class="product-meta-row">
-            <span class="product-part-no">{{ prod.part_number }}</span>
+            <span class="product-part-no" title="OEM Reference Part No.">{{ prod.part_number }}</span>
             <span class="product-make-badge">{{ prod.machine_make.name if prod.machine_make else 'Universal' }}</span>
           </div>
           
           <h3 class="product-title">
             <a href="{{ url_for('product_detail', slug=prod.slug) }}">{{ prod.name }}</a>
           </h3>
+
+          <div class="product-specs-chips">
+            {% if prod.repeat_sizes %}
+            <span class="product-spec-chip" title="Compatible Repeat Circumference">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Repeat: {{ prod.repeat_sizes }}
+            </span>
+            {% endif %}
+            {% if prod.category %}
+            <span class="product-spec-chip cat-chip" title="Category: {{ prod.category.name }}">
+              {{ prod.category.name }}
+            </span>
+            {% endif %}
+          </div>
           
           <p class="product-specs-summary">
-            {% if prod.repeat_sizes %}<strong>Repeat:</strong> {{ prod.repeat_sizes }}<br>{% endif %}
-            {{ prod.short_description or (prod.description[:85] + '...') }}
+            {{ prod.short_description or (prod.description[:85] + '...' if prod.description else 'High-precision rotary printing replacement spare part engineered for maximum operational durability.') }}
           </p>
 
           <div class="product-card-actions">
@@ -292,6 +422,7 @@
                     data-product-name="{{ prod.name }}" 
                     data-part-number="{{ prod.part_number }}"
                     data-repeat-sizes="{{ prod.repeat_sizes }}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               Inquire Now
             </button>
             <button class="btn-card-add-cart btn-add-quote-cart" 
@@ -299,7 +430,8 @@
                     data-product-name="{{ prod.name }}" 
                     data-part-number="{{ prod.part_number }}"
                     data-product-image="{{ prod.image_url }}">
-              + Quote List
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              + Quote
             </button>
           </div>
         </div>
@@ -309,6 +441,147 @@
   </div>
 </section>
 {% endif %}
+
+
+<!-- ==========================================================================
+     5B. ENGINEERING STANDARDS & CNC QUALITY BLUEPRINT INFOGRAPHIC
+     ========================================================================== -->
+<section class="engineering-blueprint-section">
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="engineering-section-header">
+      <div class="blueprint-tag">
+        <span class="blueprint-tech-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-slow"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </span>
+        MANUFACTURING BENCHMARKS &amp; QUALITY ASSURANCE
+      </div>
+      <h2 class="engineering-main-title">
+        Engineered to Micron Precision for Non-Stop Textile Printing
+      </h2>
+      <p class="engineering-main-subtitle">
+        Every spare part manufactured at Divya Trading Co. undergoes rigorous multi-stage CNC inspection, high-speed dynamic spin balancing, and metallurgy verification before dispatch.
+      </p>
+    </div>
+
+    <div class="blueprint-cards-grid">
+      <!-- Card 1: ±0.01mm CNC Milling & Hobbing -->
+      <div class="blueprint-tech-card">
+        <div class="tech-metric-display">
+          <span class="tech-metric-value">±0.01<small>mm</small></span>
+          <span class="tech-metric-badge">CNC Hobbed</span>
+        </div>
+        <div class="blueprint-icon-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+        </div>
+        <h3 class="blueprint-card-title">Micron-Tolerance Gear Hobbing</h3>
+        <p class="blueprint-card-desc">
+          Precision gear tooth profiling eliminates backlash and pitch deflection, ensuring razor-sharp pattern registration across 12-to-24 colour printing repeats.
+        </p>
+        <ul class="blueprint-check-list">
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Zero gear backlash &amp; tooth flutter
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            DIN Class 6/7 gear quality standards
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            CMM verified tooth pitch geometry
+          </li>
+        </ul>
+      </div>
+
+      <!-- Card 2: 3,000 RPM Dynamic Balancing -->
+      <div class="blueprint-tech-card">
+        <div class="tech-metric-display">
+          <span class="tech-metric-value">3,000<small>RPM</small></span>
+          <span class="tech-metric-badge">Spin Balanced</span>
+        </div>
+        <div class="blueprint-icon-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+        </div>
+        <h3 class="blueprint-card-title">Dynamic Spin Balancing</h3>
+        <p class="blueprint-card-desc">
+          Screen drive heads and rotating shafts are electronically balanced on computerized dynamic balancing rigs to eradicate high-speed harmonics and vibration.
+        </p>
+        <ul class="blueprint-check-list">
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            ISO 1940-1 Grade G2.5 balance certified
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Prevents premature bearing sleeve wear
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Guarantees whisper-quiet shift operation
+          </li>
+        </ul>
+      </div>
+
+      <!-- Card 3: Metallurgy & High-Tensile Alloys -->
+      <div class="blueprint-tech-card">
+        <div class="tech-metric-display">
+          <span class="tech-metric-value">EN-24<small>&amp; SS316</small></span>
+          <span class="tech-metric-badge">Alloy Grade</span>
+        </div>
+        <div class="blueprint-icon-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h3 class="blueprint-card-title">Certified Metallurgy &amp; Hardening</h3>
+        <p class="blueprint-card-desc">
+          Manufactured using vacuum-degassed EN-24 alloy, Swedish blue spring steel, and marine SS316 for extreme resistance to corrosive dye chemicals.
+        </p>
+        <ul class="blueprint-check-list">
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            HRC 58-62 induction case hardening
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Acid &amp; alkaline reactive dye proof
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            3x longer life than generic mild steel
+          </li>
+        </ul>
+      </div>
+
+      <!-- Card 4: Global Air & Road Express Logistics -->
+      <div class="blueprint-tech-card">
+        <div class="tech-metric-display">
+          <span class="tech-metric-value">24-48<small>HRS</small></span>
+          <span class="tech-metric-badge">Express Dispatch</span>
+        </div>
+        <div class="blueprint-icon-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        </div>
+        <h3 class="blueprint-card-title">Zero Downtime Rapid Dispatch</h3>
+        <p class="blueprint-card-desc">
+          Ready stock of over 150+ critical spare parts for immediate dispatch to Surat, Ahmedabad, Panipat, Tirupur, and express worldwide air cargo.
+        </p>
+        <ul class="blueprint-check-list">
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Same-day dispatch for emergency mill breakdowns
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Reinforced export-grade shockproof packaging
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Full air waybill tracking to international hubs
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ==========================================================================
      5. ROTARY PRINTING SPARE PARTS BY MACHINE MAKE (SEO AUTHORITY SECTION)

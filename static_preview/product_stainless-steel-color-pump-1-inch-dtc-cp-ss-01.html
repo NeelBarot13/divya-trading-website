@@ -621,9 +621,13 @@
     <div class="product-detail-grid">
       <!-- Product Image Gallery / Showcase -->
       <div>
-        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md);">
-          <img src="static/images/cat_pumps.jpg" alt="Stainless Steel Color Pump 1-Inch" style="max-height: 420px; margin: 0 auto; object-fit: contain; border-radius: var(--radius-sm);">
+        <div class="product-gallery-main" style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md); position: relative;">
+          <img id="mainProductImg" src="static/images/cat_pumps.jpg" alt="Stainless Steel Color Pump 1-Inch" style="max-height: 420px; margin: 0 auto; object-fit: contain; border-radius: var(--radius-sm); transition: opacity 0.25s ease, transform 0.3s ease;">
+          
         </div>
+        
+        
+        
         
         <div style="display: flex; gap: 12px; margin-top: 16px;">
           <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
@@ -802,11 +806,91 @@
           </div>
         </div>
         
+        <div class="product-card">
+          <a href="product_pin-sensor-dtc-pin-sensor.html" class="product-card-img-wrap">
+            <img src="static/uploads/prod_1792903025_pinsensor.jpg" alt="Pin Sensor">
+          </a>
+          <div class="product-card-body">
+            <div class="product-meta-row">
+              <span class="product-part-no">DTC_PIN_SENSOR</span>
+              <span class="product-make-badge">Universal</span>
+            </div>
+            <h4 class="product-title" style="font-size: 0.95rem;">
+              <a href="product_pin-sensor-dtc-pin-sensor.html">Pin Sensor</a>
+            </h4>
+            <div class="product-card-actions" style="margin-top: auto;">
+              <button class="btn-card-inquire btn-quick-inquire" 
+                      data-product-id="11" 
+                      data-product-name="Pin Sensor" 
+                      data-part-number="DTC_PIN_SENSOR">
+                Inquire
+              </button>
+              <button class="btn-card-add-cart btn-add-quote-cart" 
+                      data-product-id="11" 
+                      data-product-name="Pin Sensor" 
+                      data-part-number="DTC_PIN_SENSOR"
+                      data-product-image="/static/uploads/prod_1792903025_pinsensor.jpg">
+                + List
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <a href="product_ss-blade-dtc-ss-blade.html" class="product-card-img-wrap">
+            <img src="static/images/hero_parts.jpg" alt="S.S. Blade">
+          </a>
+          <div class="product-card-body">
+            <div class="product-meta-row">
+              <span class="product-part-no">DTC_SS_BLADE</span>
+              <span class="product-make-badge">Universal</span>
+            </div>
+            <h4 class="product-title" style="font-size: 0.95rem;">
+              <a href="product_ss-blade-dtc-ss-blade.html">S.S. Blade</a>
+            </h4>
+            <div class="product-card-actions" style="margin-top: auto;">
+              <button class="btn-card-inquire btn-quick-inquire" 
+                      data-product-id="12" 
+                      data-product-name="S.S. Blade" 
+                      data-part-number="DTC_SS_BLADE">
+                Inquire
+              </button>
+              <button class="btn-card-add-cart btn-add-quote-cart" 
+                      data-product-id="12" 
+                      data-product-name="S.S. Blade" 
+                      data-part-number="DTC_SS_BLADE"
+                      data-product-image="/static/images/hero_parts.jpg">
+                + List
+              </button>
+            </div>
+          </div>
+        </div>
+        
       </div>
     </div>
     
   </div>
 </section>
+
+<script>
+function switchProductDetailImage(src, btn) {
+  const main = document.getElementById('mainProductImg');
+  if (!main) return;
+  main.style.opacity = '0.3';
+  main.style.transform = 'scale(0.97)';
+  setTimeout(() => {
+    main.src = src;
+    main.style.opacity = '1';
+    main.style.transform = 'scale(1)';
+  }, 160);
+  document.querySelectorAll('.gallery-thumb-btn').forEach(b => {
+    b.style.borderColor = '#E2E8F0';
+    b.classList.remove('active');
+  });
+  btn.style.borderColor = 'var(--dtc-blue)';
+  btn.classList.add('active');
+}
+</script>
 
 
   </main>

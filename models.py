@@ -68,12 +68,38 @@ class Product(db.Model):
     repeat_sizes = db.Column(db.String(255), nullable=True)
     material = db.Column(db.String(150), nullable=True)
     image_url = db.Column(db.String(255), nullable=True)
+    gallery_images = db.Column(db.Text, nullable=True)  # JSON-encoded list of additional photo URLs
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True, index=True)
     # stock_status: 'in_stock', 'out_of_stock', 'made_to_order'
     stock_status = db.Column(db.String(30), default='in_stock', index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def get_gallery_images(self):
+        """Returns list of additional gallery image URLs"""
+        if not self.gallery_images:
+            return []
+        try:
+            import json
+            data = json.loads(self.gallery_images)
+            if isinstance(data, list):
+                return [img.strip() for img in data if img and str(img).strip()]
+        except Exception:
+            return [img.strip() for img in self.gallery_images.split(',') if img.strip()]
+        return []
+
+    def get_images(self):
+        """Returns all images (primary + gallery) with fallback"""
+        imgs = []
+        if self.image_url and self.image_url.strip():
+            imgs.append(self.image_url.strip())
+        for g in self.get_gallery_images():
+            if g not in imgs:
+                imgs.append(g)
+        if not imgs:
+            imgs.append('/static/images/hero_parts.jpg')
+        return imgs
 
     def to_dict(self):
         return {
@@ -91,6 +117,8 @@ class Product(db.Model):
             'repeat_sizes': self.repeat_sizes,
             'material': self.material,
             'image_url': self.image_url or '/static/images/hero_parts.jpg',
+            'gallery_images': self.get_gallery_images(),
+            'images': self.get_images(),
             'is_featured': self.is_featured,
             'is_active': self.is_active,
             'stock_status': self.stock_status or 'in_stock',

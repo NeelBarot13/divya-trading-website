@@ -621,9 +621,15 @@
     <div class="product-detail-grid">
       <!-- Product Image Gallery / Showcase -->
       <div>
-        <div style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md);">
-          <img src="static/images/cat_squeegee.jpg" alt="Laxmi Rotary Printing Squeegee Holder &amp; Doctor Blade Unit" style="max-height: 420px; margin: 0 auto; object-fit: contain; border-radius: var(--radius-sm);">
+        <div class="product-gallery-main" style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; padding: 20px; text-align: center; box-shadow: var(--shadow-md); position: relative;">
+          <img id="mainProductImg" src="static/images/cat_squeegee.jpg" alt="Laxmi Rotary Printing Squeegee Holder &amp; Doctor Blade Unit" style="max-height: 420px; margin: 0 auto; object-fit: contain; border-radius: var(--radius-sm); transition: opacity 0.25s ease, transform 0.3s ease;">
+          
+          <span style="position: absolute; top: 16px; left: 16px; background: #f59e0b; color: white; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 4px; box-shadow: 0 2px 6px rgba(245,158,11,0.3);">Featured Part</span>
+          
         </div>
+        
+        
+        
         
         <div style="display: flex; gap: 12px; margin-top: 16px;">
           <div style="background: var(--dtc-blue-light); border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex: 1;">
@@ -842,6 +848,26 @@
     
   </div>
 </section>
+
+<script>
+function switchProductDetailImage(src, btn) {
+  const main = document.getElementById('mainProductImg');
+  if (!main) return;
+  main.style.opacity = '0.3';
+  main.style.transform = 'scale(0.97)';
+  setTimeout(() => {
+    main.src = src;
+    main.style.opacity = '1';
+    main.style.transform = 'scale(1)';
+  }, 160);
+  document.querySelectorAll('.gallery-thumb-btn').forEach(b => {
+    b.style.borderColor = '#E2E8F0';
+    b.classList.remove('active');
+  });
+  btn.style.borderColor = 'var(--dtc-blue)';
+  btn.classList.add('active');
+}
+</script>
 
 
   </main>
