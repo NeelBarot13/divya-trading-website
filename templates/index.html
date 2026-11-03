@@ -135,72 +135,9 @@
 
 
 <!-- ==========================================================================
-     2. STREAMLINED PRECISION SPARE PARTS FINDER (Clean & Functional)
+     2. FEATURED PRECISION PRODUCTS (Clean B2B Showcase with Multi-Photos)
      ========================================================================== -->
-<section class="precision-parts-finder-section">
-  <div class="container">
-    <div class="parts-finder-card finder-card-clean">
-      <form action="{{ url_for('products') }}" method="GET" class="finder-form-grid">
-        <!-- Machine Make -->
-        <div class="finder-input-group">
-          <label for="finder_machine">Machine Make</label>
-          <div class="finder-select-wrapper">
-            <select name="machine" id="finder_machine">
-              <option value="">All Makes (Stormac, Laxmi, Stork...)</option>
-              {% for m in machines %}
-              <option value="{{ m.slug }}">{{ m.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <!-- Spare Category -->
-        <div class="finder-input-group">
-          <label for="finder_category">Component Category</label>
-          <div class="finder-select-wrapper">
-            <select name="category" id="finder_category">
-              <option value="">All Categories (Gears, Pumps, Rings...)</option>
-              {% for c in categories %}
-              <option value="{{ c.slug }}">{{ c.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <!-- Part Number / Keyword -->
-        <div class="finder-input-group">
-          <label for="finder_q">Part No. or Keyword</label>
-          <input type="text" name="q" id="finder_q" placeholder="e.g. 64R, RD-IV, Pump, End Ring...">
-        </div>
-
-        <!-- Submit Button -->
-        <div class="finder-action-group">
-          <button type="submit" class="btn-finder-search">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>Search Spares</span>
-          </button>
-        </div>
-      </form>
-
-      <!-- Quick Search Tags -->
-      <div class="finder-quick-tags">
-        <span class="quick-tags-label">Popular:</span>
-        <a href="{{ url_for('products', q='64R') }}" class="quick-tag-chip">64R Repeat Gears</a>
-        <a href="{{ url_for('products', q='Pump') }}" class="quick-tag-chip">Colour Feed Pumps</a>
-        <a href="{{ url_for('products', q='End Ring') }}" class="quick-tag-chip">Screen End Rings</a>
-        <a href="{{ url_for('products', q='Squeegee') }}" class="quick-tag-chip">Squeegee Blades</a>
-        <a href="{{ url_for('products', machine='stormac') }}" class="quick-tag-chip">Stormac Spares</a>
-        <a href="{{ url_for('products', machine='laxmi') }}" class="quick-tag-chip">Laxmi Spares</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==========================================================================
-     3. FEATURED PRECISION PRODUCTS (Clean B2B Showcase with Multi-Photos)
-     ========================================================================== -->
-{% if site_settings.show_featured_products != 'false' and featured_products %}
+{% if featured_products %}
 <section class="featured-showcase-section" style="padding: 56px 0; background: var(--bg-white);">
   <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">

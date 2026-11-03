@@ -305,13 +305,15 @@ def home():
     # Homepage featured products limit (default 8 for diverse showcase)
     try:
         featured_limit = int(settings.get('home_featured_limit', 8))
+        if featured_limit < 8:
+            featured_limit = 8
     except (ValueError, TypeError):
         featured_limit = 8
         
-    featured_products = Product.query.filter_by(is_featured=True, is_active=True).order_by(Product.id.desc()).limit(featured_limit).all()
+    featured_products = Product.query.filter_by(is_featured=True, is_active=True).order_by(Product.id.asc()).limit(featured_limit).all()
     if not featured_products:
         # Fallback to active catalog items so homepage showcase is never empty
-        featured_products = Product.query.filter_by(is_active=True).order_by(Product.id.desc()).limit(featured_limit).all()
+        featured_products = Product.query.filter_by(is_active=True).order_by(Product.id.asc()).limit(featured_limit).all()
 
     categories = Category.query.order_by(Category.order_index).all()
     machines = MachineMake.query.all()
