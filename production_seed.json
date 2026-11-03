@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-03 12:07:25 UTC",
+  "generated_at": "2026-11-03 12:35:07 UTC",
   "company": "Divya Trading Co.",
   "version": "2.0-Production",
   "stats": {
@@ -33,7 +33,7 @@
     "quality_banner_title": "QUALITY YOU CAN TRUST",
     "quality_banner_text": "With over two decades of experience, we are a leader in quality products. Our reputation is based on performance, reliability and customer satisfaction across textile printing mills worldwide.",
     "quality_banner_image": "/static/images/textile_banner.jpg",
-    "home_featured_limit": "8",
+    "home_featured_limit": "4",
     "featured_section_title": "Featured Spare Parts",
     "featured_section_subtitle": "Precision Catalog",
     "why_choose_title": "WHY CHOOSE DIVYA TRADING CO.",

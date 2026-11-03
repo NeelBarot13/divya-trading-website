@@ -137,7 +137,7 @@
 <!-- ==========================================================================
      2. FEATURED PRECISION PRODUCTS (Clean B2B Showcase with Multi-Photos)
      ========================================================================== -->
-{% if featured_products %}
+{% if site_settings.show_featured_products != 'false' and featured_products %}
 <section class="featured-showcase-section" style="padding: 56px 0; background: var(--bg-white);">
   <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">

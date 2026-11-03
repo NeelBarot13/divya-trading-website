@@ -302,13 +302,13 @@ def home():
     settings_records = SiteSetting.query.all()
     settings = {s.key: s.value for s in settings_records}
     
-    # Homepage featured products limit (default 8 for diverse showcase)
+    # Homepage featured products limit (strictly respect the CMS settings)
     try:
-        featured_limit = int(settings.get('home_featured_limit', 8))
-        if featured_limit < 8:
-            featured_limit = 8
+        featured_limit = int(settings.get('home_featured_limit', 4))
+        if featured_limit <= 0:
+            featured_limit = 4
     except (ValueError, TypeError):
-        featured_limit = 8
+        featured_limit = 4
         
     featured_products = Product.query.filter_by(is_featured=True, is_active=True).order_by(Product.id.asc()).limit(featured_limit).all()
     if not featured_products:
@@ -1802,11 +1802,32 @@ def admin_import_products():
                     except Exception as zip_e:
                         flash(f"Notice while extracting images ZIP: {zip_e}", 'warning')
                 elif allowed_file(orig_fname):
-                    base_m = secure_filename(orig_fname) or os.path.basename(orig_fname)
-                    dest = os.path.join(target_img_dir, base_m)
-                    img_f.save(dest)
+                    raw_base = os.path.basename(orig_fname).strip()
+                    safe_base = secure_filename(orig_fname) or raw_base
+                    dest_safe = os.path.join(target_img_dir, safe_base)
+                    img_f.save(dest_safe)
+                    
+                    # Also keep raw basename if different (e.g. contains spaces)
+                    if raw_base != safe_base:
+                        try:
+                            shutil.copy2(dest_safe, os.path.join(target_img_dir, raw_base))
+                        except Exception:
+                            pass
+                            
+                    # Mirror to docs directory if docs folder is present
+                    docs_img_dir = os.path.join(app.root_path, 'docs', 'static', 'images', 'products')
+                    if os.path.exists(docs_img_dir):
+                        try:
+                            shutil.copy2(dest_safe, os.path.join(docs_img_dir, safe_base))
+                            if raw_base != safe_base:
+                                shutil.copy2(dest_safe, os.path.join(docs_img_dir, raw_base))
+                        except Exception:
+                            pass
+
                     uploaded_images_count += 1
-                    uploaded_image_names.append(base_m)
+                    uploaded_image_names.append(safe_base)
+                    if raw_base != safe_base:
+                        uploaded_image_names.append(raw_base)
         
     update_existing = 'update_existing' in request.form
     result = import_products_from_file(

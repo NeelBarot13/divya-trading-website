@@ -84,7 +84,7 @@ def resolve_product_image_path(raw_path, app_root=None):
     if clean_no_slash.startswith('uploads/'):
         return '/static/' + clean_no_slash
 
-    # 4. If user provided just a filename, search candidate folders on disk
+    # 4. If user provided just a filename, search candidate folders on disk (Exact, Case-Insensitive, and Normalized)
     base_file = os.path.basename(clean_no_slash)
     if os.path.isfile(os.path.join(products_img_dir, base_file)):
         return f"/static/images/products/{base_file}"
@@ -92,6 +92,27 @@ def resolve_product_image_path(raw_path, app_root=None):
         return f"/static/images/{base_file}"
     if os.path.isfile(os.path.join(uploads_dir, base_file)):
         return f"/static/uploads/{base_file}"
+
+    # Normalized & case-insensitive search across candidate directories
+    norm_target = re.sub(r'[^a-z0-9]', '', base_file.lower())
+    for candidate_dir, prefix in [
+        (products_img_dir, '/static/images/products/'),
+        (uploads_dir, '/static/uploads/'),
+        (general_img_dir, '/static/images/')
+    ]:
+        if os.path.isdir(candidate_dir):
+            try:
+                for existing_f in os.listdir(candidate_dir):
+                    norm_existing = re.sub(r'[^a-z0-9]', '', existing_f.lower())
+                    if norm_existing == norm_target:
+                        return f"{prefix}{existing_f}"
+                    # Match even if extension was omitted in input
+                    if '.' not in base_file:
+                        existing_base = os.path.splitext(existing_f)[0]
+                        if re.sub(r'[^a-z0-9]', '', existing_base.lower()) == norm_target:
+                            return f"{prefix}{existing_f}"
+            except Exception:
+                pass
 
     # 5. Default fallback to products directory if not yet on disk
     return f"/static/images/products/{base_file}"
@@ -480,7 +501,17 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
     rows_data = []
 
     # 1. Read file rows into standardized dictionaries
-    if filename.endswith('.csv'):
+    is_csv = filename.endswith('.csv')
+    if not is_csv and not filename.endswith(('.xlsx', '.xls')):
+        try:
+            sample = file_obj.read(4)
+            file_obj.seek(0)
+            if not sample.startswith(b'PK'):
+                is_csv = True
+        except Exception:
+            pass
+
+    if is_csv:
         # Parse CSV
         content = file_obj.read()
 
@@ -540,11 +571,24 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
                 else:
                     data_rows.append(row_vals)
         except Exception as e:
-            return {
-                'success': False,
-                'message': f'Failed to read Excel workbook: {str(e)}',
-                'created': 0, 'updated': 0, 'skipped': 0, 'total': 0, 'errors': [str(e)]
-            }
+            # Fallback attempt to parse as CSV if openpyxl failed (e.g. user renamed .csv to .xlsx or raw stream)
+            try:
+                file_obj.seek(0)
+                content = file_obj.read()
+                text = content.decode('utf-8-sig', errors='replace')
+                reader = csv.reader(io.StringIO(text))
+                all_lines = list(reader)
+                if all_lines and len(all_lines) > 1 and len(all_lines[0]) >= 2:
+                    header_row = [str(c).strip() for c in all_lines[0]]
+                    data_rows = [[str(c).strip() for c in line] for line in all_lines[1:] if any(c.strip() for c in line)]
+                else:
+                    raise e
+            except Exception:
+                return {
+                    'success': False,
+                    'message': f'Failed to read Excel workbook: {str(e)}',
+                    'created': 0, 'updated': 0, 'skipped': 0, 'total': 0, 'errors': [str(e)]
+                }
 
     if not header_row or not data_rows:
         return {
@@ -746,8 +790,16 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
                     is_match = True
                 elif norm_slug and (norm_up == norm_slug or norm_up.startswith(norm_slug)):
                     is_match = True
-                elif base_no_ext.lower() in [os.path.splitext(os.path.basename(t.strip()))[0].lower() for t in re.split(r'[,;|\n]+', raw_img_val) if t.strip()]:
-                    is_match = True
+                elif raw_img_val:
+                    for t in re.split(r'[,;|\n]+', raw_img_val):
+                        t_clean = t.strip()
+                        if not t_clean:
+                            continue
+                        t_base = os.path.splitext(os.path.basename(t_clean))[0]
+                        norm_t = re.sub(r'[^a-z0-9]', '', t_base.lower())
+                        if (norm_up and norm_t and norm_up == norm_t) or (base_no_ext.lower() == t_base.lower()):
+                            is_match = True
+                            break
 
                 if is_match:
                     rel_url = f"/static/images/products/{up_fname}"
