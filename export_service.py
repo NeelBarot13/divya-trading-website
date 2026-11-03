@@ -3,6 +3,7 @@ import io
 import os
 import shutil
 import re
+import json
 from datetime import datetime
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -257,7 +258,7 @@ def generate_product_template_excel(categories=None, machines=None):
         "Material Grade",
         "Featured (Yes/No)",
         "Active (Yes/No)",
-        "Image Path / File / URL"
+        "Product Photos (Multiple allowed, e.g. photo1.jpg, photo2.jpg)"
     ]
     
     ws.append(headers)
@@ -285,7 +286,7 @@ def generate_product_template_excel(categories=None, machines=None):
             "Alloy Steel & CNC Aluminium",
             "Yes",
             "Yes",
-            "/static/images/cat_screen_heads.jpg"
+            "/static/images/cat_screen_heads.jpg, /static/images/hero_parts.jpg"
         ],
         [
             "DTC-GR-RD4-64R-M3",
@@ -457,7 +458,7 @@ def generate_product_template_excel(categories=None, machines=None):
     return output.getvalue()
 
 
-def import_products_from_file(file_storage, update_existing=True, app_root=None):
+def import_products_from_file(file_storage, update_existing=True, app_root=None, uploaded_images=None):
     """
     Parses and imports products from an uploaded Excel (.xlsx, .xls) or CSV file.
     
@@ -575,7 +576,8 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None)
             'imagepath', 'imagespath', 'images', 'imagefile', 'imagefilename',
             'imgpath', 'imgurl', 'img', 'picture', 'picturepath', 'pic',
             'filepath', 'path', 'productimage', 'productphoto', 'itemimage',
-            'productimagepath', 'productimg'
+            'productimagepath', 'productimg', 'productphotos', 'photos',
+            'gallery', 'galleryimages', 'multipleimages', 'pictures'
         )
     }
 
@@ -717,9 +719,58 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None)
         raw_active = get_val('is_active', 'yes').lower()
         is_active = raw_active not in ('no', 'false', '0', 'n', 'disabled', 'inactive')
 
-        # 6. Image URL / Path Resolution
+        # 6. Multi-Photo & Image URL Resolution (Device Uploads & Sheet Tokens)
         raw_img_val = get_val('image_url')
-        image_url = resolve_product_image_path(raw_img_val, app_root=app_root)
+        explicit_imgs = []
+        if raw_img_val:
+            # Support multiple comma/semicolon/pipe/newline separated images in the cell
+            tokens = [t.strip() for t in re.split(r'[,;|\n]+', raw_img_val) if t.strip()]
+            for t in tokens:
+                resolved = resolve_product_image_path(t, app_root=app_root)
+                if resolved and resolved not in explicit_imgs:
+                    explicit_imgs.append(resolved)
+
+        # Smart Auto-Matching: Match photos uploaded directly from the user's device
+        matched_device_imgs = []
+        if uploaded_images:
+            norm_part = re.sub(r'[^a-z0-9]', '', part_number.lower())
+            norm_slug = re.sub(r'[^a-z0-9]', '', slugify(name).lower())
+            
+            for up_fname in uploaded_images:
+                base_no_ext = os.path.splitext(up_fname)[0]
+                norm_up = re.sub(r'[^a-z0-9]', '', base_no_ext.lower())
+                
+                # Check part number match or prefix match (e.g. part, part_1, part_side)
+                is_match = False
+                if norm_part and (norm_up == norm_part or norm_up.startswith(norm_part)):
+                    is_match = True
+                elif norm_slug and (norm_up == norm_slug or norm_up.startswith(norm_slug)):
+                    is_match = True
+                elif base_no_ext.lower() in [os.path.splitext(os.path.basename(t.strip()))[0].lower() for t in re.split(r'[,;|\n]+', raw_img_val) if t.strip()]:
+                    is_match = True
+
+                if is_match:
+                    rel_url = f"/static/images/products/{up_fname}"
+                    if rel_url not in matched_device_imgs:
+                        matched_device_imgs.append(rel_url)
+
+        # Combine explicit sheet images and auto-matched device images
+        combined_imgs = []
+        for im in explicit_imgs + matched_device_imgs:
+            if im not in combined_imgs:
+                combined_imgs.append(im)
+
+        if combined_imgs:
+            primary_image = combined_imgs[0]
+            gallery_list = combined_imgs[1:]
+        elif raw_img_val:
+            primary_image = resolve_product_image_path(raw_img_val, app_root=app_root)
+            gallery_list = []
+        else:
+            primary_image = '/static/images/hero_parts.jpg'
+            gallery_list = []
+
+        gallery_json = json.dumps(gallery_list) if gallery_list else None
 
         # 7. Check if Product with this Part Number exists
         existing_prod = Product.query.filter(
@@ -740,8 +791,9 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None)
                     existing_prod.stock_status = stock_status
                     existing_prod.is_featured = is_featured
                     existing_prod.is_active = is_active
-                    if raw_img_val or not existing_prod.image_url:
-                        existing_prod.image_url = image_url
+                    if combined_imgs or raw_img_val or not existing_prod.image_url:
+                        existing_prod.image_url = primary_image
+                        existing_prod.gallery_images = gallery_json
                     updated_count += 1
                 else:
                     skipped_count += 1
@@ -768,7 +820,8 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None)
                     stock_status=stock_status,
                     is_featured=is_featured,
                     is_active=is_active,
-                    image_url=image_url
+                    image_url=primary_image,
+                    gallery_images=gallery_json
                 )
                 db.session.add(new_product)
                 created_count += 1

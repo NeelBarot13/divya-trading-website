@@ -1775,11 +1775,12 @@ def admin_import_products():
         flash('Unsupported file format. Please upload an Excel (.xlsx, .xls) or CSV file.', 'danger')
         return redirect(url_for('admin_products'))
 
-    # 1. Handle any accompanying image files or .zip archive
+    # 1. Handle any accompanying image files or .zip archive from device
     target_img_dir = os.path.join(app.root_path, 'static', 'images', 'products')
     os.makedirs(target_img_dir, exist_ok=True)
     
     uploaded_images_count = 0
+    uploaded_image_names = []
     if 'product_images' in request.files:
         img_files = request.files.getlist('product_images')
         for img_f in img_files:
@@ -1795,15 +1796,23 @@ def admin_import_products():
                                     with zf.open(member) as src_f, open(dest, 'wb') as dst_f:
                                         shutil.copyfileobj(src_f, dst_f)
                                     uploaded_images_count += 1
+                                    uploaded_image_names.append(base_m)
                     except Exception as zip_e:
                         flash(f"Notice while extracting images ZIP: {zip_e}", 'warning')
                 elif allowed_file(orig_fname):
-                    dest = os.path.join(target_img_dir, os.path.basename(orig_fname))
+                    base_m = secure_filename(orig_fname) or os.path.basename(orig_fname)
+                    dest = os.path.join(target_img_dir, base_m)
                     img_f.save(dest)
                     uploaded_images_count += 1
+                    uploaded_image_names.append(base_m)
         
     update_existing = 'update_existing' in request.form
-    result = import_products_from_file(file, update_existing=update_existing, app_root=app.root_path)
+    result = import_products_from_file(
+        file, 
+        update_existing=update_existing, 
+        app_root=app.root_path, 
+        uploaded_images=uploaded_image_names
+    )
     
     if result.get('success'):
         msg = result.get('message')

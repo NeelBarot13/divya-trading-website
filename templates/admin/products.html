@@ -420,16 +420,25 @@
             </div>
           </div>
 
-          <!-- Accompanying Images / Zip (Optional) -->
+          <!-- Accompanying Images / Zip (Direct from Device) -->
           <div class="form-group" style="margin-bottom: 18px;">
             <label class="form-label" style="font-weight: 700; margin-bottom: 6px; color: #0F172A; display: flex; justify-content: space-between; align-items: center;">
-              <span>Attach Product Images or ZIP Archive <span style="font-weight: 400; color: #64748B;">(Optional)</span></span>
-              <span style="font-size: 0.74rem; background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Multiple Files or .ZIP</span>
+              <span>Upload Product Photos from Device <span style="font-weight: 400; color: #64748B;">(Multiple Photos Allowed)</span></span>
+              <span style="font-size: 0.74rem; background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Direct from Computer / Phone</span>
             </label>
-            <input type="file" name="product_images" multiple accept="image/*,.zip" class="form-control" style="padding: 8px 12px; font-size: 0.84rem;">
-            <div style="font-size: 0.77rem; color: #64748B; margin-top: 5px; line-height: 1.4; display: flex; align-items: flex-start; gap: 6px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" style="margin-top: 2px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-              <span><strong>Flexible Images:</strong> Select multiple image files or upload a <code>.zip</code> file here. You can also directly place image files into <code>static/images/products/</code> or write their filenames, computer file paths, or image URLs into your spreadsheet!</span>
+            <div style="border: 1.5px dashed #93C5FD; border-radius: 8px; padding: 14px 16px; background: #F0F9FF;">
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <input type="file" name="product_images" id="bulkDeviceImagesInput" multiple accept="image/*,.zip" style="display: none;" onchange="updateSelectedImageFiles(this)">
+                <button type="button" class="btn-action-sm" onclick="document.getElementById('bulkDeviceImagesInput').click()" style="background: white; border: 1.5px solid #0284c7; color: #0284c7; font-weight: 700; padding: 7px 14px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <span>Choose Photos from Device</span>
+                </button>
+                <span id="selectedImagesDisplay" style="font-size: 0.82rem; color: #475569; font-weight: 600;">Select multiple images or .ZIP directly from your device</span>
+              </div>
+              <div id="selectedImagesPreviewGrid" style="display: none; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center;"></div>
+            </div>
+            <div style="font-size: 0.77rem; color: #475569; margin-top: 6px; line-height: 1.45;">
+              <strong>Smart Auto-Matching:</strong> Upload all photos directly from your computer or phone. Name files with the Part Number (e.g. <code>DTC-101.jpg</code>, <code>DTC-101_side.jpg</code>) to automatically attach multiple angles, or list multiple filenames separated by commas in your Excel file.
             </div>
           </div>
 
@@ -967,6 +976,41 @@
         display.innerHTML = `<span style="color: #059669; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">✓ Selected: ${file.name} (${sizeKb} KB)</span>`;
       } else {
         display.textContent = 'Supported: .xlsx, .xls, .csv (Max 15MB)';
+      }
+    }
+
+    function updateSelectedImageFiles(input) {
+      const display = document.getElementById('selectedImagesDisplay');
+      const previewGrid = document.getElementById('selectedImagesPreviewGrid');
+      if (!display) return;
+      
+      if (input.files && input.files.length > 0) {
+        display.innerHTML = `<span style="color: #0284c7; font-weight: 700;">✓ Ready to upload ${input.files.length} photo(s) from device</span>`;
+        if (previewGrid) {
+          previewGrid.innerHTML = '';
+          previewGrid.style.display = 'flex';
+          const maxPreview = Math.min(input.files.length, 6);
+          for (let i = 0; i < maxPreview; i++) {
+            const f = input.files[i];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const item = document.createElement('div');
+              item.style.cssText = 'width: 44px; height: 44px; border-radius: 6px; overflow: hidden; border: 1px solid #CBD5E1; background: #fff; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.08);';
+              item.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;" title="${f.name}">`;
+              previewGrid.appendChild(item);
+            };
+            reader.readAsDataURL(f);
+          }
+          if (input.files.length > 6) {
+            const more = document.createElement('div');
+            more.style.cssText = 'width: 44px; height: 44px; border-radius: 6px; background: #E2E8F0; color: #475569; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
+            more.textContent = `+${input.files.length - 6}`;
+            previewGrid.appendChild(more);
+          }
+        }
+      } else {
+        display.textContent = 'Select multiple images or .ZIP directly from your device';
+        if (previewGrid) previewGrid.style.display = 'none';
       }
     }
   </script>

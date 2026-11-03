@@ -7,14 +7,12 @@ from models import Product, Category, MachineMake, SiteSetting
 
 base = 'http://127.0.0.1:5000'
 docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
-preview_dir = os.path.join(os.path.dirname(__file__), 'static_preview')
 
-for target_dir in [docs_dir, preview_dir]:
-    if os.path.exists(target_dir):
-        shutil.rmtree(target_dir)
-    os.makedirs(target_dir, exist_ok=True)
-    # Copy static directory (css, js, images)
-    shutil.copytree(os.path.join(os.path.dirname(__file__), 'static'), os.path.join(target_dir, 'static'))
+if os.path.exists(docs_dir):
+    shutil.rmtree(docs_dir)
+os.makedirs(docs_dir, exist_ok=True)
+# Copy static directory (css, js, images)
+shutil.copytree(os.path.join(os.path.dirname(__file__), 'static'), os.path.join(docs_dir, 'static'))
 
 with app.app_context():
     products = Product.query.all()
@@ -80,10 +78,9 @@ with app.app_context():
             raw_html = resp.get_data(as_text=True)
             clean_html = transform_html(raw_html)
             
-            for target_dir in [docs_dir, preview_dir]:
-                filepath = os.path.join(target_dir, filename)
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    f.write(clean_html)
+            filepath = os.path.join(docs_dir, filename)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(clean_html)
             print(f"[OK] Generated main page: {filename}")
         except Exception as e:
             print(f"[ERR] Error freezing {url_path}: {e}")
@@ -97,21 +94,19 @@ with app.app_context():
             clean_html = transform_html(raw_html)
             
             prod_filename = f"product_{p.slug}.html"
-            for target_dir in [docs_dir, preview_dir]:
-                filepath = os.path.join(target_dir, prod_filename)
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    f.write(clean_html)
+            filepath = os.path.join(docs_dir, prod_filename)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(clean_html)
             print(f"[OK] Generated product page: {prod_filename}")
         except Exception as e:
             print(f"[ERR] Error generating product page for {p.slug}: {e}")
 
     # 3. Create .nojekyll in docs/ for GitHub Pages
-    for target_dir in [docs_dir, preview_dir]:
-        nojekyll = os.path.join(target_dir, '.nojekyll')
-        with open(nojekyll, 'w') as f:
-            f.write('')
+    nojekyll = os.path.join(docs_dir, '.nojekyll')
+    with open(nojekyll, 'w') as f:
+        f.write('')
 
 print("\n========================================================")
-print("SUCCESS: 100% Full Static Website Generated in 'docs/' and 'static_preview/'!")
-print("Every single one of the 24 products has its own static page.")
+print("SUCCESS: 100% Full Static Website Generated in 'docs/'!")
+print("Every single one of the products has its own static page.")
 print("========================================================")
