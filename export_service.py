@@ -54,22 +54,41 @@ def resolve_product_image_path(raw_path, app_root=None):
     os.makedirs(uploads_dir, exist_ok=True)
 
     # 2. Check if it's an absolute path on filesystem or contains /static/
-    if '/static/' in cleaned.lower():
-        idx = cleaned.lower().rfind('/static/')
-        rel_static = cleaned[idx:]
-        return '/' + rel_static.lstrip('/')
-
     if os.path.isabs(cleaned) or (len(cleaned) > 2 and cleaned[1] == ':'):
         local_sys_path = os.path.normpath(cleaned)
         if os.path.isfile(local_sys_path):
-            base_filename = os.path.basename(local_sys_path)
+            norm_static = os.path.normpath(static_dir)
+            # If already inside project's static directory, return web-accessible relative path
+            if local_sys_path.lower().startswith(norm_static.lower()):
+                rel = os.path.relpath(local_sys_path, app_root).replace('\\', '/')
+                return '/' + rel.lstrip('/')
+            
+            # File is elsewhere on this computer - auto-copy into static/images/products/
+            base_filename = os.path.basename(local_sys_path).strip('\'"')
             dest_path = os.path.join(products_img_dir, base_filename)
             try:
                 if not os.path.exists(dest_path) or os.path.getsize(dest_path) != os.path.getsize(local_sys_path):
                     shutil.copy2(local_sys_path, dest_path)
+                
+                # Mirror to docs static if present
+                docs_img_dir = os.path.join(app_root, 'docs', 'static', 'images', 'products')
+                if os.path.exists(docs_img_dir):
+                    try:
+                        shutil.copy2(local_sys_path, os.path.join(docs_img_dir, base_filename))
+                    except Exception:
+                        pass
                 return f"/static/images/products/{base_filename}"
             except Exception:
                 pass
+        else:
+            # File path does not exist on disk (e.g. running on server or different machine)
+            base_filename = os.path.basename(local_sys_path).strip('\'"')
+            cleaned = base_filename
+
+    if '/static/' in cleaned.lower():
+        idx = cleaned.lower().rfind('/static/')
+        rel_static = cleaned[idx:]
+        return '/' + rel_static.lstrip('/')
 
     # 3. Handle relative path prefixes
     clean_no_slash = cleaned.lstrip('/')
@@ -599,7 +618,9 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
 
     # Map headers to standard field keys
     def normalize_header(h):
-        return re.sub(r'[^a-z0-9]', '', str(h).lower())
+        # Strip text inside parentheses: "Product Photos (Multiple allowed...)" -> "Product Photos"
+        clean = re.sub(r'\(.*?\)', '', str(h))
+        return re.sub(r'[^a-z0-9]', '', clean.lower())
 
     header_map = {}
     field_patterns = {
@@ -613,24 +634,40 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
         'specifications': ('specifications', 'specs', 'specification', 'technicalspecifications', 'techspecs'),
         'repeat_sizes': ('repeatsizes', 'repeatsize', 'repeat', 'repeats'),
         'material': ('materialgrade', 'material', 'composition', 'metal'),
-        'is_featured': ('featured', 'isfeatured', 'highlight'),
-        'is_active': ('active', 'isactive', 'status', 'livestatus', 'enabled'),
+        'is_featured': ('featured', 'isfeatured', 'highlight', 'featuredyesno'),
+        'is_active': ('active', 'isactive', 'status', 'livestatus', 'enabled', 'activeyesno'),
         'image_url': (
             'imagepresetorurl', 'imageurl', 'image', 'photo', 'preset', 'photourl',
             'imagepath', 'imagespath', 'images', 'imagefile', 'imagefilename',
             'imgpath', 'imgurl', 'img', 'picture', 'picturepath', 'pic',
             'filepath', 'path', 'productimage', 'productphoto', 'itemimage',
             'productimagepath', 'productimg', 'productphotos', 'photos',
-            'gallery', 'galleryimages', 'multipleimages', 'pictures'
+            'gallery', 'galleryimages', 'multipleimages', 'pictures',
+            'productphotosmultipleallowedegphoto1jpgphoto2jpg'
         )
     }
 
+    # Pass 1: Exact matches using both stripped and raw normalized headers
     for idx, raw_h in enumerate(header_row):
         norm = normalize_header(raw_h)
+        raw_norm = re.sub(r'[^a-z0-9]', '', str(raw_h).lower())
         for field, patterns in field_patterns.items():
-            if norm in patterns and field not in header_map:
-                header_map[field] = idx
-                break
+            if field not in header_map:
+                if norm in patterns or raw_norm in patterns:
+                    header_map[field] = idx
+                    break
+
+    # Pass 2: Fallback substring / partial matches for remaining unmapped fields
+    for idx, raw_h in enumerate(header_row):
+        if idx in header_map.values():
+            continue
+        norm = normalize_header(raw_h)
+        raw_norm = re.sub(r'[^a-z0-9]', '', str(raw_h).lower())
+        for field, patterns in field_patterns.items():
+            if field not in header_map:
+                if any(p in norm for p in patterns if len(p) >= 4) or any(p in raw_norm for p in patterns if len(p) >= 4):
+                    header_map[field] = idx
+                    break
 
     # Check minimum required mappings
     if 'name' not in header_map or 'part_number' not in header_map:
@@ -766,9 +803,16 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
         # 6. Multi-Photo & Image URL Resolution (Device Uploads & Sheet Tokens)
         raw_img_val = get_val('image_url')
         explicit_imgs = []
+        tokens = []
         if raw_img_val:
-            # Support multiple comma/semicolon/pipe/newline separated images in the cell
-            tokens = [t.strip() for t in re.split(r'[,;|\n]+', raw_img_val) if t.strip()]
+            # Parse tokens respecting quotes
+            try:
+                reader = csv.reader(io.StringIO(raw_img_val), skipinitialspace=True)
+                for parsed_row in reader:
+                    tokens.extend([t.strip().strip('\'"') for t in parsed_row if t.strip()])
+            except Exception:
+                tokens = [t.strip().strip('\'"') for t in re.split(r'[,;|\n]+', raw_img_val) if t.strip()]
+
             for t in tokens:
                 resolved = resolve_product_image_path(t, app_root=app_root)
                 if resolved and resolved not in explicit_imgs:
@@ -779,29 +823,46 @@ def import_products_from_file(file_storage, update_existing=True, app_root=None,
         if uploaded_images:
             norm_part = re.sub(r'[^a-z0-9]', '', part_number.lower())
             norm_slug = re.sub(r'[^a-z0-9]', '', slugify(name).lower())
+            seen_matched_bases = set()
             
             for up_fname in uploaded_images:
                 base_no_ext = os.path.splitext(up_fname)[0]
                 norm_up = re.sub(r'[^a-z0-9]', '', base_no_ext.lower())
                 
-                # Check part number match or prefix match (e.g. part, part_1, part_side)
+                # Check part number match, slug match, word overlap, or explicit sheet mention
                 is_match = False
-                if norm_part and (norm_up == norm_part or norm_up.startswith(norm_part)):
+                if norm_part and (norm_up == norm_part or norm_up.startswith(norm_part) or norm_part.startswith(norm_up) or norm_part.endswith(norm_up) or norm_up in norm_part):
                     is_match = True
-                elif norm_slug and (norm_up == norm_slug or norm_up.startswith(norm_slug)):
+                elif norm_slug and (norm_up == norm_slug or norm_up.startswith(norm_slug) or norm_slug.startswith(norm_up) or norm_slug.rstrip('s') == norm_up.rstrip('s')):
                     is_match = True
                 elif raw_img_val:
-                    for t in re.split(r'[,;|\n]+', raw_img_val):
-                        t_clean = t.strip()
+                    for t in (tokens if tokens else re.split(r'[,;|\n]+', raw_img_val)):
+                        t_clean = t.strip().strip('\'"')
                         if not t_clean:
                             continue
                         t_base = os.path.splitext(os.path.basename(t_clean))[0]
                         norm_t = re.sub(r'[^a-z0-9]', '', t_base.lower())
-                        if (norm_up and norm_t and norm_up == norm_t) or (base_no_ext.lower() == t_base.lower()):
+                        if (norm_up and norm_t and (norm_up == norm_t or norm_up.startswith(norm_t) or norm_t.startswith(norm_up))) or (base_no_ext.lower() == t_base.lower()):
                             is_match = True
                             break
 
-                if is_match:
+                # Word token & root intersection for smart device image matching
+                if not is_match:
+                    up_words = [w.rstrip('s') for w in re.split(r'[^a-z0-9]+', base_no_ext.lower()) if len(w) >= 3]
+                    target_words = [w.rstrip('s') for w in re.split(r'[^a-z0-9]+', f"{part_number} {name}".lower()) if len(w) >= 3]
+                    for uw in up_words:
+                        for tw in target_words:
+                            if uw == tw or (len(uw) >= 4 and len(tw) >= 4 and (uw.startswith(tw) or tw.startswith(uw))):
+                                is_match = True
+                                break
+                            if len(uw) >= 6 and len(tw) >= 6 and sum(1 for a, b in zip(uw, tw) if a == b) >= min(len(uw), len(tw)) - 2:
+                                is_match = True
+                                break
+                        if is_match:
+                            break
+
+                if is_match and norm_up not in seen_matched_bases:
+                    seen_matched_bases.add(norm_up)
                     rel_url = f"/static/images/products/{up_fname}"
                     if rel_url not in matched_device_imgs:
                         matched_device_imgs.append(rel_url)

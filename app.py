@@ -1793,15 +1793,21 @@ def admin_import_products():
                         with zipfile.ZipFile(img_f) as zf:
                             for member in zf.namelist():
                                 base_m = os.path.basename(member)
-                                if base_m and base_m.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg')):
+                                if base_m and base_m.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.jfif', '.avif', '.bmp')):
                                     dest = os.path.join(target_img_dir, base_m)
                                     with zf.open(member) as src_f, open(dest, 'wb') as dst_f:
                                         shutil.copyfileobj(src_f, dst_f)
+                                    docs_img_dir = os.path.join(app.root_path, 'docs', 'static', 'images', 'products')
+                                    if os.path.exists(docs_img_dir):
+                                        try:
+                                            shutil.copy2(dest, os.path.join(docs_img_dir, base_m))
+                                        except Exception:
+                                            pass
                                     uploaded_images_count += 1
                                     uploaded_image_names.append(base_m)
                     except Exception as zip_e:
                         flash(f"Notice while extracting images ZIP: {zip_e}", 'warning')
-                elif allowed_file(orig_fname):
+                elif allowed_file(orig_fname) or allowed_file(os.path.basename(orig_fname)):
                     raw_base = os.path.basename(orig_fname).strip()
                     safe_base = secure_filename(orig_fname) or raw_base
                     dest_safe = os.path.join(target_img_dir, safe_base)

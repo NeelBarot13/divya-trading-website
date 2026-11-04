@@ -52,7 +52,7 @@ class Config:
     # Upload settings
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
     MAX_CONTENT_LENGTH = 32 * 1024 * 1024  # 32 MB max upload
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'pdf', 'doc', 'docx', 'zip'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'jfif', 'avif', 'bmp', 'tiff', 'pdf', 'doc', 'docx', 'zip'}
     
     # SMTP / Email Configuration
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
